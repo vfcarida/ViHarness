@@ -53,12 +53,14 @@ export class McpClientAdapter {
       params: {
         protocolVersion: '2024-11-05',
         capabilities: { roots: { listChanged: false } },
-        clientInfo: { name: 'vi-harness-mcp-client', version: '0.4.0' },
+        clientInfo: { name: 'vi-harness-mcp-client', version: '0.1.0' },
       },
     });
 
     if (initResponse.error) {
-      throw new Error(`MCP initialization failed for [${this.serverName}]: ${initResponse.error.message}`);
+      throw new Error(
+        `MCP initialization failed for [${this.serverName}]: ${initResponse.error.message}`,
+      );
     }
 
     // 2. Query available tools
@@ -69,10 +71,13 @@ export class McpClientAdapter {
     });
 
     if (listResponse.error) {
-      throw new Error(`Failed to list tools from MCP server [${this.serverName}]: ${listResponse.error.message}`);
+      throw new Error(
+        `Failed to list tools from MCP server [${this.serverName}]: ${listResponse.error.message}`,
+      );
     }
 
-    const mcpTools = ((listResponse.result as { tools?: McpToolDefinition[] })?.tools ?? []) as McpToolDefinition[];
+    const mcpTools = ((listResponse.result as { tools?: McpToolDefinition[] })?.tools ??
+      []) as McpToolDefinition[];
     const registeredNames: string[] = [];
 
     for (const mcpTool of mcpTools) {

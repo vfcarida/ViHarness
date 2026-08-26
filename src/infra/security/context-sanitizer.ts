@@ -15,11 +15,27 @@ const PROMPT_INJECTION_PATTERNS: ReadonlyArray<{ pattern: RegExp; replacement: s
   { pattern: /<<\/?SYS>>/gi, replacement: '[SANITIZED_SYS_TAG]' },
   { pattern: /<\/?system>/gi, replacement: '[SANITIZED_SYSTEM_TAG]' },
   { pattern: /<\|endoftext\|>/gi, replacement: '[SANITIZED_SPECIAL_TOKEN]' },
-  { pattern: /ignore\s+(?:all\s+)?(?:previous|prior)\s+(?:instructions|directives|prompts)/gi, replacement: '[SANITIZED_PROMPT_INJECTION]' },
-  { pattern: /disregard\s+(?:all\s+)?(?:previous|prior)\s+(?:instructions|directives|prompts)/gi, replacement: '[SANITIZED_PROMPT_INJECTION]' },
-  { pattern: /you\s+are\s+now\s+(?:in\s+)?(?:dan|developer|unrestricted)\s+mode/gi, replacement: '[SANITIZED_JAILBREAK_ATTEMPT]' },
-  { pattern: /(?:override|bypass)\s+(?:all\s+)?(?:safety|security|policy)\s+(?:rules|filters|checks)/gi, replacement: '[SANITIZED_POLICY_BYPASS_ATTEMPT]' },
-  { pattern: /<!--\s*SYSTEM\s*:\s*[\s\S]*?-->/gi, replacement: '[SANITIZED_HTML_COMMENT_DIRECTIVE]' },
+  {
+    pattern: /ignore\s+(?:all\s+)?(?:previous|prior)\s+(?:instructions|directives|prompts)/gi,
+    replacement: '[SANITIZED_PROMPT_INJECTION]',
+  },
+  {
+    pattern: /disregard\s+(?:all\s+)?(?:previous|prior)\s+(?:instructions|directives|prompts)/gi,
+    replacement: '[SANITIZED_PROMPT_INJECTION]',
+  },
+  {
+    pattern: /you\s+are\s+now\s+(?:in\s+)?(?:dan|developer|unrestricted)\s+mode/gi,
+    replacement: '[SANITIZED_JAILBREAK_ATTEMPT]',
+  },
+  {
+    pattern:
+      /(?:override|bypass)\s+(?:all\s+)?(?:safety|security|policy)\s+(?:rules|filters|checks)/gi,
+    replacement: '[SANITIZED_POLICY_BYPASS_ATTEMPT]',
+  },
+  {
+    pattern: /<!--\s*SYSTEM\s*:\s*[\s\S]*?-->/gi,
+    replacement: '[SANITIZED_HTML_COMMENT_DIRECTIVE]',
+  },
 ];
 
 export class ContextSanitizer {

@@ -43,7 +43,7 @@ describe('Dual Model Routing Suite (Architect / Editor Mode)', () => {
         supportsSystemPrompt: true,
       },
       costPer1kInputTokensDollars: 0.015,
-      costPer1kOutputTokensDollars: 0.060, // $60/1M output tokens
+      costPer1kOutputTokensDollars: 0.06, // $60/1M output tokens
     },
   });
 
@@ -66,7 +66,7 @@ describe('Dual Model Routing Suite (Architect / Editor Mode)', () => {
         supportsSystemPrompt: true,
       },
       costPer1kInputTokensDollars: 0.00015,
-      costPer1kOutputTokensDollars: 0.00060, // $0.60/1M output tokens (100x cheaper)
+      costPer1kOutputTokensDollars: 0.0006, // $0.60/1M output tokens (100x cheaper)
     },
   });
 
@@ -184,7 +184,11 @@ describe('Dual Model Routing Suite (Architect / Editor Mode)', () => {
           providerId: 'backup-generalist',
           version: '1.0.0',
           capabilities: {
-            capabilities: new Set([ModelCapability.REASONING, ModelCapability.CODING, ModelCapability.TOOL_USE]),
+            capabilities: new Set([
+              ModelCapability.REASONING,
+              ModelCapability.CODING,
+              ModelCapability.TOOL_USE,
+            ]),
             maxContextTokens: 200000,
             maxOutputTokens: 8192,
             supportsSystemPrompt: true,

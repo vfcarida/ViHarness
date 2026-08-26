@@ -12,11 +12,7 @@ import {
   WriteFileTool,
 } from '../../../src/infra/index.js';
 import { DefaultAgentRuntime, ActionPlanner } from '../../../src/runtime/index.js';
-import {
-  GoalStatus,
-  ActionResultStatus,
-  PolicyDecisionType,
-} from '../../../src/core/index.js';
+import { GoalStatus, ActionResultStatus, PolicyDecisionType } from '../../../src/core/index.js';
 import type { Goal } from '../../../src/core/index.js';
 
 describe('Runtime Correctness & Hardening Suite', () => {
@@ -82,7 +78,9 @@ describe('Runtime Correctness & Hardening Suite', () => {
   it('2. Policy Enforcement: Policy Engine MUST execute and reject forbidden actions before execution', async () => {
     const mockProvider = new MockModelProvider({
       providerId: 'primary-mock',
-      defaultToolCalls: [{ id: 'tc-1', name: 'write_file', input: { path: '/etc/shadow', content: 'hack' } }],
+      defaultToolCalls: [
+        { id: 'tc-1', name: 'write_file', input: { path: '/etc/shadow', content: 'hack' } },
+      ],
       simulatedLatencyMs: 0,
     });
 

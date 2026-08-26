@@ -10,11 +10,7 @@ import {
 } from '../../../src/infra/index.js';
 import { DefaultAgentRuntime } from '../../../src/runtime/default-agent-runtime.js';
 import { DefaultVerificationEngine } from '../../../src/infra/verification/default-verification-engine.js';
-import {
-  AgentPhase,
-  GoalStatus,
-  AgentEventType,
-} from '../../../src/core/index.js';
+import { AgentPhase, GoalStatus, AgentEventType } from '../../../src/core/index.js';
 import type {
   Goal,
   AgentEvent,

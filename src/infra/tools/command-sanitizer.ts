@@ -11,27 +11,42 @@
 const FORBIDDEN_DESTRUCTIVE_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }> = [
   { pattern: /\bsudo\b/i, description: 'Privilege escalation with sudo' },
   { pattern: /\bsu\s+/i, description: 'Switch user command' },
-  { pattern: /\brm\s+-(?:rf?|fr?)\s+[/~*]/i, description: 'Destructive recursive root/home deletion' },
+  {
+    pattern: /\brm\s+-(?:rf?|fr?)\s+[/~*]/i,
+    description: 'Destructive recursive root/home deletion',
+  },
   { pattern: /\bmkfs\b/i, description: 'Filesystem formatting' },
   { pattern: /\bdd\s+if=/i, description: 'Direct disk write with dd' },
   { pattern: /\bfdisk\b/i, description: 'Disk partitioning' },
   { pattern: /\bparted\b/i, description: 'Disk partitioning' },
-  { pattern: /\bchmod\s+(?:777|a\+rwx|-R\s+777)\b/i, description: 'Dangerous permissive permission change' },
+  {
+    pattern: /\bchmod\s+(?:777|a\+rwx|-R\s+777)\b/i,
+    description: 'Dangerous permissive permission change',
+  },
   { pattern: /\|\s*(?:sh|bash|zsh|dash)\b/i, description: 'Pipe to shell interpreter' },
   { pattern: />\s*\/dev\/(?:sd[a-z]|hd[a-z]|nvme)/i, description: 'Raw block device redirection' },
-  { pattern: /\b(?:eval|child_process|powershell\s+-(?:enc|encodedcommand)|cmd\.exe\s+\/c)\b/i, description: 'Child process execution or obfuscated eval shell execution' },
+  {
+    pattern: /\b(?:eval|child_process|powershell\s+-(?:enc|encodedcommand)|cmd\.exe\s+\/c)\b/i,
+    description: 'Child process execution or obfuscated eval shell execution',
+  },
 ];
 
 const ENV_EXFILTRATION_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }> = [
   { pattern: /^(?:printenv|env)\b/i, description: 'Environment variable dump (printenv/env)' },
-  { pattern: /(?:\b(?:export\s+-p|set\b)|Get-ChildItem\s+env:|dir\s+env:)/i, description: 'Environment listing command' },
+  {
+    pattern: /(?:\b(?:export\s+-p|set\b)|Get-ChildItem\s+env:|dir\s+env:)/i,
+    description: 'Environment listing command',
+  },
 ];
 
 const NETWORK_EXFILTRATION_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }> = [
   { pattern: /\b(?:curl|wget)\b/i, description: 'Outbound HTTP download/exfiltration tool' },
   { pattern: /\b(?:nc|netcat|ncat|socat)\b/i, description: 'Raw TCP socket / reverse shell tool' },
   { pattern: /\b(?:ssh|scp|sftp|ftp|telnet)\b/i, description: 'Remote shell / transfer protocol' },
-  { pattern: /\b(?:Invoke-WebRequest|Invoke-RestMethod)\b/i, description: 'PowerShell outbound HTTP call' },
+  {
+    pattern: /\b(?:Invoke-WebRequest|Invoke-RestMethod)\b/i,
+    description: 'PowerShell outbound HTTP call',
+  },
 ];
 
 const COMMAND_CHAINING_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }> = [
@@ -54,7 +69,12 @@ export interface CommandSanitizationResult {
   readonly allowed: boolean;
   readonly normalizedCommand: string;
   readonly reason?: string;
-  readonly errorCode?: 'SHELL_INJECTION' | 'FORBIDDEN_COMMAND' | 'ENV_EXFILTRATION' | 'NETWORK_EXFILTRATION' | 'EMPTY_COMMAND';
+  readonly errorCode?:
+    | 'SHELL_INJECTION'
+    | 'FORBIDDEN_COMMAND'
+    | 'ENV_EXFILTRATION'
+    | 'NETWORK_EXFILTRATION'
+    | 'EMPTY_COMMAND';
 }
 
 export class CommandSanitizer {

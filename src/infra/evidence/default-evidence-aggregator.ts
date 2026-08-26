@@ -36,7 +36,10 @@ export class DefaultEvidenceAggregator implements EvidenceAggregator {
 
     for (const current of currentEvidence) {
       if (current.checkId && baselineMap.has(current.checkId)) {
-        if (current.outcome === EvidenceOutcome.FAIL || current.outcome === EvidenceOutcome.REGRESSION) {
+        if (
+          current.outcome === EvidenceOutcome.FAIL ||
+          current.outcome === EvidenceOutcome.REGRESSION
+        ) {
           regressions.push({
             ...current,
             outcome: EvidenceOutcome.REGRESSION,
@@ -103,7 +106,9 @@ export class DefaultEvidenceAggregator implements EvidenceAggregator {
 
     // 4. Regression check
     if (policy.zeroRegressionsRequired && regressionsDetected.length > 0) {
-      missingRequirements.push(`Zero regressions required, but ${regressionsDetected.length} regression(s) detected.`);
+      missingRequirements.push(
+        `Zero regressions required, but ${regressionsDetected.length} regression(s) detected.`,
+      );
     }
 
     const satisfied = missingRequirements.length === 0 && regressionsDetected.length === 0;

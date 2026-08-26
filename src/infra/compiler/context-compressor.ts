@@ -103,24 +103,25 @@ export class ContextCompressor {
 
     // Compaction Thresholds (Pressure vs Overflow)
     const snipThreshold = isOverflow
-      ? (options?.aggressiveThreshold ?? 0.20)
+      ? (options?.aggressiveThreshold ?? 0.2)
       : isSmallWindow
-        ? 0.40
+        ? 0.4
         : 0.75;
     const microCompactThreshold = isOverflow
-      ? (options?.aggressiveThreshold ? options.aggressiveThreshold + 0.10 : 0.30)
+      ? options?.aggressiveThreshold
+        ? options.aggressiveThreshold + 0.1
+        : 0.3
       : isSmallWindow
-        ? 0.50
-        : 0.80;
+        ? 0.5
+        : 0.8;
     const collapseThreshold = isOverflow
-      ? (options?.collapseThreshold ?? 0.40)
+      ? (options?.collapseThreshold ?? 0.4)
       : isSmallWindow
-        ? 0.60
+        ? 0.6
         : (options?.collapseThreshold ?? 0.85);
 
     // Tool Result Cap
-    const maxToolResultTokens =
-      options?.maxToolResultTokens ?? (isOverflow ? 4000 : 8000);
+    const maxToolResultTokens = options?.maxToolResultTokens ?? (isOverflow ? 4000 : 8000);
     const pruner = options?.pruner ?? new DefaultToolResultPruner(maxToolResultTokens * 4);
     const collapseStore = options?.collapseStore ?? new InMemoryCollapseStore();
 
@@ -165,9 +166,9 @@ export class ContextCompressor {
       // ---------------------------------------------------------------------
       const isCachedPrefix =
         (options?.cachedPrefixIds
-          ? (options.cachedPrefixIds instanceof Set
-              ? options.cachedPrefixIds.has(obj.id)
-              : (options.cachedPrefixIds as ReadonlyArray<string>).includes(obj.id))
+          ? options.cachedPrefixIds instanceof Set
+            ? options.cachedPrefixIds.has(obj.id)
+            : (options.cachedPrefixIds as ReadonlyArray<string>).includes(obj.id)
           : false) ||
         obj.tags.includes('cached_prefix') ||
         obj.metadata?.['isCachedPrefix'] === true;
@@ -181,7 +182,8 @@ export class ContextCompressor {
           action: 'RETAINED',
           score: scored.score,
           tokenCost: obj.costTokens,
-          reason: 'Cache-Aware Compaction: Preserved unmodified in provider prompt cache prefix to avoid KV cache invalidation',
+          reason:
+            'Cache-Aware Compaction: Preserved unmodified in provider prompt cache prefix to avoid KV cache invalidation',
           mustPreserve: false,
         });
         continue;
@@ -220,11 +222,15 @@ export class ContextCompressor {
       // ---------------------------------------------------------------------
       // STAGE 0.5: TOOL-RESULT PRUNING (Deterministic head/middle/tail pruning)
       // ---------------------------------------------------------------------
-      if (isToolOutput && pruner.measureContent([{ type: 'text', text: obj.content }]) > maxToolResultTokens * 2) {
-        const { text: prunedText, pruned, charsRemoved } = (pruner as DefaultToolResultPruner).pruneText(
-          obj.content,
-          maxToolResultTokens * 2,
-        );
+      if (
+        isToolOutput &&
+        pruner.measureContent([{ type: 'text', text: obj.content }]) > maxToolResultTokens * 2
+      ) {
+        const {
+          text: prunedText,
+          pruned,
+          charsRemoved,
+        } = (pruner as DefaultToolResultPruner).pruneText(obj.content, maxToolResultTokens * 2);
         if (pruned) {
           const newTokens = Math.ceil(prunedText.length / 4);
           obj = {

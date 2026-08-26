@@ -97,7 +97,7 @@ describe('Frozen Memory Snapshot (Hermes Pattern) — P007', () => {
       content: 'OAuth tokens must use RS256 signing algorithm.',
       source: 'security_spec',
       confidence: 0.95,
-      importance: 0.90,
+      importance: 0.9,
       scope: MemoryScope.REPOSITORY,
       status: MemoryStatus.ACTIVE,
       tags: ['auth', 'jwt', 'security'],
@@ -150,8 +150,14 @@ describe('Frozen Memory Snapshot (Hermes Pattern) — P007', () => {
       frozenMemoryObjects: frozenObjects,
     });
 
-    expect(iter1Result.compiledContext.entries.some((e) => e.content.includes('Bearer token'))).toBe(true);
-    expect(iter1Result.compiledContext.entries.some((e) => e.content.includes('Dynamic Runtime Addition'))).toBe(false);
+    expect(
+      iter1Result.compiledContext.entries.some((e) => e.content.includes('Bearer token')),
+    ).toBe(true);
+    expect(
+      iter1Result.compiledContext.entries.some((e) =>
+        e.content.includes('Dynamic Runtime Addition'),
+      ),
+    ).toBe(false);
 
     // Mid-execution: Agent creates a new memory during iteration 1
     await memoryStore.createRecord({
@@ -175,8 +181,14 @@ describe('Frozen Memory Snapshot (Hermes Pattern) — P007', () => {
     });
 
     // Iteration 2 MUST NOT contain the new memory added mid-execution
-    expect(iter2Result.compiledContext.entries.some((e) => e.content.includes('Bearer token'))).toBe(true);
-    expect(iter2Result.compiledContext.entries.some((e) => e.content.includes('Dynamic Runtime Addition'))).toBe(false);
+    expect(
+      iter2Result.compiledContext.entries.some((e) => e.content.includes('Bearer token')),
+    ).toBe(true);
+    expect(
+      iter2Result.compiledContext.entries.some((e) =>
+        e.content.includes('Dynamic Runtime Addition'),
+      ),
+    ).toBe(false);
 
     // Next execution start: fresh capture reflects the newly created memory
     const nextExecutionSnapshot = await snapshotManager.capture({
@@ -184,7 +196,9 @@ describe('Frozen Memory Snapshot (Hermes Pattern) — P007', () => {
       goalDescription: sampleGoal.description,
     });
 
-    expect(nextExecutionSnapshot.some((e) => e.content.includes('Dynamic Runtime Addition'))).toBe(true);
+    expect(nextExecutionSnapshot.some((e) => e.content.includes('Dynamic Runtime Addition'))).toBe(
+      true,
+    );
   });
 
   it('3. should ensure static prompt prefix is perfectly invariant across iterations for cache hit', async () => {

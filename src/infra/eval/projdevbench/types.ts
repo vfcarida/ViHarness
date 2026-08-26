@@ -102,7 +102,12 @@ export interface ProjDevBenchmarkReport {
 export const PROJDEVBENCH_KNOWN_LEADERBOARD: ReadonlyArray<LeaderboardEntry> = [
   { agent: 'OpenAI Codex', score: 77.85, referenceModel: 'code-davinci-002', isBaseline: true },
   { agent: 'Cursor', score: 75.32, referenceModel: 'claude-3-5-sonnet', isBaseline: true },
-  { agent: 'Claude Code', score: 73.10, referenceModel: 'claude-3-7-sonnet', isBaseline: true },
+  { agent: 'Claude Code', score: 73.1, referenceModel: 'claude-3-7-sonnet', isBaseline: true },
   { agent: 'Gemini CLI', score: 68.45, referenceModel: 'gemini-1.5-pro', isBaseline: true },
-  { agent: 'Aider (Architect)', score: 67.20, referenceModel: 'claude-3-5-sonnet', isBaseline: true },
+  {
+    agent: 'Aider (Architect)',
+    score: 67.2,
+    referenceModel: 'claude-3-5-sonnet',
+    isBaseline: true,
+  },
 ];

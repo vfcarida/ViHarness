@@ -9,10 +9,7 @@ export {
 
 export * from './spill/index.js';
 
-export {
-  type ToolRunContext,
-  DefaultToolRunContext,
-} from './deferred-context.js';
+export { type ToolRunContext, DefaultToolRunContext } from './deferred-context.js';
 
 export {
   type ParameterField,

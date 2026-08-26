@@ -41,13 +41,29 @@ export {
 } from './model/provider-resilience.js';
 export type { ResilientExecutionOptions } from './model/provider-resilience.js';
 export { ScriptedModelProvider } from './model/scripted-model-provider.js';
-export type { ScriptedStep, ScriptStepHandler, ScriptedModelProviderOptions } from './model/scripted-model-provider.js';
+export type {
+  ScriptedStep,
+  ScriptStepHandler,
+  ScriptedModelProviderOptions,
+} from './model/scripted-model-provider.js';
 export { ProviderMessageAdapter } from './model/provider-message-adapter.js';
-export type { AnthropicMessage, AnthropicPayload, AnthropicToolUseBlock, AnthropicToolResultBlock } from './model/provider-message-adapter.js';
+export type {
+  AnthropicMessage,
+  AnthropicPayload,
+  AnthropicToolUseBlock,
+  AnthropicToolResultBlock,
+} from './model/provider-message-adapter.js';
 export { SimulatedFaultModelProvider } from './model/simulated-fault-model-provider.js';
-export type { SimulatedFaultType, SimulatedFaultProviderOptions } from './model/simulated-fault-model-provider.js';
+export type {
+  SimulatedFaultType,
+  SimulatedFaultProviderOptions,
+} from './model/simulated-fault-model-provider.js';
 export { StructuredOutputValidator } from './model/structured-output-validator.js';
-export type { StructuredValidationResult, StructuredValidationSuccess, StructuredValidationFailure } from './model/structured-output-validator.js';
+export type {
+  StructuredValidationResult,
+  StructuredValidationSuccess,
+  StructuredValidationFailure,
+} from './model/structured-output-validator.js';
 export { CircuitBreaker } from './model/circuit-breaker.js';
 export type { CircuitBreakerOptions, CircuitState } from './model/circuit-breaker.js';
 
@@ -79,9 +95,15 @@ export { SourceCodeIndexer } from './syntax/source-code-indexer.js';
 export { ContextDeduplicator } from './compiler/context-deduplicator.js';
 export { ContextRanker } from './compiler/context-ranker.js';
 export { ContextCompressor } from './compiler/context-compressor.js';
-export type { MultiTierCompressorOptions, CompressionResult } from './compiler/context-compressor.js';
+export type {
+  MultiTierCompressorOptions,
+  CompressionResult,
+} from './compiler/context-compressor.js';
 export { ContextCollapser, InMemoryCollapseStore } from './compiler/context-collapse.js';
-export type { ApplyCollapseOptions, CollapseApplicationResult } from './compiler/context-collapse.js';
+export type {
+  ApplyCollapseOptions,
+  CollapseApplicationResult,
+} from './compiler/context-collapse.js';
 export { DefaultToolResultPruner } from './compiler/tool-result-pruner.js';
 export type { PruneOptions } from './compiler/tool-result-pruner.js';
 export { InMemoryCompactionLock } from './compiler/compaction-lock.js';
@@ -184,7 +206,10 @@ export { MarkdownReportGenerator } from './eval/markdown-report-generator.js';
 export { DefaultBenchmarkRunner } from './eval/default-benchmark-runner.js';
 export type { DefaultBenchmarkRunnerOptions } from './eval/default-benchmark-runner.js';
 export { DualModelCostEvaluator } from './eval/dual-model-cost-evaluator.js';
-export type { DualModelEvaluationReport, PhaseCostBreakdown } from './eval/dual-model-cost-evaluator.js';
+export type {
+  DualModelEvaluationReport,
+  PhaseCostBreakdown,
+} from './eval/dual-model-cost-evaluator.js';
 
 // Performance Optimization Subsystem
 export { PerformanceProfiler, TelemetryCategory } from './optimization/performance-profiler.js';
@@ -201,7 +226,11 @@ export { PiCompactionStrategy } from './eval/strategies/pi-compaction-strategy.j
 export type { PiCompactionOptions } from './eval/strategies/pi-compaction-strategy.js';
 export { ViContextCompilerStrategy } from './eval/strategies/vi-context-compiler-strategy.js';
 export type { ViContextCompilerOptions } from './eval/strategies/vi-context-compiler-strategy.js';
-export type { ContextBenchmarkStrategy, StrategyStepResult, RetentionEvaluationResult } from './eval/strategies/context-strategy.js';
+export type {
+  ContextBenchmarkStrategy,
+  StrategyStepResult,
+  RetentionEvaluationResult,
+} from './eval/strategies/context-strategy.js';
 
 // Pi Replacement Compatibility Layer Adapter
 export { ViHarness } from './adapter/vi-harness-adapter.js';
@@ -218,7 +247,10 @@ export type { TestSelectionRule } from './verification/impacted-test-selector.js
 export { TraceDistiller } from './telemetry/trace-distiller.js';
 export type { ToolPerformanceMetrics, CausalTraceAnalysis } from './telemetry/trace-distiller.js';
 export { HarnessDiagnosticEngine } from './telemetry/harness-diagnostic-engine.js';
-export type { HarnessRecommendation, HarnessDiagnosticReport } from './telemetry/harness-diagnostic-engine.js';
+export type {
+  HarnessRecommendation,
+  HarnessDiagnosticReport,
+} from './telemetry/harness-diagnostic-engine.js';
 
 // Dynamic Context Budget Balancer
 export { ContextBudgetBalancer } from './compiler/context-budget-balancer.js';
@@ -252,11 +284,17 @@ export type { DashboardState } from './tui/terminal-dashboard-renderer.js';
 
 // Trajectory Distillation (SFT & DPO)
 export { TrajectoryDatasetExporter } from './telemetry/trajectory-dataset-exporter.js';
-export type { SftTrainingExample, DpoTrainingExample } from './telemetry/trajectory-dataset-exporter.js';
+export type {
+  SftTrainingExample,
+  DpoTrainingExample,
+} from './telemetry/trajectory-dataset-exporter.js';
 
 // Frozen Memory Snapshot & Self-Improvement
 export { FrozenMemorySnapshot } from './memory/frozen-memory-snapshot.js';
-export type { FrozenMemorySnapshotOptions, CreateSnapshotParams } from './memory/frozen-memory-snapshot.js';
+export type {
+  FrozenMemorySnapshotOptions,
+  CreateSnapshotParams,
+} from './memory/frozen-memory-snapshot.js';
 export { SkillExtractor } from './memory/skill-extractor.js';
 export type { SkillExtractorOptions } from './memory/skill-extractor.js';
 export { SkillCurator } from './memory/skill-curator.js';
@@ -341,10 +379,7 @@ export { TerminalTool } from './tools/terminal-tool.js';
 export type { TerminalToolOptions } from './tools/terminal-tool.js';
 
 // MCP Transports & Transport Registry
-export {
-  StdioTransport,
-  HttpTransport,
-} from './mcp/transports/index.js';
+export { StdioTransport, HttpTransport } from './mcp/transports/index.js';
 export type {
   Transport,
   JsonRpcHandler,
@@ -356,10 +391,7 @@ export { TransportRegistry } from './mcp/transport-registry.js';
 export type { TransportFactory } from './mcp/transport-registry.js';
 
 // Agent Client Protocol (ACP) Automation Server
-export {
-  AcpServer,
-  AcpHandlers,
-} from './acp/index.js';
+export { AcpServer, AcpHandlers } from './acp/index.js';
 export type {
   AcpNewSessionParams,
   AcpNewSessionResult,
@@ -402,9 +434,4 @@ export type {
 } from './storage/index.js';
 
 // Profile System (DSH Reference)
-export {
-  ProfileLoader,
-  ProfileManager,
-  BUILTIN_PROFILES,
-  KNOWN_BUNDLES,
-} from './profile/index.js';
+export { ProfileLoader, ProfileManager, BUILTIN_PROFILES, KNOWN_BUNDLES } from './profile/index.js';

@@ -5,7 +5,12 @@
  * timeout enforcement, and cancellation.
  */
 import type { Tool } from './tool.js';
-import type { ToolCategory, ToolInput, ToolResult, ToolExecutionContext } from '../model/tool-types.js';
+import type {
+  ToolCategory,
+  ToolInput,
+  ToolResult,
+  ToolExecutionContext,
+} from '../model/tool-types.js';
 
 export interface ToolExecutionRequest {
   readonly toolName?: string;

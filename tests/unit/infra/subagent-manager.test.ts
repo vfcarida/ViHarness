@@ -9,9 +9,7 @@ import {
   UuidV7IdFactory,
   TestClock,
 } from '../../../src/infra/index.js';
-import {
-  SubagentRole,
-} from '../../../src/core/index.js';
+import { SubagentRole } from '../../../src/core/index.js';
 import type { SubagentSpec } from '../../../src/core/index.js';
 
 describe('Subagent Manager', () => {

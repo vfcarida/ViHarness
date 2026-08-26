@@ -20,13 +20,23 @@ describe('Cost, Budget & Adaptive Optimization Unit Suite', () => {
       expect(estimateGpt4o.hasPricing).toBe(true);
       expect(estimateGpt4o.estimatedCostUSD).toBeGreaterThan(0);
 
-      const estimateSonnet = costTracker.calculateCost('anthropic', 'claude-3-5-sonnet', 2000, 1000);
+      const estimateSonnet = costTracker.calculateCost(
+        'anthropic',
+        'claude-3-5-sonnet',
+        2000,
+        1000,
+      );
       expect(estimateSonnet.hasPricing).toBe(true);
       expect(estimateSonnet.estimatedCostUSD).toBeGreaterThan(0);
     });
 
     it('2. Gracefully handles unregistered models by returning 0.0 with hasPricing: false', () => {
-      const estimateUnknown = costTracker.calculateCost('custom', 'unregistered-model-xyz', 5000, 2000);
+      const estimateUnknown = costTracker.calculateCost(
+        'custom',
+        'unregistered-model-xyz',
+        5000,
+        2000,
+      );
       expect(estimateUnknown.hasPricing).toBe(false);
       expect(estimateUnknown.estimatedCostUSD).toBe(0.0);
     });
@@ -37,7 +47,12 @@ describe('Cost, Budget & Adaptive Optimization Unit Suite', () => {
         completionPricePerMillion: 2.0,
       });
 
-      const estimate = costTracker.calculateCost('custom', 'custom-cheap-llm', 1_000_000, 1_000_000);
+      const estimate = costTracker.calculateCost(
+        'custom',
+        'custom-cheap-llm',
+        1_000_000,
+        1_000_000,
+      );
       expect(estimate.hasPricing).toBe(true);
       expect(estimate.estimatedCostUSD).toBeCloseTo(3.0, 4);
     });
@@ -49,7 +64,7 @@ describe('Cost, Budget & Adaptive Optimization Unit Suite', () => {
 
       expect(costTracker.getTotalCost(taskId1)).toBeCloseTo(0.08, 4);
       expect(costTracker.getTotalCost(taskId2)).toBeCloseTo(0.12, 4);
-      expect(costTracker.getTotalCost()).toBeCloseTo(0.20, 4);
+      expect(costTracker.getTotalCost()).toBeCloseTo(0.2, 4);
     });
   });
 
@@ -64,18 +79,18 @@ describe('Cost, Budget & Adaptive Optimization Unit Suite', () => {
           'gpt-4o': 1.0,
         },
       });
-      budgetTracker.setTaskBudget(taskId, 0.50); // $0.50 task budget
+      budgetTracker.setTaskBudget(taskId, 0.5); // $0.50 task budget
     });
 
     it('5. Allows execution below warning threshold', () => {
-      const check = budgetTracker.checkBudget(taskId, 'gpt-4o', 0.20);
+      const check = budgetTracker.checkBudget(taskId, 'gpt-4o', 0.2);
       expect(check.allowed).toBe(true);
       expect(check.warning).toBe(false);
     });
 
     it('6. Dispatches warning when projected cost reaches warningThreshold (80%)', () => {
       // 0.40 / 0.50 = 80%
-      const check = budgetTracker.checkBudget(taskId, 'gpt-4o', 0.40);
+      const check = budgetTracker.checkBudget(taskId, 'gpt-4o', 0.4);
       expect(check.allowed).toBe(true);
       expect(check.warning).toBe(true);
       expect(check.warningMessage).toContain('80%');
@@ -86,7 +101,7 @@ describe('Cost, Budget & Adaptive Optimization Unit Suite', () => {
       budgetTracker.recordUsage(taskId, 'gpt-4o', 0.35);
 
       // Next call would add 0.20 -> projected 0.55 > 0.50
-      const check = budgetTracker.checkBudget(taskId, 'gpt-4o', 0.20);
+      const check = budgetTracker.checkBudget(taskId, 'gpt-4o', 0.2);
       expect(check.allowed).toBe(false);
       expect(check.errorMessage).toContain('Task budget limit');
     });
@@ -96,7 +111,7 @@ describe('Cost, Budget & Adaptive Optimization Unit Suite', () => {
       budgetTracker.setTaskBudget(task2, 10.0); // high task budget
 
       // Model limit for gpt-4o is $1.00
-      budgetTracker.recordUsage(task2, 'gpt-4o', 0.90);
+      budgetTracker.recordUsage(task2, 'gpt-4o', 0.9);
       const check = budgetTracker.checkBudget(task2, 'gpt-4o', 0.15); // 0.90 + 0.15 = 1.05 > 1.00
       expect(check.allowed).toBe(false);
       expect(check.errorMessage).toContain('Model [gpt-4o] budget limit');
@@ -109,10 +124,17 @@ describe('Cost, Budget & Adaptive Optimization Unit Suite', () => {
       expect(smallBug.maxTokens).toBe(4000);
       expect(smallBug.softLimitTokens).toBe(3200);
 
-      const refactor = AdaptiveContextBudget.computeBudget(BaselineScenarioCategory.MULTI_FILE_REFACTOR, 1);
+      const refactor = AdaptiveContextBudget.computeBudget(
+        BaselineScenarioCategory.MULTI_FILE_REFACTOR,
+        1,
+      );
       expect(refactor.maxTokens).toBe(16000);
 
-      const boundedSmallModel = AdaptiveContextBudget.computeBudget(BaselineScenarioCategory.MULTI_FILE_REFACTOR, 1, 8000);
+      const boundedSmallModel = AdaptiveContextBudget.computeBudget(
+        BaselineScenarioCategory.MULTI_FILE_REFACTOR,
+        1,
+        8000,
+      );
       expect(boundedSmallModel.maxTokens).toBe(8000);
     });
   });

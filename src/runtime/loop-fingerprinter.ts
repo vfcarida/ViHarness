@@ -27,7 +27,8 @@ export interface LoopAnomalyDetection {
 }
 
 export class LoopFingerprinter {
-  private readonly history: Array<{ readonly fingerprint: string; readonly iteration: number }> = [];
+  private readonly history: Array<{ readonly fingerprint: string; readonly iteration: number }> =
+    [];
   private readonly maxWindowSize: number;
   private readonly maxAllowedRepeats: number;
 
@@ -42,8 +43,12 @@ export class LoopFingerprinter {
   static computeFingerprint(snapshot: LoopStateSnapshot): string {
     const normalizedFiles = [...snapshot.modifiedFiles].sort().join(',');
     const normalizedTools = [...snapshot.proposedToolNames].sort().join(',');
-    const normalizedError = snapshot.activeError ? snapshot.activeError.trim().substring(0, 100) : 'NO_ERROR';
-    const normalizedHypothesis = snapshot.hypothesis ? snapshot.hypothesis.trim().substring(0, 80) : '';
+    const normalizedError = snapshot.activeError
+      ? snapshot.activeError.trim().substring(0, 100)
+      : 'NO_ERROR';
+    const normalizedHypothesis = snapshot.hypothesis
+      ? snapshot.hypothesis.trim().substring(0, 80)
+      : '';
 
     const payload = `${snapshot.phase}|${normalizedError}|${normalizedFiles}|${normalizedTools}|${normalizedHypothesis}`;
     return crypto.createHash('sha256').update(payload, 'utf-8').digest('hex').substring(0, 16);
@@ -52,7 +57,10 @@ export class LoopFingerprinter {
   /**
    * Record state at current iteration and check for loop anomalies.
    */
-  recordAndInspect(snapshot: LoopStateSnapshot, currentIteration: number): LoopAnomalyDetection | null {
+  recordAndInspect(
+    snapshot: LoopStateSnapshot,
+    currentIteration: number,
+  ): LoopAnomalyDetection | null {
     const fingerprint = LoopFingerprinter.computeFingerprint(snapshot);
     this.history.push({ fingerprint, iteration: currentIteration });
 
@@ -79,7 +87,11 @@ export class LoopFingerprinter {
     if (this.history.length >= 4) {
       const [h1, h2, h3, h4] = this.history.slice(-4);
       if (h1 && h2 && h3 && h4) {
-        if (h1.fingerprint === h3.fingerprint && h2.fingerprint === h4.fingerprint && h1.fingerprint !== h2.fingerprint) {
+        if (
+          h1.fingerprint === h3.fingerprint &&
+          h2.fingerprint === h4.fingerprint &&
+          h1.fingerprint !== h2.fingerprint
+        ) {
           return {
             anomalyType: 'OSCILLATION',
             description: `Oscillation cycle detected between states [${h1.fingerprint}] and [${h2.fingerprint}] (iterations: ${h1.iteration}, ${h2.iteration}, ${h3.iteration}, ${h4.iteration}).`,

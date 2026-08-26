@@ -111,7 +111,11 @@ describe('Agent Client Protocol (ACP) Server — P012', () => {
 
   it('4. should retrieve session status with session/status', async () => {
     const server = createTestAcpServer();
-    const newSessionRes = await server.handleRequest({ jsonrpc: '2.0', id: 5, method: 'session/new' });
+    const newSessionRes = await server.handleRequest({
+      jsonrpc: '2.0',
+      id: 5,
+      method: 'session/new',
+    });
     const sessionId = (newSessionRes.result as any).sessionId;
 
     await server.handleRequest({
@@ -134,7 +138,11 @@ describe('Agent Client Protocol (ACP) Server — P012', () => {
 
   it('5. should cancel active session with session/cancel', async () => {
     const server = createTestAcpServer();
-    const newSessionRes = await server.handleRequest({ jsonrpc: '2.0', id: 8, method: 'session/new' });
+    const newSessionRes = await server.handleRequest({
+      jsonrpc: '2.0',
+      id: 8,
+      method: 'session/new',
+    });
     const sessionId = (newSessionRes.result as any).sessionId;
 
     const cancelRes = await server.handleRequest({
@@ -157,7 +165,11 @@ describe('Agent Client Protocol (ACP) Server — P012', () => {
 
   it('6. should retrieve event history with session/history', async () => {
     const server = createTestAcpServer();
-    const newSessionRes = await server.handleRequest({ jsonrpc: '2.0', id: 11, method: 'session/new' });
+    const newSessionRes = await server.handleRequest({
+      jsonrpc: '2.0',
+      id: 11,
+      method: 'session/new',
+    });
     const sessionId = (newSessionRes.result as any).sessionId;
 
     await server.handleRequest({
@@ -179,7 +191,11 @@ describe('Agent Client Protocol (ACP) Server — P012', () => {
 
   it('7. should resolve agent/idle when session is completed or idle', async () => {
     const server = createTestAcpServer();
-    const newSessionRes = await server.handleRequest({ jsonrpc: '2.0', id: 14, method: 'session/new' });
+    const newSessionRes = await server.handleRequest({
+      jsonrpc: '2.0',
+      id: 14,
+      method: 'session/new',
+    });
     const sessionId = (newSessionRes.result as any).sessionId;
 
     const idleRes = await server.handleRequest({

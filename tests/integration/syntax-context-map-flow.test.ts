@@ -43,7 +43,7 @@ describe('Syntactic Context Map Flow — 100-File Repository Simulation', () => 
       supportsSystemPrompt: true,
     },
     costPer1kInputTokensDollars: 0.00015,
-    costPer1kOutputTokensDollars: 0.00060,
+    costPer1kOutputTokensDollars: 0.0006,
   };
 
   it('compiles 100-file repository with symbol map achieving >75% token reduction while retaining invariants', async () => {
@@ -116,7 +116,8 @@ export function createService${i}(): ModuleService${i} {
       id: idFactory.create<'Context'>(),
       tier: ContextTier.L3_REPOSITORY,
       type: ContextObjectType.DECISION,
-      content: 'ARCHITECTURAL INVARIANT: All database transactions in Module 42 must use Serializable Isolation.',
+      content:
+        'ARCHITECTURAL INVARIANT: All database transactions in Module 42 must use Serializable Isolation.',
       source: 'architect',
       timestamp: now,
       importance: 1.0,
@@ -202,16 +203,14 @@ export function createService${i}(): ModuleService${i} {
     expect(decisionRetained!.content).toContain('Serializable Isolation');
 
     // c) Syntactic Symbol Map was included
-    const repoMapRetained = compiled.retainedObjects.find(
-      (o) => o.tags.includes('repo_map'),
-    );
+    const repoMapRetained = compiled.retainedObjects.find((o) => o.tags.includes('repo_map'));
     expect(repoMapRetained).toBeDefined();
 
     // d) Significant token reduction (>75% token reduction vs naive 100 raw file accumulation)
     const compiledTokens = compiled.compiledContext.totalTokenEstimate;
     const tokenReduction = (rawTokens - compiledTokens) / rawTokens;
 
-    expect(tokenReduction).toBeGreaterThan(0.60); // >60% token savings across 100 files!
+    expect(tokenReduction).toBeGreaterThan(0.6); // >60% token savings across 100 files!
     expect(compiledTokens).toBeLessThanOrEqual(8000);
   });
 });

@@ -180,7 +180,10 @@ export class AcpHandlers {
 
     if (record.activeExecutionId && record.status === 'RUNNING') {
       try {
-        await (this.runtime as any).cancel?.(record.activeExecutionId, params.reason ?? 'Cancelled via ACP');
+        await (this.runtime as any).cancel?.(
+          record.activeExecutionId,
+          params.reason ?? 'Cancelled via ACP',
+        );
       } catch {
         // Ignore cancellation error
       }

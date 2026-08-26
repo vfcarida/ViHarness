@@ -63,9 +63,9 @@ describe('State Machine & Transition Validation', () => {
     });
 
     it('should throw HarnessError with STATE_INVALID_TRANSITION code on invalid transition in validateTransitionOrThrow', () => {
-      expect(() =>
-        validateTransitionOrThrow(AgentPhase.IMPLEMENT, StateEvent.MARK_DONE),
-      ).toThrow(HarnessError);
+      expect(() => validateTransitionOrThrow(AgentPhase.IMPLEMENT, StateEvent.MARK_DONE)).toThrow(
+        HarnessError,
+      );
 
       try {
         validateTransitionOrThrow(AgentPhase.IMPLEMENT, StateEvent.MARK_DONE);

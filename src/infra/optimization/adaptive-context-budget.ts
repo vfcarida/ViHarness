@@ -11,7 +11,11 @@ export class AdaptiveContextBudget {
   /**
    * Compute adaptive token budget for context compilation.
    */
-  static computeBudget(category: BaselineScenarioCategory, iteration: number, modelMaxTokens = 128000): ContextBudget {
+  static computeBudget(
+    category: BaselineScenarioCategory,
+    iteration: number,
+    modelMaxTokens = 128000,
+  ): ContextBudget {
     let targetTokens = 8000;
 
     switch (category) {

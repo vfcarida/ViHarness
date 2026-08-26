@@ -141,10 +141,11 @@ export class DefaultContextCompiler implements ContextCompiler {
     // 8. Calculate Metrics
     const durationMs = Date.now() - startTime;
     const tokensAfter = compressionResult.totalTokens;
-    const compressionRatio =
-      tokensBefore > 0 ? (tokensBefore - tokensAfter) / tokensBefore : 0;
+    const compressionRatio = tokensBefore > 0 ? (tokensBefore - tokensAfter) / tokensBefore : 0;
 
-    const mandatoryRetainedCount = retainedObjects.filter((o) => ContextRanker.isMustPreserve(o)).length;
+    const mandatoryRetainedCount = retainedObjects.filter((o) =>
+      ContextRanker.isMustPreserve(o),
+    ).length;
 
     const metrics: CompilationMetrics = {
       inputObjectCount: candidates.length,
@@ -201,7 +202,7 @@ export class DefaultContextCompiler implements ContextCompiler {
           const mem = scored.record;
           if (
             (mem.status === MemoryStatus.ACTIVE || mem.status === MemoryStatus.PROMOTED) &&
-            ((scored.scoreBreakdown?.textSimilarity ?? 0) > 0 || scored.relevanceScore >= 0.50)
+            ((scored.scoreBreakdown?.textSimilarity ?? 0) > 0 || scored.relevanceScore >= 0.5)
           ) {
             candidates.push({
               id: this.idFactory.create<'Context'>(),
@@ -234,11 +235,7 @@ export class DefaultContextCompiler implements ContextCompiler {
       for (const obj of request.relevantObjects) {
         // If Symbol Map is active and object is a large raw file that is not the primary focus file,
         // compress it to its syntactic outline to save tokens
-        if (
-          request.useSymbolMap &&
-          request.repoSymbolMap &&
-          obj.type === ContextObjectType.FILE
-        ) {
+        if (request.useSymbolMap && request.repoSymbolMap && obj.type === ContextObjectType.FILE) {
           const filePath = String(obj.metadata['filePath'] ?? obj.id);
           const fileMap = request.repoSymbolMap.files.get(filePath);
           if (fileMap && (!request.currentFiles || !request.currentFiles.includes(filePath))) {
@@ -262,7 +259,7 @@ export class DefaultContextCompiler implements ContextCompiler {
       // - 40% when no files are actively in context (broad repository discovery)
       // - 10% when active files exist in context (compact outline, space freed for file content)
       const hasActiveFiles = Boolean(request.currentFiles && request.currentFiles.length > 0);
-      const budgetRatio = hasActiveFiles ? 0.10 : 0.40;
+      const budgetRatio = hasActiveFiles ? 0.1 : 0.4;
       const maxBudgetCap = hasActiveFiles ? 1000 : 4000;
       const dynamicMaxTokens = Math.min(
         maxBudgetCap,
@@ -293,7 +290,10 @@ export class DefaultContextCompiler implements ContextCompiler {
           tags: ['repo_map', 'syntactic_context'],
           version: 1,
           active: true,
-          metadata: { totalFiles: request.repoSymbolMap.totalFiles, totalSymbols: request.repoSymbolMap.totalSymbols },
+          metadata: {
+            totalFiles: request.repoSymbolMap.totalFiles,
+            totalSymbols: request.repoSymbolMap.totalSymbols,
+          },
         });
       }
     }
@@ -387,7 +387,9 @@ export class DefaultContextCompiler implements ContextCompiler {
           lastUsed: now,
           lastVerified: ev.createdAt,
           costTokens: Math.ceil(ev.summary.length / 4),
-          tags: ev.pass ? ['evidence', 'pass'] : ['evidence', 'fail', 'auto_feedback', 'must_preserve'],
+          tags: ev.pass
+            ? ['evidence', 'pass']
+            : ['evidence', 'fail', 'auto_feedback', 'must_preserve'],
           version: 1,
           active: true,
           metadata: { evidenceId: ev.id, outcome: ev.outcome },

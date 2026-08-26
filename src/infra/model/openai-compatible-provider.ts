@@ -24,11 +24,7 @@ import type {
   ToolCall,
   TokenUsage,
 } from '../../core/model/model-io.js';
-import {
-  FinishReason,
-  ModelCapability,
-  ProviderHealthStatus,
-} from '../../core/model/model-io.js';
+import { FinishReason, ModelCapability, ProviderHealthStatus } from '../../core/model/model-io.js';
 import { HarnessError } from '../../core/errors/base-error.js';
 import { ErrorCode, ErrorCategory } from '../../core/errors/error-codes.js';
 import { ProviderMessageAdapter } from './provider-message-adapter.js';
@@ -70,23 +66,32 @@ const OpenAIResponseSchema = z.object({
   object: z.string().optional(),
   model: z.string().optional(),
   choices: z.array(OpenAIChoiceSchema).min(1, 'Response contained no choices'),
-  usage: z.object({
-    prompt_tokens: z.number().optional(),
-    completion_tokens: z.number().optional(),
-    total_tokens: z.number().optional(),
-    prompt_tokens_details: z.object({
-      cached_tokens: z.number().optional(),
-      cache_read_tokens: z.number().optional(),
-    }).passthrough().optional(),
-    completion_tokens_details: z.object({
-      reasoning_tokens: z.number().optional(),
-    }).passthrough().optional(),
-    cache_read_input_tokens: z.number().optional(),
-    cache_creation_input_tokens: z.number().optional(),
-    cache_deleted_input_tokens: z.number().optional(),
-    prompt_cache_hit_tokens: z.number().optional(),
-    prompt_cache_miss_tokens: z.number().optional(),
-  }).passthrough().optional(),
+  usage: z
+    .object({
+      prompt_tokens: z.number().optional(),
+      completion_tokens: z.number().optional(),
+      total_tokens: z.number().optional(),
+      prompt_tokens_details: z
+        .object({
+          cached_tokens: z.number().optional(),
+          cache_read_tokens: z.number().optional(),
+        })
+        .passthrough()
+        .optional(),
+      completion_tokens_details: z
+        .object({
+          reasoning_tokens: z.number().optional(),
+        })
+        .passthrough()
+        .optional(),
+      cache_read_input_tokens: z.number().optional(),
+      cache_creation_input_tokens: z.number().optional(),
+      cache_deleted_input_tokens: z.number().optional(),
+      prompt_cache_hit_tokens: z.number().optional(),
+      prompt_cache_miss_tokens: z.number().optional(),
+    })
+    .passthrough()
+    .optional(),
 });
 
 export class OpenAICompatibleProvider implements ModelProvider {
@@ -302,11 +307,7 @@ export class OpenAICompatibleProvider implements ModelProvider {
     return payload;
   }
 
-  private parseResponse(
-    data: unknown,
-    request: ModelRequest,
-    latencyMs: number,
-  ): ModelResponse {
+  private parseResponse(data: unknown, request: ModelRequest, latencyMs: number): ModelResponse {
     const validation = OpenAIResponseSchema.safeParse(data);
     if (!validation.success) {
       throw new HarnessError({
@@ -370,32 +371,36 @@ export class OpenAICompatibleProvider implements ModelProvider {
       usageObj['prompt_cache_hit_tokens'];
 
     const cacheCreationInputTokens =
-      usageObj['cache_creation_input_tokens'] ??
-      usageObj['prompt_cache_miss_tokens'];
+      usageObj['cache_creation_input_tokens'] ?? usageObj['prompt_cache_miss_tokens'];
 
-    const cacheDeletedInputTokens =
-      usageObj['cache_deleted_input_tokens'];
+    const cacheDeletedInputTokens = usageObj['cache_deleted_input_tokens'];
 
     const hasCacheData =
       cacheReadInputTokens !== undefined ||
       cacheCreationInputTokens !== undefined ||
       cacheDeletedInputTokens !== undefined;
 
-    const cacheMetrics: import('../../core/model/model-io.js').CacheMetrics | undefined = hasCacheData
-      ? {
-          cacheReadInputTokens: typeof cacheReadInputTokens === 'number' ? cacheReadInputTokens : undefined,
-          cacheCreationInputTokens: typeof cacheCreationInputTokens === 'number' ? cacheCreationInputTokens : undefined,
-          cacheDeletedInputTokens: typeof cacheDeletedInputTokens === 'number' ? cacheDeletedInputTokens : undefined,
-        }
-      : undefined;
+    const cacheMetrics: import('../../core/model/model-io.js').CacheMetrics | undefined =
+      hasCacheData
+        ? {
+            cacheReadInputTokens:
+              typeof cacheReadInputTokens === 'number' ? cacheReadInputTokens : undefined,
+            cacheCreationInputTokens:
+              typeof cacheCreationInputTokens === 'number' ? cacheCreationInputTokens : undefined,
+            cacheDeletedInputTokens:
+              typeof cacheDeletedInputTokens === 'number' ? cacheDeletedInputTokens : undefined,
+          }
+        : undefined;
 
     const usage: TokenUsage = {
       inputTokens: usageObj.prompt_tokens ?? 0,
       outputTokens: usageObj.completion_tokens ?? 0,
-      totalTokens: usageObj.total_tokens ?? (usageObj.prompt_tokens ?? 0) + (usageObj.completion_tokens ?? 0),
+      totalTokens:
+        usageObj.total_tokens ?? (usageObj.prompt_tokens ?? 0) + (usageObj.completion_tokens ?? 0),
       reasoningTokens: usageObj.completion_tokens_details?.reasoning_tokens,
       cacheReadTokens: typeof cacheReadInputTokens === 'number' ? cacheReadInputTokens : undefined,
-      cacheWriteTokens: typeof cacheCreationInputTokens === 'number' ? cacheCreationInputTokens : undefined,
+      cacheWriteTokens:
+        typeof cacheCreationInputTokens === 'number' ? cacheCreationInputTokens : undefined,
     };
 
     const cost =
@@ -475,11 +480,7 @@ function mapFinishReason(rawReason?: string): FinishReason {
   }
 }
 
-function mapHttpStatusToError(
-  status: number,
-  bodyText: string,
-  providerId: string,
-): HarnessError {
+function mapHttpStatusToError(status: number, bodyText: string, providerId: string): HarnessError {
   if (status === 429) {
     return new HarnessError({
       code: ErrorCode.MODEL_RATE_LIMITED,

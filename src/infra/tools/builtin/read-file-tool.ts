@@ -5,7 +5,11 @@
  */
 import * as fs from 'node:fs';
 import type { Tool } from '../../../core/interfaces/tool.js';
-import type { ToolInput, ToolResult, ToolExecutionContext } from '../../../core/model/tool-types.js';
+import type {
+  ToolInput,
+  ToolResult,
+  ToolExecutionContext,
+} from '../../../core/model/tool-types.js';
 import { ToolCategory, ToolRiskLevel } from '../../../core/model/tool-types.js';
 import type { IdFactory } from '../../../core/types/identifiers.js';
 import { PathValidator } from '../../security/path-validator.js';
@@ -69,7 +73,11 @@ export class ReadFileTool implements Tool {
           success: false,
           durationMs: Date.now() - startTime,
           error: err instanceof Error ? err.message : String(err),
-          metadata: { path: rawPath, errorCode: 'FS_READ_ERROR', correlationId: context.correlationId },
+          metadata: {
+            path: rawPath,
+            errorCode: 'FS_READ_ERROR',
+            correlationId: context.correlationId,
+          },
         };
       }
     }

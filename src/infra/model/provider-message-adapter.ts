@@ -28,7 +28,8 @@ export interface AnthropicTextBlock {
 
 export interface AnthropicMessage {
   readonly role: 'user' | 'assistant';
-  readonly content: string | ReadonlyArray<AnthropicTextBlock | AnthropicToolUseBlock | AnthropicToolResultBlock>;
+  readonly content:
+    string | ReadonlyArray<AnthropicTextBlock | AnthropicToolUseBlock | AnthropicToolResultBlock>;
 }
 
 export interface AnthropicPayload {
@@ -79,11 +80,12 @@ export class ProviderMessageAdapter {
         }
 
         case MessageRole.TOOL_CALL: {
-          const toolCalls = m.toolCalls && m.toolCalls.length > 0
-            ? m.toolCalls
-            : m.name
-            ? [{ id: m.toolCallId ?? 'call_auto', name: m.name, input: {} }]
-            : [];
+          const toolCalls =
+            m.toolCalls && m.toolCalls.length > 0
+              ? m.toolCalls
+              : m.name
+                ? [{ id: m.toolCallId ?? 'call_auto', name: m.name, input: {} }]
+                : [];
 
           messages.push({
             role: 'assistant',
@@ -182,7 +184,9 @@ export class ProviderMessageAdapter {
           if (m.content) {
             blocks.push({ type: 'text', text: m.content });
           }
-          const toolCalls = m.toolCalls ?? (m.name ? [{ id: m.toolCallId ?? 'call_1', name: m.name, input: {} }] : []);
+          const toolCalls =
+            m.toolCalls ??
+            (m.name ? [{ id: m.toolCallId ?? 'call_1', name: m.name, input: {} }] : []);
           for (const tc of toolCalls) {
             blocks.push({
               type: 'tool_use',
@@ -260,7 +264,10 @@ export class ProviderMessageAdapter {
   /**
    * Helper to format an Assistant Tool Call message.
    */
-  static createToolCallMessage(toolCalls: ReadonlyArray<ToolCall>, thoughtContent?: string): ModelMessage {
+  static createToolCallMessage(
+    toolCalls: ReadonlyArray<ToolCall>,
+    thoughtContent?: string,
+  ): ModelMessage {
     return {
       role: MessageRole.ASSISTANT,
       content: thoughtContent ?? '',

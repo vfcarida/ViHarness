@@ -18,11 +18,7 @@ import type {
   CreateMemoryRecordParams,
   MemoryConflict,
 } from '../../core/model/memory-types.js';
-import {
-  MemoryStatus,
-  MemoryScope,
-  MemoryTier,
-} from '../../core/model/memory-types.js';
+import { MemoryStatus, MemoryScope, MemoryTier } from '../../core/model/memory-types.js';
 import { InMemoryMemoryProvider } from './in-memory-memory-provider.js';
 import { MemoryLifecycle } from './memory-lifecycle.js';
 import { HarnessError } from '../../core/errors/base-error.js';
@@ -59,7 +55,9 @@ export class InMemoryMemoryStore implements MemoryStore {
     const requestedTier = params.tier ?? MemoryTier.SHORT_TERM;
     let initialStatus =
       params.status ??
-      (requestedTier === MemoryTier.SHORT_TERM && (params.importance ?? 0.5) < 0.7 && params.source.startsWith('tool:')
+      (requestedTier === MemoryTier.SHORT_TERM &&
+      (params.importance ?? 0.5) < 0.7 &&
+      params.source.startsWith('tool:')
         ? MemoryStatus.CANDIDATE
         : MemoryStatus.ACTIVE);
     let initialTier = requestedTier;
@@ -251,7 +249,10 @@ export class InMemoryMemoryStore implements MemoryStore {
     }
 
     const winningId = winningRecordId;
-    const losingId = conflict.existingRecord.id === winningId ? conflict.conflictingRecord.id : conflict.existingRecord.id;
+    const losingId =
+      conflict.existingRecord.id === winningId
+        ? conflict.conflictingRecord.id
+        : conflict.existingRecord.id;
 
     await this.invalidate(losingId, `Resolved conflict ${conflictId} in favor of ${winningId}`);
     const winner = await this.promote(winningId);
@@ -283,12 +284,16 @@ export class InMemoryMemoryStore implements MemoryStore {
       // Check if topics match and contents are contradictory
       const topicMatches =
         (newRecord.topic && existing.topic && newRecord.topic === existing.topic) ||
-        (newRecord.scopeTarget && existing.scopeTarget && newRecord.scopeTarget === existing.scopeTarget);
+        (newRecord.scopeTarget &&
+          existing.scopeTarget &&
+          newRecord.scopeTarget === existing.scopeTarget);
 
       if (topicMatches && existing.content !== newRecord.content) {
         const isContradictory =
-          (existing.content.toLowerCase().includes('port') && newRecord.content.toLowerCase().includes('port')) ||
-          (existing.content.toLowerCase().includes('must') && newRecord.content.toLowerCase().includes('must')) ||
+          (existing.content.toLowerCase().includes('port') &&
+            newRecord.content.toLowerCase().includes('port')) ||
+          (existing.content.toLowerCase().includes('must') &&
+            newRecord.content.toLowerCase().includes('must')) ||
           existing.content !== newRecord.content;
 
         if (isContradictory) {

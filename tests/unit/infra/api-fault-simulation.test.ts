@@ -42,9 +42,7 @@ describe('API Fault Simulation Suite', () => {
         providerId: 'rate-limited-api',
         faultType: 'RATE_LIMIT',
         failCount: 1, // fails 1st attempt with 429, then recovers
-        steps: [
-          { content: 'Recovered response after 429 retry', finishReason: FinishReason.STOP },
-        ],
+        steps: [{ content: 'Recovered response after 429 retry', finishReason: FinishReason.STOP }],
       });
 
       const request: ModelRequest = {
@@ -129,7 +127,9 @@ describe('API Fault Simulation Suite', () => {
         providerId: 'secondary-backup',
         modelId: 'secondary-model',
         faultType: 'NONE',
-        steps: [{ content: 'Fallback secondary provider response', finishReason: FinishReason.STOP }],
+        steps: [
+          { content: 'Fallback secondary provider response', finishReason: FinishReason.STOP },
+        ],
       });
 
       const router = new UtilityModelRouter();

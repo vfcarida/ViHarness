@@ -33,8 +33,16 @@ export class DefaultTelemetryCollector {
   private readonly modelMetricsList: ModelMetrics[] = [];
   private readonly contextMetricsList: ContextMetrics[] = [];
   private readonly toolCallsList: Array<{ executionTimeMs: number; success: boolean }> = [];
-  private readonly verificationsList: Array<{ pass: boolean; regression: boolean; flaky: boolean }> = [];
-  private readonly taskResults: Array<{ success: boolean; iterations: number; terminationReason: string }> = [];
+  private readonly verificationsList: Array<{
+    pass: boolean;
+    regression: boolean;
+    flaky: boolean;
+  }> = [];
+  private readonly taskResults: Array<{
+    success: boolean;
+    iterations: number;
+    terminationReason: string;
+  }> = [];
 
   private readonly idFactory: IdFactory;
   private readonly clock: Clock;
@@ -87,7 +95,11 @@ export class DefaultTelemetryCollector {
     this.toolCallsList.push({ executionTimeMs, success });
   }
 
-  recordVerificationOutcome(pass: boolean, regression: boolean = false, flaky: boolean = false): void {
+  recordVerificationOutcome(
+    pass: boolean,
+    regression: boolean = false,
+    flaky: boolean = false,
+  ): void {
     this.verificationsList.push({ pass, regression, flaky });
   }
 
@@ -122,18 +134,21 @@ export class DefaultTelemetryCollector {
 
     // 3. Context Metrics Aggregation
     const contextCount = this.contextMetricsList.length;
-    const avgContextSize = contextCount > 0
-      ? this.contextMetricsList.reduce((acc, c) => acc + c.contextSize, 0) / contextCount
-      : 0;
-    const avgCompressedSize = contextCount > 0
-      ? this.contextMetricsList.reduce((acc, c) => acc + c.compressedSize, 0) / contextCount
-      : 0;
+    const avgContextSize =
+      contextCount > 0
+        ? this.contextMetricsList.reduce((acc, c) => acc + c.contextSize, 0) / contextCount
+        : 0;
+    const avgCompressedSize =
+      contextCount > 0
+        ? this.contextMetricsList.reduce((acc, c) => acc + c.compressedSize, 0) / contextCount
+        : 0;
     const compressionRatio = avgContextSize > 0 ? avgCompressedSize / avgContextSize : 1.0;
     const totalRetrievals = this.contextMetricsList.reduce((acc, c) => acc + c.retrievalCount, 0);
     const totalOmitted = this.contextMetricsList.reduce((acc, c) => acc + c.omittedObjects, 0);
-    const avgCompilerLatency = contextCount > 0
-      ? this.contextMetricsList.reduce((acc, c) => acc + c.compilerLatencyMs, 0) / contextCount
-      : 0;
+    const avgCompilerLatency =
+      contextCount > 0
+        ? this.contextMetricsList.reduce((acc, c) => acc + c.compilerLatencyMs, 0) / contextCount
+        : 0;
 
     const context: ContextMetrics = {
       contextSize: avgContextSize,

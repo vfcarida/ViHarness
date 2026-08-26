@@ -49,10 +49,7 @@ export class SessionJsonlPersistence {
   /**
    * Deserializes JSONL text into a Session, automatically repairing crashed turns if enabled.
    */
-  static deserializeSession(
-    jsonlContent: string,
-    options?: DeserializeSessionOptions,
-  ): Session {
+  static deserializeSession(jsonlContent: string, options?: DeserializeSessionOptions): Session {
     const rawLines = jsonlContent.split('\n').filter((l) => l.trim().length > 0);
 
     if (rawLines.length === 0) {
@@ -152,10 +149,7 @@ export class SessionJsonlPersistence {
   /**
    * Reads and parses a session JSONL file from disk (sync).
    */
-  static readSessionFromFileSync(
-    filePath: string,
-    options?: DeserializeSessionOptions,
-  ): Session {
+  static readSessionFromFileSync(filePath: string, options?: DeserializeSessionOptions): Session {
     if (!fs.existsSync(filePath)) {
       throw new HarnessError({
         code: ErrorCode.STATE_NOT_FOUND,

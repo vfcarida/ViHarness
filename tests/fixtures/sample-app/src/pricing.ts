@@ -15,7 +15,7 @@ export class PricingEngine {
 
     let discountAmount = 0;
     if (subtotal >= 100) {
-      discountAmount = subtotal * 0.10; // FIXED 10% discount
+      discountAmount = subtotal * 0.1; // FIXED 10% discount
     }
 
     const taxableAmount = subtotal - discountAmount;

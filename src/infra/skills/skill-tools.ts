@@ -53,7 +53,8 @@ export function createLoadSkillTool(
     definition: {
       name: 'load_skill',
       version: '1.0.0',
-      description: 'Load a specific skill into context by name and mount its instructions for the current session.',
+      description:
+        'Load a specific skill into context by name and mount its instructions for the current session.',
       category: ToolCategory.READ,
       riskLevel: ToolRiskLevel.LOW,
       mutating: false,

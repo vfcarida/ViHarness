@@ -30,7 +30,9 @@ export class TBenchReportGenerator {
       const rank = idx + 1;
       const agentLabel = isViHarness ? `**${entry.agent}**` : entry.agent;
       const modelLabel = entry.model;
-      const scoreLabel = isViHarness ? `**${entry.resolution_rate.toFixed(2)}%**` : `${entry.resolution_rate.toFixed(2)}%`;
+      const scoreLabel = isViHarness
+        ? `**${entry.resolution_rate.toFixed(2)}%**`
+        : `${entry.resolution_rate.toFixed(2)}%`;
       const statusLabel = isViHarness ? '🎯 **Evaluated**' : 'Official Baseline';
       lines.push(`| ${rank} | ${agentLabel} | ${modelLabel} | ${scoreLabel} | ${statusLabel} |`);
     });
@@ -40,7 +42,9 @@ export class TBenchReportGenerator {
     lines.push('| :--- | :--- | :--- | :--- |');
 
     for (const [cat, data] of Object.entries(results.by_category)) {
-      lines.push(`| ${cat} | ${data.passed} | ${data.total} | ${data.resolution_rate.toFixed(2)}% |`);
+      lines.push(
+        `| ${cat} | ${data.passed} | ${data.total} | ${data.resolution_rate.toFixed(2)}% |`,
+      );
     }
 
     lines.push('\n## 🎯 Performance by Difficulty\n');
@@ -48,11 +52,15 @@ export class TBenchReportGenerator {
     lines.push('| :--- | :--- | :--- | :--- |');
 
     for (const [diff, data] of Object.entries(results.by_difficulty)) {
-      lines.push(`| ${diff.toUpperCase()} | ${data.passed} | ${data.total} | ${data.resolution_rate.toFixed(2)}% |`);
+      lines.push(
+        `| ${diff.toUpperCase()} | ${data.passed} | ${data.total} | ${data.resolution_rate.toFixed(2)}% |`,
+      );
     }
 
     lines.push('\n## 📋 Detailed Task Breakdown\n');
-    lines.push('| Task ID | Category | Difficulty | Result | Duration | Commands | Tokens | Cost |');
+    lines.push(
+      '| Task ID | Category | Difficulty | Result | Duration | Commands | Tokens | Cost |',
+    );
     lines.push('| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |');
 
     for (const task of results.tasks) {

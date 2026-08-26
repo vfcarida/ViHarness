@@ -152,7 +152,9 @@ describe('Meta-Harness Outer-Loop Experience Accumulation E2E Suite — P009', (
     const runsAfter1 = await experienceStore.listRuns();
     expect(runsAfter1).toHaveLength(1);
     expect(fs.existsSync(path.join(tempDir, runsAfter1[0]!.runId, 'traces.jsonl'))).toBe(true);
-    expect(fs.existsSync(path.join(tempDir, runsAfter1[0]!.runId, 'harness-config.json'))).toBe(true);
+    expect(fs.existsSync(path.join(tempDir, runsAfter1[0]!.runId, 'harness-config.json'))).toBe(
+      true,
+    );
     expect(fs.existsSync(path.join(tempDir, runsAfter1[0]!.runId, 'scores.json'))).toBe(true);
     expect(fs.existsSync(path.join(tempDir, runsAfter1[0]!.runId, 'summary.md'))).toBe(true);
 
@@ -233,20 +235,24 @@ describe('Meta-Harness Outer-Loop Experience Accumulation E2E Suite — P009', (
 
     const crossAnalysis = HarnessDiagnosticEngine.analyzeAcrossRuns(recentTraces);
     expect(crossAnalysis.runsAnalyzed).toBeGreaterThanOrEqual(2);
-    expect(crossAnalysis.recurringFailurePatterns.some((p) => p.includes('execute_migration'))).toBe(true);
+    expect(
+      crossAnalysis.recurringFailurePatterns.some((p) => p.includes('execute_migration')),
+    ).toBe(true);
 
     const toolRec = crossAnalysis.recommendations.find(
-      (r) => r.type === 'TOOL_OPTIMIZATION' && r.parameter === 'toolFeedbackEnhancement_execute_migration',
+      (r) =>
+        r.type === 'TOOL_OPTIMIZATION' &&
+        r.parameter === 'toolFeedbackEnhancement_execute_migration',
     );
     expect(toolRec).toBeDefined();
-    expect(toolRec?.confidence).toBeGreaterThanOrEqual(0.70);
+    expect(toolRec?.confidence).toBeGreaterThanOrEqual(0.7);
 
     // 6. Auto-Tune Configuration
     const baseConfig = { toolFeedbackEnhancement_execute_migration: false };
     const tuneResult = await HarnessAutoTuner.applyRecommendations(
       baseConfig,
       crossAnalysis.recommendations,
-      { minConfidence: 0.70, experienceStore, idFactory },
+      { minConfidence: 0.7, experienceStore, idFactory },
     );
 
     expect(tuneResult.appliedCount).toBeGreaterThanOrEqual(1);
@@ -255,7 +261,9 @@ describe('Meta-Harness Outer-Loop Experience Accumulation E2E Suite — P009', (
     // 7. Verify Tuning Decision logged in experience store
     const tuningHistory = await experienceStore.getTuningHistory();
     expect(tuningHistory.length).toBeGreaterThanOrEqual(1);
-    expect(tuningHistory[0]?.recommendation.parameter).toBe('toolFeedbackEnhancement_execute_migration');
+    expect(tuningHistory[0]?.recommendation.parameter).toBe(
+      'toolFeedbackEnhancement_execute_migration',
+    );
 
     // Cleanup
     fs.rmSync(tempDir, { recursive: true, force: true });

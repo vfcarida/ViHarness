@@ -50,7 +50,11 @@ describe('Persistence and Crash Recovery Subsystem', () => {
     taskId = idFactory.create<'Task'>();
   });
 
-  function createSampleProposal(type: ActionType = ActionType.FILE_READ, description: string = 'Read main.ts', irreversible = false): ActionProposal {
+  function createSampleProposal(
+    type: ActionType = ActionType.FILE_READ,
+    description: string = 'Read main.ts',
+    irreversible = false,
+  ): ActionProposal {
     return {
       id: idFactory.create<'Action'>(),
       taskId,
@@ -80,7 +84,12 @@ describe('Persistence and Crash Recovery Subsystem', () => {
     await journal.logStart(execId);
 
     // Simulate crash during execution
-    const analysis = await recoveryManager.analyzeCrash(taskId, journal, eventStore, checkpointStore);
+    const analysis = await recoveryManager.analyzeCrash(
+      taskId,
+      journal,
+      eventStore,
+      checkpointStore,
+    );
     expect(analysis.interruptedEntries).toHaveLength(1);
     expect(analysis.interruptedEntries[0]!.status).toBe(ActionExecutionStatus.RUNNING);
     expect(analysis.recommendedPolicy).toBe(RecoveryPolicy.RETRY_SAFE);
@@ -107,13 +116,22 @@ describe('Persistence and Crash Recovery Subsystem', () => {
   });
 
   it('should enforce REQUIRE_REVIEW policy when destructive action crashes mid-execution', async () => {
-    const destructiveProposal = createSampleProposal(ActionType.FILE_DELETE, 'Delete production data', true);
+    const destructiveProposal = createSampleProposal(
+      ActionType.FILE_DELETE,
+      'Delete production data',
+      true,
+    );
 
     const execId = await journal.logProposal(destructiveProposal, true);
     await journal.logStart(execId);
 
     // Crash during destructive operation
-    const analysis = await recoveryManager.analyzeCrash(taskId, journal, eventStore, checkpointStore);
+    const analysis = await recoveryManager.analyzeCrash(
+      taskId,
+      journal,
+      eventStore,
+      checkpointStore,
+    );
 
     expect(analysis.requiresHumanReview).toBe(true);
     expect(analysis.recommendedPolicy).toBe(RecoveryPolicy.REQUIRE_REVIEW);
@@ -138,7 +156,12 @@ describe('Persistence and Crash Recovery Subsystem', () => {
     });
 
     // Crash happens
-    const analysis = await recoveryManager.analyzeCrash(taskId, journal, eventStore, checkpointStore);
+    const analysis = await recoveryManager.analyzeCrash(
+      taskId,
+      journal,
+      eventStore,
+      checkpointStore,
+    );
     const decision = recoveryManager.createRecoveryDecision(analysis);
 
     expect(decision.targetCheckpointId).toBe(cp.id);

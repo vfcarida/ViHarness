@@ -17,10 +17,7 @@ import type { ExecutionJournal } from '../../core/interfaces/execution-journal.j
 import type { EventStore } from '../../core/interfaces/event-store.js';
 import type { CheckpointStore } from '../../core/interfaces/checkpoint-store.js';
 import type { TaskId } from '../../core/types/identifiers.js';
-import type {
-  RecoveryAnalysis,
-  RecoveryDecision,
-} from '../../core/model/recovery-types.js';
+import type { RecoveryAnalysis, RecoveryDecision } from '../../core/model/recovery-types.js';
 import { ActionExecutionStatus, RecoveryPolicy } from '../../core/model/recovery-types.js';
 import { ActionType } from '../../core/model/action.js';
 
@@ -48,7 +45,12 @@ export class DefaultRecoveryManager implements RecoveryManager {
         entry.actionProposal.type === ActionType.FILE_DELETE ||
         entry.actionProposal.irreversible;
 
-      if (isDestructive && (entry.status === ActionExecutionStatus.STARTED || entry.status === ActionExecutionStatus.PROPOSED || entry.status === ActionExecutionStatus.AUTHORIZED)) {
+      if (
+        isDestructive &&
+        (entry.status === ActionExecutionStatus.STARTED ||
+          entry.status === ActionExecutionStatus.PROPOSED ||
+          entry.status === ActionExecutionStatus.AUTHORIZED)
+      ) {
         hasDestructiveInterruption = true;
         await journal.logUnknown(
           entry.executionId,
@@ -94,12 +96,16 @@ export class DefaultRecoveryManager implements RecoveryManager {
   }
 
   createRecoveryDecision(analysis: RecoveryAnalysis): RecoveryDecision {
-    if (analysis.requiresHumanReview || analysis.recommendedPolicy === RecoveryPolicy.REQUIRE_REVIEW) {
+    if (
+      analysis.requiresHumanReview ||
+      analysis.recommendedPolicy === RecoveryPolicy.REQUIRE_REVIEW
+    ) {
       return {
         action: 'ESCALATE',
         targetCheckpointId: analysis.lastCheckpointId,
         recoveryPolicy: RecoveryPolicy.REQUIRE_REVIEW,
-        rationale: 'Destructive action was interrupted during execution. Human review required to prevent silent duplicate execution; automatic retry is strictly forbidden.',
+        rationale:
+          'Destructive action was interrupted during execution. Human review required to prevent silent duplicate execution; automatic retry is strictly forbidden.',
       };
     }
 
@@ -116,7 +122,8 @@ export class DefaultRecoveryManager implements RecoveryManager {
       action: 'RESUME',
       targetCheckpointId: analysis.lastCheckpointId,
       recoveryPolicy: RecoveryPolicy.RETRY_SAFE,
-      rationale: 'No interrupted actions found. Resuming runtime from last verified milestone state.',
+      rationale:
+        'No interrupted actions found. Resuming runtime from last verified milestone state.',
     };
   }
 }

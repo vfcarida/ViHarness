@@ -168,7 +168,9 @@ async function main(rawArgs: string[] = process.argv.slice(2)): Promise<void> {
   // 3. Execute problems with concurrency control
   for (let i = 0; i < problems.length; i++) {
     const prob = problems[i]!;
-    console.log(`[${i + 1}/${problems.length}] Running problem [${prob.id}] (${prob.category}, ${prob.difficulty})...`);
+    console.log(
+      `[${i + 1}/${problems.length}] Running problem [${prob.id}] (${prob.category}, ${prob.difficulty})...`,
+    );
 
     const workspace = await workspaceManager.createWorkspace(prob);
     try {
@@ -190,7 +192,10 @@ async function main(rawArgs: string[] = process.argv.slice(2)): Promise<void> {
     modelId: args.modelId,
   });
 
-  const { jsonPath, mdPath } = await ProjDevReportGenerator.writeReportFiles(report, args.outputDir);
+  const { jsonPath, mdPath } = await ProjDevReportGenerator.writeReportFiles(
+    report,
+    args.outputDir,
+  );
 
   console.log('======================================================================');
   console.log(`🏆 Overall ProjDevBench Score: ${report.overallScore.toFixed(2)}%`);
@@ -201,7 +206,10 @@ async function main(rawArgs: string[] = process.argv.slice(2)): Promise<void> {
 
 export { main as runProjDevBenchCli };
 
-if (process.argv[1]?.endsWith('projdevbench-eval.ts') || process.argv[1]?.endsWith('projdevbench-eval.js')) {
+if (
+  process.argv[1]?.endsWith('projdevbench-eval.ts') ||
+  process.argv[1]?.endsWith('projdevbench-eval.js')
+) {
   main().catch((err) => {
     console.error('[ERROR] ProjDevBench runner failed:', err);
     process.exit(1);

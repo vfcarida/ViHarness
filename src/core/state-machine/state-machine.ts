@@ -10,17 +10,9 @@
  *
  * No I/O, no side effects, no async — pure domain logic.
  */
-import type {
-  TaskId,
-  EvidenceId,
-  IdFactory,
-} from '../types/identifiers.js';
+import type { TaskId, EvidenceId, IdFactory } from '../types/identifiers.js';
 import type { Clock } from '../interfaces/clock.js';
-import {
-  AgentPhase,
-  StateEvent,
-  TERMINAL_PHASES,
-} from '../model/state.js';
+import { AgentPhase, StateEvent, TERMINAL_PHASES } from '../model/state.js';
 import type { AgentState, StateTransition } from '../model/state.js';
 import { validateTransitionOrThrow } from './transition-validator.js';
 import { HarnessError } from '../errors/base-error.js';
@@ -124,17 +116,18 @@ export class StateMachine {
     // (Human override path from HUMAN_REQUIRED allows direct MARK_DONE without evidence).
     if (
       targetPhase === AgentPhase.DONE &&
-      (event === StateEvent.VERIFICATION_PASSED || (event === StateEvent.MARK_DONE && this._state.phase !== AgentPhase.HUMAN_REQUIRED)) &&
+      (event === StateEvent.VERIFICATION_PASSED ||
+        (event === StateEvent.MARK_DONE && this._state.phase !== AgentPhase.HUMAN_REQUIRED)) &&
       (!options?.evidenceIds || options.evidenceIds.length === 0)
     ) {
       throw new HarnessError({
         code: ErrorCode.STATE_INVALID_TRANSITION,
         category: ErrorCategory.STATE,
-        message: 'Transition to DONE requires at least one verified evidenceId. The agent must prove task completion with empirical evidence.',
+        message:
+          'Transition to DONE requires at least one verified evidenceId. The agent must prove task completion with empirical evidence.',
         context: { from: this._state.phase, event, evidenceIds: options?.evidenceIds ?? [] },
       });
     }
-
 
     const now = this._clock.now();
     const previousPhase = this._state.phase;

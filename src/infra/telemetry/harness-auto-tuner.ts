@@ -33,7 +33,7 @@ export class HarnessAutoTuner {
     recommendations: ReadonlyArray<HarnessRecommendation>,
     options?: AutoTuneOptions,
   ): Promise<AutoTuneResult> {
-    const minConfidence = options?.minConfidence ?? 0.80;
+    const minConfidence = options?.minConfidence ?? 0.8;
     const dryRun = options?.dryRun ?? false;
     const allowed = options?.allowedParameters ? new Set(options.allowedParameters) : null;
 

@@ -8,10 +8,7 @@
  * static prefix while placing per-iteration state (errors, tool outputs) at the suffix.
  */
 import { MessageRole, type ModelMessage } from '../../core/model/model-io.js';
-import type {
-  PrefixCachingPayload,
-  PromptCacheSegment,
-} from '../../core/model/caching-types.js';
+import type { PrefixCachingPayload, PromptCacheSegment } from '../../core/model/caching-types.js';
 
 export interface PrefixCachingCompilerInput {
   readonly systemPrompt: string;

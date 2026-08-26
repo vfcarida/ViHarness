@@ -93,9 +93,7 @@ export class DefaultRepeatToolGuard {
     // Including this upcoming call: count = matches.length + 1
     const totalCount = matches.length + 1;
     if (totalCount >= this.config.thresholdCount) {
-      const previousResults = matches
-        .map((m) => m.resultSummary || '(no summary)')
-        .filter(Boolean);
+      const previousResults = matches.map((m) => m.resultSummary || '(no summary)').filter(Boolean);
 
       return {
         tool: name,
@@ -112,9 +110,10 @@ export class DefaultRepeatToolGuard {
    * Generate an advisory reminder string for the model.
    */
   generateReminder(info: RepeatInfo): string {
-    const resultsSummary = info.previousResults.length > 0
-      ? `\nPrevious observations: [${info.previousResults.slice(0, 3).join(' | ')}]`
-      : '';
+    const resultsSummary =
+      info.previousResults.length > 0
+        ? `\nPrevious observations: [${info.previousResults.slice(0, 3).join(' | ')}]`
+        : '';
 
     return (
       `Advisory Notice: You have invoked tool '${info.tool}' ${info.count} times ` +
@@ -138,10 +137,13 @@ export class DefaultRepeatToolGuard {
         // Sort keys deterministically
         const sorted = Object.keys(args as object)
           .sort()
-          .reduce((acc, k) => {
-            acc[k] = (args as any)[k];
-            return acc;
-          }, {} as Record<string, unknown>);
+          .reduce(
+            (acc, k) => {
+              acc[k] = (args as any)[k];
+              return acc;
+            },
+            {} as Record<string, unknown>,
+          );
         return JSON.stringify(sorted).toLowerCase();
       }
       return String(args).toLowerCase();
@@ -155,8 +157,8 @@ export class DefaultRepeatToolGuard {
     if (!a || !b) return 0.0;
 
     // Token-based Jaccard similarity + Levenshtein character similarity
-    const setA = new Set(a.split(/[\s,{}":\[\]]+/));
-    const setB = new Set(b.split(/[\s,{}":\[\]]+/));
+    const setA = new Set(a.split(/[\s,{}":[\]]+/));
+    const setB = new Set(b.split(/[\s,{}":[\]]+/));
 
     const intersection = new Set([...setA].filter((x) => setB.has(x)));
     const union = new Set([...setA, ...setB]);

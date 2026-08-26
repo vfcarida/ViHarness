@@ -64,14 +64,20 @@ describe('Tool Result Caching & Performance Optimization (Prompt 13)', () => {
     });
 
     // 1st call: executes tool
-    const res1 = await executor.execute({ toolName: 'mock_read_file', input: { path: 'file1.ts' } });
+    const res1 = await executor.execute({
+      toolName: 'mock_read_file',
+      input: { path: 'file1.ts' },
+    });
     expect(res1.success).toBe(true);
     expect(res1.output).toBe('Content of file1.ts');
     expect(res1.metadata?.['fromCache']).toBeUndefined();
     expect(rawExecutionCount).toBe(1);
 
     // 2nd call with identical input: served from cache!
-    const res2 = await executor.execute({ toolName: 'mock_read_file', input: { path: 'file1.ts' } });
+    const res2 = await executor.execute({
+      toolName: 'mock_read_file',
+      input: { path: 'file1.ts' },
+    });
     expect(res2.success).toBe(true);
     expect(res2.output).toBe('Content of file1.ts');
     expect(res2.metadata?.['fromCache']).toBe(true);
@@ -118,7 +124,10 @@ describe('Tool Result Caching & Performance Optimization (Prompt 13)', () => {
         idempotent: false,
         defaultTimeoutMs: 1000,
         requiredPermissions: ['fs:write'],
-        inputSchema: { type: 'object', properties: { doc: { type: 'string' }, content: { type: 'string' } } },
+        inputSchema: {
+          type: 'object',
+          properties: { doc: { type: 'string' }, content: { type: 'string' } },
+        },
       },
       async execute(input: ToolInput): Promise<ToolResult> {
         fileContent = String(input['content']);

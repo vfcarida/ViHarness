@@ -7,10 +7,7 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type {
-  IterationTraceRecord,
-  ExecutionTraceSummary,
-} from '../../core/model/trace-types.js';
+import type { IterationTraceRecord, ExecutionTraceSummary } from '../../core/model/trace-types.js';
 import type { ExecutionId } from '../../core/types/identifiers.js';
 import type { AgentPhase } from '../../core/model/state.js';
 

@@ -63,9 +63,7 @@ export class Container {
 
     const factory = this.factories.get(token);
     if (!factory) {
-      throw new Error(
-        `No registration found for token: ${token.toString()}`,
-      );
+      throw new Error(`No registration found for token: ${token.toString()}`);
     }
 
     const instance = factory(this) as T;

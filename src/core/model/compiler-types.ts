@@ -40,11 +40,11 @@ export interface CompilerScoringWeights {
 }
 
 export const DEFAULT_SCORING_WEIGHTS: Readonly<CompilerScoringWeights> = {
-  importanceWeight: 0.30,
+  importanceWeight: 0.3,
   dependencyWeight: 0.25,
-  verificationWeight: 0.20,
+  verificationWeight: 0.2,
   failureRelevanceWeight: 0.15,
-  recencyWeight: 0.10,
+  recencyWeight: 0.1,
   tokenCostPenaltyWeight: 0.05,
 };
 

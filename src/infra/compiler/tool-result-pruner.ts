@@ -87,10 +87,7 @@ export class DefaultToolResultPruner implements ToolResultPruner {
    * Replace over-budget text middle while retaining structure.
    * Returns null if within budget, or pruned blocks if over budget.
    */
-  pruneContent(
-    blocks: ReadonlyArray<ContentBlock>,
-    maxCodePoints?: number,
-  ): ContentBlock[] | null {
+  pruneContent(blocks: ReadonlyArray<ContentBlock>, maxCodePoints?: number): ContentBlock[] | null {
     const budget = maxCodePoints ?? this.defaultMaxCodePoints;
     const totalCodePoints = this.measureContent(blocks);
 

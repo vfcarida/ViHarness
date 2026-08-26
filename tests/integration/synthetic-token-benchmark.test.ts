@@ -43,13 +43,17 @@ describe('Synthetic 50-Iteration Token Measurement Benchmark', { timeout: 60000 
       providerId: 'scripted-bench',
       version: '1.0',
       capabilities: {
-        capabilities: new Set([ModelCapability.REASONING, ModelCapability.CODING, ModelCapability.TOOL_USE]),
+        capabilities: new Set([
+          ModelCapability.REASONING,
+          ModelCapability.CODING,
+          ModelCapability.TOOL_USE,
+        ]),
         maxContextTokens: 128000,
         maxOutputTokens: 4096,
         supportsSystemPrompt: true,
       },
       costPer1kInputTokensDollars: 0.0025, // $2.50 per 1M input tokens
-      costPer1kOutputTokensDollars: 0.010,  // $10.00 per 1M output tokens
+      costPer1kOutputTokensDollars: 0.01, // $10.00 per 1M output tokens
     };
 
     // Build 50 scripted steps: 49 tool calls editing/reading + 1 final completion
@@ -105,8 +109,8 @@ describe('Synthetic 50-Iteration Token Measurement Benchmark', { timeout: 60000 
 
     const costTracker = new DefaultCostTracker();
     costTracker.registerPricing('benchmark-gpt4o', {
-      promptPricePerMillion: 2.50,
-      completionPricePerMillion: 10.00,
+      promptPricePerMillion: 2.5,
+      completionPricePerMillion: 10.0,
     });
 
     const budgetTracker = new DefaultBudgetTracker();
@@ -167,8 +171,18 @@ describe('Synthetic 50-Iteration Token Measurement Benchmark', { timeout: 60000 
         cumulativeTotalTokens += u.totalTokens;
 
         // Record in CostTracker and BudgetTracker for each iteration
-        const est = costTracker.calculateCost('scripted-bench', 'benchmark-gpt4o', u.inputTokens, u.outputTokens);
-        costTracker.recordCost(result.taskId, 'scripted-bench', 'benchmark-gpt4o', est.estimatedCostUSD);
+        const est = costTracker.calculateCost(
+          'scripted-bench',
+          'benchmark-gpt4o',
+          u.inputTokens,
+          u.outputTokens,
+        );
+        costTracker.recordCost(
+          result.taskId,
+          'scripted-bench',
+          'benchmark-gpt4o',
+          est.estimatedCostUSD,
+        );
         budgetTracker.recordUsage(result.taskId, 'benchmark-gpt4o', est.estimatedCostUSD);
       }
     }
@@ -182,7 +196,9 @@ describe('Synthetic 50-Iteration Token Measurement Benchmark', { timeout: 60000 
     expect(cumulativeTotalTokens).toBe(expectedTotal);
 
     // 2. Financial Cost Audit
-    const expectedDollarCost = totalIterations * ((inputTokensPerTurn / 1_000_000) * 2.50 + (outputTokensPerTurn / 1_000_000) * 10.00);
+    const expectedDollarCost =
+      totalIterations *
+      ((inputTokensPerTurn / 1_000_000) * 2.5 + (outputTokensPerTurn / 1_000_000) * 10.0);
     const trackedTotalCost = costTracker.getTotalCost(result.taskId);
 
     expect(trackedTotalCost).toBeCloseTo(expectedDollarCost, 5);

@@ -11,12 +11,7 @@
  * IMPORTANT: The LLM must never directly set an arbitrary terminal state.
  * All transitions pass through the transition validator.
  */
-import type {
-  StateId,
-  TaskId,
-  IterationId,
-  EvidenceId,
-} from '../types/identifiers.js';
+import type { StateId, TaskId, IterationId, EvidenceId } from '../types/identifiers.js';
 
 // ---------------------------------------------------------------------------
 // Agent phase — the 14 canonical states of the state machine

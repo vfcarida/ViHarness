@@ -67,9 +67,15 @@ describe('SQLite Memory Curator (Hermes Lifecycle) — P013', () => {
     await curator.set('project', 'archive_candidate', 'value3');
 
     // Manually set access timestamps for lifecycle test
-    store.db.prepare("UPDATE memory SET accessed_at = ? WHERE key = 'recent_entry'").run(baseTime + 30 * dayMs);
-    store.db.prepare("UPDATE memory SET accessed_at = ? WHERE key = 'stale_candidate'").run(baseTime - 5 * dayMs);
-    store.db.prepare("UPDATE memory SET accessed_at = ? WHERE key = 'archive_candidate'").run(baseTime - 65 * dayMs);
+    store.db
+      .prepare("UPDATE memory SET accessed_at = ? WHERE key = 'recent_entry'")
+      .run(baseTime + 30 * dayMs);
+    store.db
+      .prepare("UPDATE memory SET accessed_at = ? WHERE key = 'stale_candidate'")
+      .run(baseTime - 5 * dayMs);
+    store.db
+      .prepare("UPDATE memory SET accessed_at = ? WHERE key = 'archive_candidate'")
+      .run(baseTime - 65 * dayMs);
 
     // Pass 1: Run sweep at baseTime + 30 days
     // active candidates inactive for >=30d transition to stale

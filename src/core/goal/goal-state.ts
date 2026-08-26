@@ -20,11 +20,11 @@ export type GoalPhase = 'active' | 'paused' | 'blocked' | 'completed' | 'cleared
 // ---------------------------------------------------------------------------
 
 export type BlockerCode =
-  | 'provider-limit'      // Context window or provider rate limit exceeded
-  | 'budget-exhausted'    // Token, cost, or round budget hit
-  | 'execution-error'     // Unrecoverable tool/runtime failure
-  | 'human-input-needed'  // Requires user intervention/clarification
-  | 'dependency-blocked'  // Waiting on external system or parent task
+  | 'provider-limit' // Context window or provider rate limit exceeded
+  | 'budget-exhausted' // Token, cost, or round budget hit
+  | 'execution-error' // Unrecoverable tool/runtime failure
+  | 'human-input-needed' // Requires user intervention/clarification
+  | 'dependency-blocked' // Waiting on external system or parent task
   | string;
 
 // ---------------------------------------------------------------------------

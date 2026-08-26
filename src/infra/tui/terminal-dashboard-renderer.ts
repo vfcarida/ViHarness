@@ -49,7 +49,9 @@ export class TerminalDashboardRenderer {
 
     // 1. Header
     lines.push(separator);
-    lines.push(` VI-HARNESS AGENTIC DASHBOARD | Exec: ${state.executionId.slice(0, 12)} | Turn: #${state.sequenceNumber}`);
+    lines.push(
+      ` VI-HARNESS AGENTIC DASHBOARD | Exec: ${state.executionId.slice(0, 12)} | Turn: #${state.sequenceNumber}`,
+    );
     lines.push(` Model: ${state.providerId}/${state.modelId} | Phase: [${state.currentPhase}]`);
     lines.push(subseparator);
 
@@ -70,13 +72,20 @@ export class TerminalDashboardRenderer {
     // 3. Four-Tier Context Budget Meters
     lines.push(' Context Hierarchy Allocations (L0 - L3):');
     if (state.contextBudget && state.currentTierUsage) {
-      for (const tier of [ContextTier.L0_HOT, ContextTier.L1_WORKING, ContextTier.L2_EPISODIC, ContextTier.L3_REPOSITORY]) {
+      for (const tier of [
+        ContextTier.L0_HOT,
+        ContextTier.L1_WORKING,
+        ContextTier.L2_EPISODIC,
+        ContextTier.L3_REPOSITORY,
+      ]) {
         const alloc = state.contextBudget.allocations[tier];
         const used = state.currentTierUsage[tier] ?? 0;
         const max = alloc?.maxTokens ?? 1000;
         const pct = Math.min(100, Math.round((used / Math.max(1, max)) * 100));
         const bar = this.renderProgressBar(pct, 20);
-        lines.push(`   ${tier.padEnd(16)}: ${bar} ${String(pct).padStart(3)}% (${used}/${max} tokens)`);
+        lines.push(
+          `   ${tier.padEnd(16)}: ${bar} ${String(pct).padStart(3)}% (${used}/${max} tokens)`,
+        );
       }
     } else {
       lines.push('   (Dynamic context budget balancing active)');
@@ -85,7 +94,8 @@ export class TerminalDashboardRenderer {
 
     // 4. Token & Financial Telemetry
     const totalTokens = state.promptTokens + state.completionTokens;
-    const cacheHitPct = state.promptTokens > 0 ? Math.round((state.cachedTokens / state.promptTokens) * 100) : 0;
+    const cacheHitPct =
+      state.promptTokens > 0 ? Math.round((state.cachedTokens / state.promptTokens) * 100) : 0;
     lines.push(
       ` Telemetry: Tokens: ${totalTokens.toLocaleString()} (Prompt: ${state.promptTokens.toLocaleString()} | Output: ${state.completionTokens.toLocaleString()} | Cache Hit: ${cacheHitPct}%)`,
     );

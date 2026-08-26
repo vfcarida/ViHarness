@@ -64,7 +64,9 @@ describe('SQLite Session Store & Tree Branching — P013', () => {
 
     // Branch from message index 1 (inherits Msg 0 and Msg 1)
     const childId = idFactory.create<'Session'>();
-    const child = await sessionStore.branchSession(parentId, 1, childId, { branchReason: 'Alternative approach' });
+    const child = await sessionStore.branchSession(parentId, 1, childId, {
+      branchReason: 'Alternative approach',
+    });
 
     expect(child.id).toBe(childId);
     expect(child.header.parentId).toBe(parentId);
@@ -141,7 +143,9 @@ describe('SQLite Session Store & Tree Branching — P013', () => {
   });
 
   it('6. should throw error when branching non-existent parent session', async () => {
-    await expect(sessionStore.branchSession('non-existent-id', 0)).rejects.toThrow(/non-existent parent/i);
+    await expect(sessionStore.branchSession('non-existent-id', 0)).rejects.toThrow(
+      /non-existent parent/i,
+    );
   });
 
   it('7. should throw error when resuming non-existent session', async () => {

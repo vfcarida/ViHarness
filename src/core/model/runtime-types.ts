@@ -16,7 +16,13 @@ import type { ActionProposal, ActionResult } from './action.js';
 import type { Evidence } from './evidence.js';
 import type { TokenUsage } from './model-io.js';
 import type { TerminationDecision } from './termination.js';
-import type { TaskCategory, RiskLevel, ComplexityLevel, ModelRole, DualModelConfig } from './router-types.js';
+import type {
+  TaskCategory,
+  RiskLevel,
+  ComplexityLevel,
+  ModelRole,
+  DualModelConfig,
+} from './router-types.js';
 import type { ContextObject } from './context-object.js';
 import type { PolicyDecisionType } from './policy.js';
 import type { PreStepListener, PreStepInterceptor } from './pre-step.js';
@@ -88,12 +94,7 @@ export interface IterationPhases {
 // ---------------------------------------------------------------------------
 
 export type AgentExecutionStatus =
-  | 'RUNNING'
-  | 'PAUSED'
-  | 'COMPLETED'
-  | 'FAILED'
-  | 'CANCELLED'
-  | 'AWAITING_HUMAN';
+  'RUNNING' | 'PAUSED' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'AWAITING_HUMAN';
 
 // ---------------------------------------------------------------------------
 // Observable Agent Event Types

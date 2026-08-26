@@ -76,7 +76,11 @@ export class MemoryLifecycle {
    * Determine optimal target tier for a promoted memory record.
    */
   static determinePromotedTier(record: MemoryRecord): MemoryTier {
-    if (record.tags.includes('pattern') || record.tags.includes('workflow') || record.tags.includes('skill')) {
+    if (
+      record.tags.includes('pattern') ||
+      record.tags.includes('workflow') ||
+      record.tags.includes('skill')
+    ) {
       return MemoryTier.PROCEDURAL;
     }
     return MemoryTier.SEMANTIC;

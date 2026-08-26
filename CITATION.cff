@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use Vi-Harness in your research or software engineering projects, please cite it as below."
 title: "Vi-Harness: Enterprise-Grade, Model-Agnostic Coding-Agent Runtime and Harness"
-version: 0.4.0
+version: 0.1.0
 date-released: 2026-08-14
 license: MIT
 repository-code: "https://github.com/vfcarida/Vi-Harness"

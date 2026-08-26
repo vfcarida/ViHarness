@@ -29,13 +29,7 @@ import {
   UuidV7IdFactory,
 } from '../../src/infra/index.js';
 import { LoopFingerprinter, DefaultAgentRuntime } from '../../src/runtime/index.js';
-import {
-  Goal,
-  GoalStatus,
-  FinishReason,
-  MessageRole,
-  AgentPhase,
-} from '../../src/core/index.js';
+import { Goal, GoalStatus, FinishReason, MessageRole, AgentPhase } from '../../src/core/index.js';
 
 describe('Meta-Harness Production Flow Integration Suite', () => {
   it('executes autonomous task with prefix caching, causal trace logging, loop fingerprinting, and impacted test selection', async () => {

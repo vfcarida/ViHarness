@@ -87,7 +87,8 @@ export class TBenchRunner {
     // 4. Aggregate Statistics
     const passedCount = taskResults.filter((r) => r.passed).length;
     const totalCount = taskResults.length;
-    const resolutionRate = totalCount > 0 ? Number(((passedCount / totalCount) * 100).toFixed(2)) : 0;
+    const resolutionRate =
+      totalCount > 0 ? Number(((passedCount / totalCount) * 100).toFixed(2)) : 0;
 
     const byCategory: Record<string, { passed: number; total: number }> = {};
     const byDifficulty: Record<string, { passed: number; total: number }> = {};

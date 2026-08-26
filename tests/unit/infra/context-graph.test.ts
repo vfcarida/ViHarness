@@ -1,9 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ContextGraph } from '../../../src/infra/context/context-graph.js';
-import {
-  ContextObjectType,
-  ContextRelationType,
-} from '../../../src/core/model/context-object.js';
+import { ContextObjectType, ContextRelationType } from '../../../src/core/model/context-object.js';
 import { ContextTier } from '../../../src/core/model/context.js';
 import type { ContextObject, ContextRelation } from '../../../src/core/model/context-object.js';
 import type { ContextId, TaskId } from '../../../src/core/types/identifiers.js';
@@ -12,7 +9,11 @@ describe('ContextGraph Unit Suite', () => {
   let graph: ContextGraph;
   const taskId = 'task-100' as TaskId;
 
-  function createNode(id: string, type = ContextObjectType.OBSERVATION, content = 'content'): ContextObject {
+  function createNode(
+    id: string,
+    type = ContextObjectType.OBSERVATION,
+    content = 'content',
+  ): ContextObject {
     return {
       id: id as ContextId,
       taskId,
@@ -109,10 +110,34 @@ describe('ContextGraph Unit Suite', () => {
     graph.addNode(nodeC);
     graph.addNode(nodeD);
 
-    graph.addRelation({ id: 'r1', sourceId: nodeA.id, targetId: nodeB.id, relation: ContextRelationType.DEPENDS_ON, createdAt: new Date() });
-    graph.addRelation({ id: 'r2', sourceId: nodeB.id, targetId: nodeC.id, relation: ContextRelationType.DEPENDS_ON, createdAt: new Date() });
-    graph.addRelation({ id: 'r3', sourceId: nodeC.id, targetId: nodeD.id, relation: ContextRelationType.DEPENDS_ON, createdAt: new Date() });
-    graph.addRelation({ id: 'r4', sourceId: nodeD.id, targetId: nodeA.id, relation: ContextRelationType.DEPENDS_ON, createdAt: new Date() }); // cycle!
+    graph.addRelation({
+      id: 'r1',
+      sourceId: nodeA.id,
+      targetId: nodeB.id,
+      relation: ContextRelationType.DEPENDS_ON,
+      createdAt: new Date(),
+    });
+    graph.addRelation({
+      id: 'r2',
+      sourceId: nodeB.id,
+      targetId: nodeC.id,
+      relation: ContextRelationType.DEPENDS_ON,
+      createdAt: new Date(),
+    });
+    graph.addRelation({
+      id: 'r3',
+      sourceId: nodeC.id,
+      targetId: nodeD.id,
+      relation: ContextRelationType.DEPENDS_ON,
+      createdAt: new Date(),
+    });
+    graph.addRelation({
+      id: 'r4',
+      sourceId: nodeD.id,
+      targetId: nodeA.id,
+      relation: ContextRelationType.DEPENDS_ON,
+      createdAt: new Date(),
+    }); // cycle!
 
     // Ancestors of A (nodes A points to via DEPENDS_ON)
     const ancestorsOfA = graph.getAncestors(nodeA.id, ContextRelationType.DEPENDS_ON);

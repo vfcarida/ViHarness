@@ -67,7 +67,7 @@ export class ContextCollapser {
     options: ApplyCollapseOptions,
   ): CollapseApplicationResult {
     const threshold =
-      options.collapseThreshold ?? (options.trigger === 'context-overflow' ? 0.40 : 0.70);
+      options.collapseThreshold ?? (options.trigger === 'context-overflow' ? 0.4 : 0.7);
     const tokenLimit = options.modelMaxTokens * threshold;
 
     if (options.currentTokens <= tokenLimit) {
@@ -105,7 +105,9 @@ export class ContextCollapser {
       const itemSnippets =
         currentBatch.length <= 3
           ? currentBatch
-              .map((o, idx) => `[${idx + 1}] ${o.type}: ${o.content.slice(0, 30).replace(/\n/g, ' ')}`)
+              .map(
+                (o, idx) => `[${idx + 1}] ${o.type}: ${o.content.slice(0, 30).replace(/\n/g, ' ')}`,
+              )
               .join('; ')
           : `[1] ${currentBatch[0]!.content.slice(0, 30)} ... [${currentBatch.length}] ${currentBatch[currentBatch.length - 1]!.content.slice(0, 30)}`;
 

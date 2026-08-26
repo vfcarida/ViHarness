@@ -42,7 +42,10 @@ export class ContextRanker {
     // 2. Explicit human decisions & critical architectural decisions
     if (
       obj.type === ContextObjectType.DECISION &&
-      (obj.source === 'human' || obj.source === 'user' || obj.importance >= 0.8 || obj.tags.includes('critical_decision'))
+      (obj.source === 'human' ||
+        obj.source === 'user' ||
+        obj.importance >= 0.8 ||
+        obj.tags.includes('critical_decision'))
     ) {
       return true;
     }
@@ -84,9 +87,7 @@ export class ContextRanker {
 
     // 3. Failure relevance score
     const failureRelevance =
-      obj.type === ContextObjectType.FAILURE || obj.type === ContextObjectType.EVIDENCE
-        ? 0.9
-        : 0.2;
+      obj.type === ContextObjectType.FAILURE || obj.type === ContextObjectType.EVIDENCE ? 0.9 : 0.2;
 
     // 4. Recency decay score
     const ageHours = Math.max(0, (nowMs - obj.lastUsed.getTime()) / (1000 * 60 * 60));

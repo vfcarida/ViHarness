@@ -5,7 +5,11 @@
  * tool failure rate computation, bottleneck identification, and outer-loop adaptation recommendations.
  */
 import { describe, it, expect } from 'vitest';
-import { TraceDistiller, HarnessDiagnosticEngine, UuidV7IdFactory } from '../../../src/infra/index.js';
+import {
+  TraceDistiller,
+  HarnessDiagnosticEngine,
+  UuidV7IdFactory,
+} from '../../../src/infra/index.js';
 import { AgentPhase, MessageRole } from '../../../src/core/index.js';
 import type { IterationTraceRecord } from '../../../src/core/model/trace-types.js';
 

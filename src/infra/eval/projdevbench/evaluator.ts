@@ -84,11 +84,20 @@ export class ProjDevEvaluator {
 
         if (errorObj?.killed || errorObj?.signal === 'SIGTERM' || duration >= timeout) {
           verdict = 'TLE';
-        } else if (combined.includes('SyntaxError') || combined.includes('TS2304') || combined.includes('Cannot find module')) {
+        } else if (
+          combined.includes('SyntaxError') ||
+          combined.includes('TS2304') ||
+          combined.includes('Cannot find module')
+        ) {
           verdict = 'CE';
         } else if (combined.includes('JavaScript heap out of memory')) {
           verdict = 'MLE';
-        } else if (errorObj?.code && errorObj.code !== 0 && !combined.includes('AssertionError') && !combined.includes('FAIL')) {
+        } else if (
+          errorObj?.code &&
+          errorObj.code !== 0 &&
+          !combined.includes('AssertionError') &&
+          !combined.includes('FAIL')
+        ) {
           verdict = 'RE';
         }
 
@@ -180,7 +189,13 @@ export class ProjDevEvaluator {
       const relPath = path.join(rel, entry.name).replace(/\\/g, '/');
       if (entry.isDirectory()) {
         results.push(...this.listCodeFiles(full, relPath));
-      } else if (entry.isFile() && (relPath.endsWith('.ts') || relPath.endsWith('.js') || relPath.endsWith('.py') || relPath.endsWith('.json'))) {
+      } else if (
+        entry.isFile() &&
+        (relPath.endsWith('.ts') ||
+          relPath.endsWith('.js') ||
+          relPath.endsWith('.py') ||
+          relPath.endsWith('.json'))
+      ) {
         results.push(relPath);
       }
     }
@@ -216,7 +231,7 @@ export class ProjDevEvaluator {
 
     // 3. Composite Final Score
     const finalScore = Number((0.8 * executionScore + 0.2 * codeReviewScore).toFixed(4));
-    const success = finalScore >= 0.70;
+    const success = finalScore >= 0.7;
 
     return {
       problemId: problem.id,

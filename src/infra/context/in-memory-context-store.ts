@@ -18,10 +18,7 @@ import type {
   CreateContextObjectParams,
   CreateContextRelationParams,
 } from '../../core/model/context-object.js';
-import {
-  ContextScope,
-  ContextRelationType,
-} from '../../core/model/context-object.js';
+import { ContextScope, ContextRelationType } from '../../core/model/context-object.js';
 import { ContextGraph } from './context-graph.js';
 import { HarnessError } from '../../core/errors/base-error.js';
 import { ErrorCode, ErrorCategory } from '../../core/errors/error-codes.js';
@@ -95,10 +92,7 @@ export class InMemoryContextStore implements ContextStore {
     return object;
   }
 
-  async updateObject(
-    id: ContextId,
-    updates: Partial<ContextObject>,
-  ): Promise<ContextObject> {
+  async updateObject(id: ContextId, updates: Partial<ContextObject>): Promise<ContextObject> {
     const historyMap = this.versionHistory.get(id);
     if (!historyMap || historyMap.size === 0) {
       throw new HarnessError({
@@ -128,10 +122,7 @@ export class InMemoryContextStore implements ContextStore {
     return updatedObject;
   }
 
-  async getObject(
-    id: ContextId,
-    version?: number,
-  ): Promise<ContextObject | undefined> {
+  async getObject(id: ContextId, version?: number): Promise<ContextObject | undefined> {
     const historyMap = this.versionHistory.get(id);
     if (!historyMap || historyMap.size === 0) return undefined;
 
@@ -289,13 +280,8 @@ export class InMemoryContextStore implements ContextStore {
   private calculateCompositeScore(obj: ContextObject, nowMs: number): number {
     const ageHours = Math.max(0, (nowMs - obj.lastUsed.getTime()) / (1000 * 60 * 60));
     const recencyScore = 1 / (1 + ageHours / 24); // Half-life decay of ~24h
-    const verifiedBonus = obj.lastVerified !== null ? 0.10 : 0.0;
+    const verifiedBonus = obj.lastVerified !== null ? 0.1 : 0.0;
 
-    return (
-      obj.importance * 0.35 +
-      obj.confidence * 0.35 +
-      recencyScore * 0.20 +
-      verifiedBonus
-    );
+    return obj.importance * 0.35 + obj.confidence * 0.35 + recencyScore * 0.2 + verifiedBonus;
   }
 }

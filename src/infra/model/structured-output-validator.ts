@@ -26,8 +26,7 @@ export interface StructuredValidationFailure {
 }
 
 export type StructuredValidationResult<T> =
-  | StructuredValidationSuccess<T>
-  | StructuredValidationFailure;
+  StructuredValidationSuccess<T> | StructuredValidationFailure;
 
 export class StructuredOutputValidator {
   /**

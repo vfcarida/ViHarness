@@ -8,10 +8,7 @@ import {
   CommandSanitizer,
   UuidV7IdFactory,
 } from '../../../src/infra/index.js';
-import {
-  ToolCategory,
-  PolicyDecisionType,
-} from '../../../src/core/index.js';
+import { ToolCategory, PolicyDecisionType } from '../../../src/core/index.js';
 import type { Tool, PolicyEngine } from '../../../src/core/index.js';
 
 describe('Tool Execution Layer', () => {

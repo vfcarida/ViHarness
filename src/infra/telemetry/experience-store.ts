@@ -100,8 +100,7 @@ export class DefaultExperienceStore implements ExperienceStore {
   private readonly clock: Clock;
 
   constructor(options?: ExperienceStoreOptions) {
-    this.baseDir =
-      options?.baseDir ?? path.join(os.homedir(), '.vi-harness', 'experience');
+    this.baseDir = options?.baseDir ?? path.join(os.homedir(), '.vi-harness', 'experience');
     this.clock = options?.clock ?? new SystemClock();
 
     if (!fs.existsSync(this.baseDir)) {
@@ -177,11 +176,12 @@ export class DefaultExperienceStore implements ExperienceStore {
         totalTokens: (it.tokenUsage?.inputTokens ?? 0) + (it.tokenUsage?.outputTokens ?? 0),
         costDollars: it.costDollars ?? 0,
         messages: [],
-        proposedToolCalls: it.actionProposals?.map((p) => ({
-          id: p.id,
-          name: String(p.parameters['toolName'] ?? p.description),
-          input: p.parameters,
-        })) ?? [],
+        proposedToolCalls:
+          it.actionProposals?.map((p) => ({
+            id: p.id,
+            name: String(p.parameters['toolName'] ?? p.description),
+            input: p.parameters,
+          })) ?? [],
         policyDecisions: [],
         executedToolResults: it.toolResults ?? [],
         evidenceCreated: it.evidenceCreated ?? [],
@@ -207,7 +207,9 @@ export class DefaultExperienceStore implements ExperienceStore {
     // 5. Update index.json catalog
     const lastIteration = traces[traces.length - 1];
     const finalPhase = String(
-      lastIteration?.phaseAfter ?? (result as any).finalPhase ?? (result.success ? 'DONE' : 'FAILED'),
+      lastIteration?.phaseAfter ??
+        (result as any).finalPhase ??
+        (result.success ? 'DONE' : 'FAILED'),
     );
 
     const indexEntry: RunIndexEntry = {

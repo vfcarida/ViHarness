@@ -5,12 +5,7 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type {
-  ProjDevProblem,
-  ProjDevCategory,
-  ProjDevDifficulty,
-  ProjDevMode,
-} from './types.js';
+import type { ProjDevProblem, ProjDevCategory, ProjDevDifficulty, ProjDevMode } from './types.js';
 import { type Goal, GoalStatus, DEFAULT_GOAL_CONSTRAINTS } from '../../../core/model/goal.js';
 import type { IdFactory } from '../../../core/types/identifiers.js';
 
@@ -82,7 +77,8 @@ export class ProjDevTaskLoader {
       title: String(rawConfig.title ?? rawConfig.id ?? path.basename(dirPath)),
       category: (rawConfig.category ?? 'SYSTEMS_UTILITY') as ProjDevCategory,
       difficulty: (rawConfig.difficulty ?? 'MEDIUM') as ProjDevDifficulty,
-      mode: (rawConfig.mode ?? (Object.keys(templateFiles).length > 0 ? 'SCAFFOLD' : 'FROM_SCRATCH')) as ProjDevMode,
+      mode: (rawConfig.mode ??
+        (Object.keys(templateFiles).length > 0 ? 'SCAFFOLD' : 'FROM_SCRATCH')) as ProjDevMode,
       specMarkdown,
       testCommands,
       templateFiles,

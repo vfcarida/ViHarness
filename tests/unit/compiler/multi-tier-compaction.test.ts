@@ -176,9 +176,13 @@ describe('Multi-Tier Progressive Context Compaction Suite (Prompt 6)', () => {
     const scored = objects.map((o) => ContextRanker.scoreObject(o, nowMs, DEFAULT_SCORING_WEIGHTS));
 
     // Small model (32k) -> Triggers aggressive compaction early
-    const smallResult = ContextCompressor.compress(scored, 600, nowMs, { modelContextTokens: 32000 });
+    const smallResult = ContextCompressor.compress(scored, 600, nowMs, {
+      modelContextTokens: 32000,
+    });
     // Large model (200k) -> Delays compaction threshold
-    const largeResult = ContextCompressor.compress(scored, 1000, nowMs, { modelContextTokens: 200000 });
+    const largeResult = ContextCompressor.compress(scored, 1000, nowMs, {
+      modelContextTokens: 200000,
+    });
 
     expect(smallResult.totalTokens).toBeLessThanOrEqual(600);
     expect(largeResult.totalTokens).toBeGreaterThan(smallResult.totalTokens);
@@ -324,11 +328,15 @@ describe('Multi-Tier Progressive Context Compaction Suite (Prompt 6)', () => {
     expect(compiled.compiledContext.totalTokenEstimate).toBeLessThanOrEqual(2500);
 
     // b) Invariants 100% preserved
-    const retainedDecisions = compiled.retainedObjects.filter((o) => o.type === ContextObjectType.DECISION);
+    const retainedDecisions = compiled.retainedObjects.filter(
+      (o) => o.type === ContextObjectType.DECISION,
+    );
     expect(retainedDecisions.length).toBeGreaterThanOrEqual(1);
     expect(retainedDecisions[0]?.content).toContain('atomic Lua scripts');
 
-    const retainedGoals = compiled.retainedObjects.filter((o) => o.type === ContextObjectType.USER_INSTRUCTION);
+    const retainedGoals = compiled.retainedObjects.filter(
+      (o) => o.type === ContextObjectType.USER_INSTRUCTION,
+    );
     expect(retainedGoals.length).toBeGreaterThanOrEqual(1);
 
     // c) Detailed Explanation Report generated
@@ -337,7 +345,7 @@ describe('Multi-Tier Progressive Context Compaction Suite (Prompt 6)', () => {
     expect(compiled.explanation!.riskLevel).toBeDefined();
 
     // d) Metrics demonstrate massive compression ratio
-    expect(compiled.metrics.compressionRatio).toBeGreaterThan(0.60);
+    expect(compiled.metrics.compressionRatio).toBeGreaterThan(0.6);
     expect(compiled.metrics.mandatoryRetainedCount).toBeGreaterThanOrEqual(2);
   });
 });

@@ -5,7 +5,11 @@
  * "Tests generate evidence" — verification outputs feed the evidence store.
  */
 import type { TaskId } from '../types/identifiers.js';
-import type { VerificationResult, VerificationSuite, VerificationProfile } from '../model/verification.js';
+import type {
+  VerificationResult,
+  VerificationSuite,
+  VerificationProfile,
+} from '../model/verification.js';
 
 export interface VerificationTarget {
   /** Type of artifact/target to verify (e.g. 'file', 'test-suite', 'build', 'security'). */

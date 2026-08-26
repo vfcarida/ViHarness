@@ -34,12 +34,14 @@ export class DefaultToolRunContext implements ToolRunContext {
   private readonly deferredMessages: Array<Record<string, unknown> | string> = [];
   private turnConcluded = false;
 
-  constructor(options: {
-    sessionId?: string;
-    callId?: string;
-    toolName?: string;
-    metadata?: Record<string, unknown>;
-  } = {}) {
+  constructor(
+    options: {
+      sessionId?: string;
+      callId?: string;
+      toolName?: string;
+      metadata?: Record<string, unknown>;
+    } = {},
+  ) {
     this.sessionId = options.sessionId;
     this.callId = options.callId;
     this.toolName = options.toolName;

@@ -48,7 +48,10 @@ export interface ReferenceEdge {
 export interface ReferenceGraph {
   readonly nodes: ReadonlySet<string>; // file paths
   readonly edges: ReadonlyArray<ReferenceEdge>;
-  readonly symbolDefinitions: ReadonlyMap<string, { readonly filePath: string; readonly symbol: CodeSymbol }>;
+  readonly symbolDefinitions: ReadonlyMap<
+    string,
+    { readonly filePath: string; readonly symbol: CodeSymbol }
+  >;
   readonly fileReferences: ReadonlyMap<string, ReadonlyMap<string, number>>; // filePath -> (symbolName -> count)
 }
 

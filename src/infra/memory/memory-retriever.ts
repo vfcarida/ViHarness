@@ -6,7 +6,11 @@
  *
  * Ensures only high-signal records crossing the relevance threshold are retrieved.
  */
-import type { MemoryRecord, ScoredMemoryRecord, MemoryQuery } from '../../core/model/memory-types.js';
+import type {
+  MemoryRecord,
+  ScoredMemoryRecord,
+  MemoryQuery,
+} from '../../core/model/memory-types.js';
 import { MemoryStatus } from '../../core/model/memory-types.js';
 import { MemoryScorer } from './memory-scorer.js';
 import { MemoryLifecycle } from './memory-lifecycle.js';
@@ -81,7 +85,10 @@ export class MemoryRetriever {
       const scored = MemoryScorer.score(record, query, nowMs);
 
       // If minRelevance threshold is specified, enforce it
-      if ((query as any).minRelevance !== undefined && scored.relevanceScore < (query as any).minRelevance) {
+      if (
+        (query as any).minRelevance !== undefined &&
+        scored.relevanceScore < (query as any).minRelevance
+      ) {
         continue;
       }
 

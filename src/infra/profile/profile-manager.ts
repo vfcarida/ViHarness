@@ -6,9 +6,13 @@
  */
 import type { ProfileConfig, ResolvedProfile, ProfilePatch } from '../../core/profile/types.js';
 
-export const KNOWN_BUNDLES: Record<string, { description: string; defaultSettings: Record<string, unknown> }> = {
+export const KNOWN_BUNDLES: Record<
+  string,
+  { description: string; defaultSettings: Record<string, unknown> }
+> = {
   base: {
-    description: 'Core engine: StateMachine, TestClock/SystemClock, UuidV7IdFactory, ContextCompiler',
+    description:
+      'Core engine: StateMachine, TestClock/SystemClock, UuidV7IdFactory, ContextCompiler',
     defaultSettings: { maxIterations: 50, safetyBounds: true },
   },
   headless: {
@@ -24,7 +28,8 @@ export const KNOWN_BUNDLES: Record<string, { description: string; defaultSetting
     defaultSettings: { mcpEnabled: true },
   },
   sqlite: {
-    description: 'Persistent SQLite database for sessions, experiences, metrics, and memory curation',
+    description:
+      'Persistent SQLite database for sessions, experiences, metrics, and memory curation',
     defaultSettings: { persistence: 'sqlite', walMode: true },
   },
   benchmark: {
@@ -46,7 +51,8 @@ export class ProfileManager {
       throw new Error('Profile must have a valid non-empty name');
     }
 
-    const activeBundles = Array.isArray(config.bundles) && config.bundles.length > 0 ? [...config.bundles] : ['base'];
+    const activeBundles =
+      Array.isArray(config.bundles) && config.bundles.length > 0 ? [...config.bundles] : ['base'];
 
     // Collect settings from active bundles
     const resolvedConfig: Record<string, unknown> = {};
@@ -62,7 +68,8 @@ export class ProfileManager {
     for (const patch of patches) {
       if (patch.config) {
         resolvedConfig[patch.target] = {
-          ...(typeof resolvedConfig[patch.target] === 'object' && resolvedConfig[patch.target] !== null
+          ...(typeof resolvedConfig[patch.target] === 'object' &&
+          resolvedConfig[patch.target] !== null
             ? (resolvedConfig[patch.target] as Record<string, unknown>)
             : {}),
           ...patch.config,
@@ -97,7 +104,10 @@ export class ProfileManager {
   /**
    * Apply resolved profile configuration to runtime options.
    */
-  applyToRuntimeOptions<T extends Record<string, any>>(profile: ResolvedProfile, baseOptions: T): T {
+  applyToRuntimeOptions<T extends Record<string, any>>(
+    profile: ResolvedProfile,
+    baseOptions: T,
+  ): T {
     const updated = { ...baseOptions };
 
     // If storage patch exists
@@ -110,7 +120,8 @@ export class ProfileManager {
     }
 
     // If router patch exists
-    const routerPatch = profile.resolvedConfig['model-router'] as Record<string, unknown> | undefined;
+    const routerPatch = profile.resolvedConfig['model-router'] as
+      Record<string, unknown> | undefined;
     if (routerPatch) {
       (updated as any).routerOptions = {
         ...((updated as any).routerOptions ?? {}),

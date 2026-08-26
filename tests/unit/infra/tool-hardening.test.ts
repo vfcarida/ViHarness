@@ -218,7 +218,13 @@ describe('Tool System Hardening Suite', () => {
         executionOrder.push('start_1');
         await new Promise((r) => setTimeout(r, 40));
         executionOrder.push('end_1');
-        return { toolCallId: idFactory.create<'ToolCall'>(), name: 'write_1', output: 'ok', success: true, durationMs: 40 };
+        return {
+          toolCallId: idFactory.create<'ToolCall'>(),
+          name: 'write_1',
+          output: 'ok',
+          success: true,
+          durationMs: 40,
+        };
       },
     };
 
@@ -228,7 +234,13 @@ describe('Tool System Hardening Suite', () => {
         executionOrder.push('start_2');
         await new Promise((r) => setTimeout(r, 10));
         executionOrder.push('end_2');
-        return { toolCallId: idFactory.create<'ToolCall'>(), name: 'write_2', output: 'ok', success: true, durationMs: 10 };
+        return {
+          toolCallId: idFactory.create<'ToolCall'>(),
+          name: 'write_2',
+          output: 'ok',
+          success: true,
+          durationMs: 10,
+        };
       },
     };
 

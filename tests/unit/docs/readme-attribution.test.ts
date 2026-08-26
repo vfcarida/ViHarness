@@ -65,13 +65,16 @@ describe('README Attribution & Reference Documentation Suite — P015', () => {
 
     for (const { text, target } of links) {
       // If relative local file link (not http/https and not purely an anchor #...)
-      if (!target.startsWith('http://') && !target.startsWith('https://') && !target.startsWith('#')) {
+      if (
+        !target.startsWith('http://') &&
+        !target.startsWith('https://') &&
+        !target.startsWith('#')
+      ) {
         const filePath = path.resolve(rootDir, target.split('#')[0]);
         const exists = fs.existsSync(filePath);
-        expect(
-          exists,
-          `Link [${text}](${target}) points to non-existent file: ${filePath}`
-        ).toBe(true);
+        expect(exists, `Link [${text}](${target}) points to non-existent file: ${filePath}`).toBe(
+          true,
+        );
       }
     }
   });
@@ -85,7 +88,11 @@ describe('README Attribution & Reference Documentation Suite — P015', () => {
       { name: 'Hermes', org: 'Devin', url: 'https://github.com/anthropics/hermes' },
       { name: 'Pi', org: 'Cursor', url: 'https://github.com/anthropics/pi' },
       { name: 'Meta-Harness', org: '', url: 'https://github.com/meta-harness/meta-harness' },
-      { name: 'DeepSeek Harness', org: 'DeepSeek AI', url: 'https://github.com/deepseek-ai/deepseek-harness' },
+      {
+        name: 'DeepSeek Harness',
+        org: 'DeepSeek AI',
+        url: 'https://github.com/deepseek-ai/deepseek-harness',
+      },
     ];
 
     expect(readmeContent).toContain('## References & Acknowledgments');
@@ -96,7 +103,9 @@ describe('README Attribution & Reference Documentation Suite — P015', () => {
     }
 
     // Check each reference section contains "What we learned" and "Key insight"
-    const refSection = readmeContent.substring(readmeContent.indexOf('## References & Acknowledgments'));
+    const refSection = readmeContent.substring(
+      readmeContent.indexOf('## References & Acknowledgments'),
+    );
     const learnedMatches = refSection.match(/\*\*What we learned\*\*/g) || [];
     const insightMatches = refSection.match(/\*\*Key insight\*\*/g) || [];
 
@@ -168,7 +177,8 @@ describe('README Attribution & Reference Documentation Suite — P015', () => {
       },
       {
         path: 'src/infra/tools/parallel-tool-executor.ts',
-        pattern: '// Pattern: Concurrency safety classification & parallel tool execution (ref: DeepSeek Harness)',
+        pattern:
+          '// Pattern: Concurrency safety classification & parallel tool execution (ref: DeepSeek Harness)',
       },
       {
         path: 'src/runtime/loop-fingerprinter.ts',
@@ -190,7 +200,7 @@ describe('README Attribution & Reference Documentation Suite — P015', () => {
       const content = fs.readFileSync(fullPath, 'utf-8');
       expect(
         content.startsWith(pattern),
-        `File ${relPath} must begin with pattern comment: "${pattern}"`
+        `File ${relPath} must begin with pattern comment: "${pattern}"`,
       ).toBe(true);
     }
   });

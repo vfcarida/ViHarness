@@ -26,8 +26,14 @@ export class ParallelToolExecutor {
     context?: Partial<ToolExecutionContext>,
   ): Promise<ReadonlyArray<ToolResult>> {
     // Separate non-mutating (safe) from mutating tool calls
-    const safeCalls: { call: { toolName: string; input: Record<string, unknown> }; index: number }[] = [];
-    const mutatingCalls: { call: { toolName: string; input: Record<string, unknown> }; index: number }[] = [];
+    const safeCalls: {
+      call: { toolName: string; input: Record<string, unknown> };
+      index: number;
+    }[] = [];
+    const mutatingCalls: {
+      call: { toolName: string; input: Record<string, unknown> };
+      index: number;
+    }[] = [];
 
     for (let i = 0; i < calls.length; i++) {
       const call = calls[i]!;

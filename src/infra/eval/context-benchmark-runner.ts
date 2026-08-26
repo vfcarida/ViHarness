@@ -46,19 +46,27 @@ export class ContextBenchmarkRunner {
     // Compute executive summary averages across all horizons
     const horizonList = Object.values(comparisonsByHorizon);
     const overallViVsNaiveSavings =
-      horizonList.reduce((acc, h) => acc + h.viVsNaiveTokenSavingsPercent, 0) / Math.max(1, horizonList.length);
+      horizonList.reduce((acc, h) => acc + h.viVsNaiveTokenSavingsPercent, 0) /
+      Math.max(1, horizonList.length);
     const overallViVsPiSavings =
-      horizonList.reduce((acc, h) => acc + h.viVsPiTokenSavingsPercent, 0) / Math.max(1, horizonList.length);
+      horizonList.reduce((acc, h) => acc + h.viVsPiTokenSavingsPercent, 0) /
+      Math.max(1, horizonList.length);
 
     const overallViRetention =
-      horizonList.reduce((acc, h) => acc + h.strategyResults['VI_CONTEXT_COMPILER'].criticalMemoryRetentionScore, 0) /
-      Math.max(1, horizonList.length);
+      horizonList.reduce(
+        (acc, h) => acc + h.strategyResults['VI_CONTEXT_COMPILER'].criticalMemoryRetentionScore,
+        0,
+      ) / Math.max(1, horizonList.length);
     const overallPiRetention =
-      horizonList.reduce((acc, h) => acc + h.strategyResults['PI_COMPACTION'].criticalMemoryRetentionScore, 0) /
-      Math.max(1, horizonList.length);
+      horizonList.reduce(
+        (acc, h) => acc + h.strategyResults['PI_COMPACTION'].criticalMemoryRetentionScore,
+        0,
+      ) / Math.max(1, horizonList.length);
     const overallNaiveRetention =
-      horizonList.reduce((acc, h) => acc + h.strategyResults['NAIVE_ACCUMULATION'].criticalMemoryRetentionScore, 0) /
-      Math.max(1, horizonList.length);
+      horizonList.reduce(
+        (acc, h) => acc + h.strategyResults['NAIVE_ACCUMULATION'].criticalMemoryRetentionScore,
+        0,
+      ) / Math.max(1, horizonList.length);
 
     return {
       suiteId: `context-efficiency-suite-v1`,
@@ -78,7 +86,10 @@ export class ContextBenchmarkRunner {
   /**
    * Run comparison for a single horizon.
    */
-  async runHorizon(horizon: number, options?: ContextBenchmarkOptions): Promise<HorizonComparisonResult> {
+  async runHorizon(
+    horizon: number,
+    options?: ContextBenchmarkOptions,
+  ): Promise<HorizonComparisonResult> {
     const trajectory = ContextTrajectoryGenerator.generateTrajectory(horizon);
     const totalCriticalFacts = ContextTrajectoryGenerator.getInjectedCriticalItems(horizon).length;
     const totalInjectedTokens = trajectory.reduce((acc, s) => acc + s.rawTokens, 0);
@@ -127,15 +138,21 @@ export class ContextBenchmarkRunner {
         const retention = strategy.evaluateRetention(injectedSoFar);
 
         // Get naive tokens at this iteration for baseline ratio computation
-        const naiveTokensAtIter = measurements.length > 0 && strategy.name !== 'NAIVE_ACCUMULATION'
-          ? strategyResults['NAIVE_ACCUMULATION']?.measurements[iter - 1]?.contextTokens ?? lastContextTokens
-          : lastContextTokens;
-        const naiveCumTokensAtIter = measurements.length > 0 && strategy.name !== 'NAIVE_ACCUMULATION'
-          ? strategyResults['NAIVE_ACCUMULATION']?.measurements[iter - 1]?.cumulativeTokens ?? cumulativeTokens
-          : cumulativeTokens;
+        const naiveTokensAtIter =
+          measurements.length > 0 && strategy.name !== 'NAIVE_ACCUMULATION'
+            ? (strategyResults['NAIVE_ACCUMULATION']?.measurements[iter - 1]?.contextTokens ??
+              lastContextTokens)
+            : lastContextTokens;
+        const naiveCumTokensAtIter =
+          measurements.length > 0 && strategy.name !== 'NAIVE_ACCUMULATION'
+            ? (strategyResults['NAIVE_ACCUMULATION']?.measurements[iter - 1]?.cumulativeTokens ??
+              cumulativeTokens)
+            : cumulativeTokens;
 
-        const compressionRatio = naiveTokensAtIter > 0 ? lastContextTokens / naiveTokensAtIter : 1.0;
-        const cumulativeTokenRatio = naiveCumTokensAtIter > 0 ? cumulativeTokens / naiveCumTokensAtIter : 1.0;
+        const compressionRatio =
+          naiveTokensAtIter > 0 ? lastContextTokens / naiveTokensAtIter : 1.0;
+        const cumulativeTokenRatio =
+          naiveCumTokensAtIter > 0 ? cumulativeTokens / naiveCumTokensAtIter : 1.0;
 
         measurements.push({
           iteration: iter,
@@ -157,8 +174,12 @@ export class ContextBenchmarkRunner {
       const durationMs = Date.now() - startTime;
       const initialContextTokens = measurements[0]?.contextTokens ?? 0;
       const finalContextTokens = measurements[measurements.length - 1]?.contextTokens ?? 0;
-      const avgContext = measurements.reduce((acc, m) => acc + m.contextTokens, 0) / Math.max(1, measurements.length);
-      const avgCompression = measurements.reduce((acc, m) => acc + m.compressionRatio, 0) / Math.max(1, measurements.length);
+      const avgContext =
+        measurements.reduce((acc, m) => acc + m.contextTokens, 0) /
+        Math.max(1, measurements.length);
+      const avgCompression =
+        measurements.reduce((acc, m) => acc + m.compressionRatio, 0) /
+        Math.max(1, measurements.length);
 
       strategyResults[strategy.name] = {
         strategy: strategy.name,
@@ -183,13 +204,19 @@ export class ContextBenchmarkRunner {
     const piResult = strategyResults['PI_COMPACTION'];
     const viResult = strategyResults['VI_CONTEXT_COMPILER'];
 
-    const viVsNaiveTokenSavings = naiveResult.totalCumulativeTokens > 0
-      ? ((naiveResult.totalCumulativeTokens - viResult.totalCumulativeTokens) / naiveResult.totalCumulativeTokens) * 100
-      : 0;
+    const viVsNaiveTokenSavings =
+      naiveResult.totalCumulativeTokens > 0
+        ? ((naiveResult.totalCumulativeTokens - viResult.totalCumulativeTokens) /
+            naiveResult.totalCumulativeTokens) *
+          100
+        : 0;
 
-    const viVsPiTokenSavings = piResult.totalCumulativeTokens > 0
-      ? ((piResult.totalCumulativeTokens - viResult.totalCumulativeTokens) / piResult.totalCumulativeTokens) * 100
-      : 0;
+    const viVsPiTokenSavings =
+      piResult.totalCumulativeTokens > 0
+        ? ((piResult.totalCumulativeTokens - viResult.totalCumulativeTokens) /
+            piResult.totalCumulativeTokens) *
+          100
+        : 0;
 
     const viVsPiRetentionDelta =
       (viResult.criticalMemoryRetentionScore - piResult.criticalMemoryRetentionScore) * 100;

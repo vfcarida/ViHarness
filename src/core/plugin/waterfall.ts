@@ -61,10 +61,7 @@ export class WaterfallEngine {
    * Register a waterfall interceptor for a specific lifecycle point.
    * Returns a disposer function that removes this interceptor.
    */
-  register<K extends keyof WaterfallMap>(
-    event: K,
-    handler: WaterfallHandler<K>,
-  ): () => void {
+  register<K extends keyof WaterfallMap>(event: K, handler: WaterfallHandler<K>): () => void {
     const list = this.handlers.get(event) ?? [];
     list.push(handler);
     this.handlers.set(event, list);

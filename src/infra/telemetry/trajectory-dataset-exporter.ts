@@ -57,7 +57,8 @@ export class TrajectoryDatasetExporter {
     // Base system instruction
     messages.push({
       role: 'system',
-      content: 'You are an autonomous software engineering agent operating as a stateful, evidence-driven state machine.',
+      content:
+        'You are an autonomous software engineering agent operating as a stateful, evidence-driven state machine.',
     });
 
     for (const rec of records) {
@@ -116,11 +117,19 @@ export class TrajectoryDatasetExporter {
       const next = records[i + 1]!;
 
       // Check if current iteration had a failed tool or policy rejection, and next iteration succeeded
-      const hasFailure = current.executedToolResults.some((r) => r.status === ActionResultStatus.FAILURE) ||
-                         current.policyDecisions.some((p) => String(p.decision) === 'DENY');
-      const nextSucceeded = next.executedToolResults.every((r) => r.status === ActionResultStatus.SUCCESS);
+      const hasFailure =
+        current.executedToolResults.some((r) => r.status === ActionResultStatus.FAILURE) ||
+        current.policyDecisions.some((p) => String(p.decision) === 'DENY');
+      const nextSucceeded = next.executedToolResults.every(
+        (r) => r.status === ActionResultStatus.SUCCESS,
+      );
 
-      if (hasFailure && nextSucceeded && current.proposedToolCalls.length > 0 && next.proposedToolCalls.length > 0) {
+      if (
+        hasFailure &&
+        nextSucceeded &&
+        current.proposedToolCalls.length > 0 &&
+        next.proposedToolCalls.length > 0
+      ) {
         const promptText = current.messages.map((m) => `${m.role}: ${m.content}`).join('\n');
         const rejectedProposal = JSON.stringify(current.proposedToolCalls);
         const chosenProposal = JSON.stringify(next.proposedToolCalls);

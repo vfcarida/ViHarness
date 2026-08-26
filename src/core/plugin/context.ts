@@ -9,7 +9,12 @@ import type { Plugin, Disposer, PluginRecord } from './plugin.js';
 import { PluginState } from './plugin.js';
 import type { ServiceMap } from './service-map.js';
 import type { EventMap, EventHandler } from './event-map.js';
-import type { WaterfallMap, WaterfallArgs, WaterfallReturn, WaterfallHandler } from './waterfall.js';
+import type {
+  WaterfallMap,
+  WaterfallArgs,
+  WaterfallReturn,
+  WaterfallHandler,
+} from './waterfall.js';
 import { WaterfallEngine } from './waterfall.js';
 import { HarnessError } from '../errors/base-error.js';
 import { ErrorCode, ErrorCategory } from '../errors/error-codes.js';
@@ -33,11 +38,14 @@ export interface PluginContext {
   // Event system
   on<K extends keyof EventMap>(event: K, handler: EventHandler<K>): Disposer;
   emit<K extends keyof EventMap>(event: K, data: EventMap[K]): void;
-  waterfall<K extends keyof WaterfallMap>(event: K, ...args: WaterfallArgs<K>): Promise<WaterfallReturn<K>>;
+  waterfall<K extends keyof WaterfallMap>(
+    event: K,
+    ...args: WaterfallArgs<K>
+  ): Promise<WaterfallReturn<K>>;
   intercept<K extends keyof WaterfallMap>(event: K, handler: WaterfallHandler<K>): Disposer;
 
   // Reversible effect registration
-  effect(setup: () => Disposer | void | Promise<Disposer | void>): Disposer;
+  effect(setup: () => Disposer | undefined | Promise<Disposer | undefined>): Disposer;
 
   // Service access
   get<K extends keyof ServiceMap>(key: K): ServiceMap[K];
@@ -203,10 +211,7 @@ export class DefaultPluginContext implements PluginContext {
   /**
    * Register a waterfall interceptor.
    */
-  intercept<K extends keyof WaterfallMap>(
-    event: K,
-    handler: WaterfallHandler<K>,
-  ): Disposer {
+  intercept<K extends keyof WaterfallMap>(event: K, handler: WaterfallHandler<K>): Disposer {
     const remove = this.waterfallEngine.register(event, handler);
     const disposer: Disposer = () => remove();
     this.trackDisposer(disposer);
@@ -226,20 +231,16 @@ export class DefaultPluginContext implements PluginContext {
   /**
    * Register a reversible effect.
    */
-  effect(setup: () => Disposer | void | Promise<Disposer | void>): Disposer {
+  effect(setup: () => Disposer | undefined | Promise<Disposer | undefined>): Disposer {
     let effectDisposer: Disposer | undefined;
 
-    try {
-      const res = setup();
-      if (typeof res === 'function') {
-        effectDisposer = res;
-      } else if (res instanceof Promise) {
-        res.then((r) => {
-          if (typeof r === 'function') effectDisposer = r;
-        });
-      }
-    } catch (err) {
-      throw err;
+    const res = setup();
+    if (typeof res === 'function') {
+      effectDisposer = res;
+    } else if (res instanceof Promise) {
+      res.then((r) => {
+        if (typeof r === 'function') effectDisposer = r;
+      });
     }
 
     const disposer: Disposer = async () => {

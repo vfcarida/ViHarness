@@ -33,8 +33,8 @@ Vi-Harness is an open-source coding agent harness built by studying, synthesizin
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/vi-harness/vi-harness.git
-cd vi-harness
+git clone https://github.com/vfcarida/Vi-Harness.git
+cd Vi-Harness
 
 # 2. Install dependencies (using exact lockfile)
 npm ci

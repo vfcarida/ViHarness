@@ -4,7 +4,11 @@
  * Defines the contract for isolated code/tool execution environments.
  * Encapsulates filesystem, process, network, and environment boundaries.
  */
-import type { SandboxConfig, SandboxExecutionRequest, SandboxExecutionResult } from '../model/sandbox-types.js';
+import type {
+  SandboxConfig,
+  SandboxExecutionRequest,
+  SandboxExecutionResult,
+} from '../model/sandbox-types.js';
 
 export interface ExecutionSandbox {
   /** Effective sandbox isolation configuration. */

@@ -143,7 +143,11 @@ export class DynamicContextManager {
     };
   }
 
-  private recordCommand(action: DynamicContextAction, targetPath: string | undefined, rawCommand: string): void {
+  private recordCommand(
+    action: DynamicContextAction,
+    targetPath: string | undefined,
+    rawCommand: string,
+  ): void {
     this.history.push({ action, targetPath, rawCommand });
   }
 

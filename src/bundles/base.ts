@@ -111,7 +111,10 @@ export const CAPABILITY_SEAMS: Record<string, CapabilitySeam> = {
   },
 };
 
-export function resolvePluginTree(): { seams: Record<string, CapabilitySeam>; bundles: Record<string, Bundle> } {
+export function resolvePluginTree(): {
+  seams: Record<string, CapabilitySeam>;
+  bundles: Record<string, Bundle>;
+} {
   return {
     seams: CAPABILITY_SEAMS,
     bundles: { base: BASE_BUNDLE },

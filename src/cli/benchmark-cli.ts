@@ -161,10 +161,18 @@ export async function runCli(argv = process.argv.slice(2)): Promise<number> {
     for (const [name, summary] of Object.entries(suiteResult.harnessSummaries)) {
       console.log(`\n[${name}] (version: ${summary.harnessVersion}, trials: ${summary.totalRuns})`);
       console.log(`  Success Rate   : ${(summary.overallSuccessRate * 100).toFixed(1)}%`);
-      console.log(`  Cost (USD)     : Mean: $${summary.costDistribution.mean.toFixed(4)} | Median: $${summary.costDistribution.median.toFixed(4)} | P95: $${summary.costDistribution.p95.toFixed(4)}`);
-      console.log(`  Iterations     : Mean: ${summary.iterationDistribution.mean.toFixed(1)} | Median: ${summary.iterationDistribution.median.toFixed(1)} | P95: ${summary.iterationDistribution.p95.toFixed(1)}`);
-      console.log(`  Total Tokens   : Mean: ${summary.tokenDistribution.totalTokens.mean.toFixed(0)} | Median: ${summary.tokenDistribution.totalTokens.median.toFixed(0)} | P95: ${summary.tokenDistribution.totalTokens.p95.toFixed(0)}`);
-      console.log(`  Latency (ms)   : Mean: ${summary.latencyDistribution.mean.toFixed(0)}ms | Median: ${summary.latencyDistribution.median.toFixed(0)}ms | P95: ${summary.latencyDistribution.p95.toFixed(0)}ms`);
+      console.log(
+        `  Cost (USD)     : Mean: $${summary.costDistribution.mean.toFixed(4)} | Median: $${summary.costDistribution.median.toFixed(4)} | P95: $${summary.costDistribution.p95.toFixed(4)}`,
+      );
+      console.log(
+        `  Iterations     : Mean: ${summary.iterationDistribution.mean.toFixed(1)} | Median: ${summary.iterationDistribution.median.toFixed(1)} | P95: ${summary.iterationDistribution.p95.toFixed(1)}`,
+      );
+      console.log(
+        `  Total Tokens   : Mean: ${summary.tokenDistribution.totalTokens.mean.toFixed(0)} | Median: ${summary.tokenDistribution.totalTokens.median.toFixed(0)} | P95: ${summary.tokenDistribution.totalTokens.p95.toFixed(0)}`,
+      );
+      console.log(
+        `  Latency (ms)   : Mean: ${summary.latencyDistribution.mean.toFixed(0)}ms | Median: ${summary.latencyDistribution.median.toFixed(0)}ms | P95: ${summary.latencyDistribution.p95.toFixed(0)}ms`,
+      );
     }
   }
   console.log('\n' + '='.repeat(70));
@@ -173,7 +181,10 @@ export async function runCli(argv = process.argv.slice(2)): Promise<number> {
 }
 
 // Execute if invoked directly via CLI
-if (process.argv[1] && (process.argv[1].endsWith('benchmark-cli.ts') || process.argv[1].endsWith('benchmark-cli.js'))) {
+if (
+  process.argv[1] &&
+  (process.argv[1].endsWith('benchmark-cli.ts') || process.argv[1].endsWith('benchmark-cli.js'))
+) {
   runCli().catch((err) => {
     console.error('Benchmark execution failed:', err);
     process.exit(1);

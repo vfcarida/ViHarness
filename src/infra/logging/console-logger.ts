@@ -22,10 +22,7 @@ export class ConsoleLogger implements Logger {
   private readonly context: Record<string, unknown>;
   private readonly minLevel: LogLevel;
 
-  constructor(
-    context: Record<string, unknown> = {},
-    minLevel: LogLevel = LogLevel.DEBUG,
-  ) {
+  constructor(context: Record<string, unknown> = {}, minLevel: LogLevel = LogLevel.DEBUG) {
     this.context = context;
     this.minLevel = minLevel;
   }
@@ -51,10 +48,7 @@ export class ConsoleLogger implements Logger {
   }
 
   child(context: Record<string, unknown>): Logger {
-    return new ConsoleLogger(
-      { ...this.context, ...context },
-      this.minLevel,
-    );
+    return new ConsoleLogger({ ...this.context, ...context }, this.minLevel);
   }
 
   private log(level: LogLevel, message: string, context?: Record<string, unknown>): void {

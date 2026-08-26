@@ -10,12 +10,7 @@
 import type { GoalId } from '../types/identifiers.js';
 import type { IdFactory } from '../types/identifiers.js';
 import type { Clock } from '../interfaces/clock.js';
-import type {
-  LifecycleGoal,
-  GoalRef,
-  GoalPhase,
-  BlockerCode,
-} from './goal-state.js';
+import type { LifecycleGoal, GoalRef, GoalPhase, BlockerCode } from './goal-state.js';
 import { DEFAULT_MAX_ROUNDS, canTransitionGoalPhase } from './goal-state.js';
 import type { GoalChangeEvent, GoalMutation } from './goal-events.js';
 import { HarnessError } from '../errors/base-error.js';

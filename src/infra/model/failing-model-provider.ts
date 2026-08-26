@@ -13,11 +13,7 @@ import type {
   ModelDescriptor,
   ModelHealth,
 } from '../../core/model/model-io.js';
-import {
-  FinishReason,
-  ModelCapability,
-  ProviderHealthStatus,
-} from '../../core/model/model-io.js';
+import { FinishReason, ModelCapability, ProviderHealthStatus } from '../../core/model/model-io.js';
 import { HarnessError } from '../../core/errors/base-error.js';
 import { ErrorCode, ErrorCategory } from '../../core/errors/error-codes.js';
 

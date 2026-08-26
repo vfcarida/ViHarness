@@ -49,9 +49,7 @@ export type PreStepDecision =
 /**
  * Pre-step listener function signature.
  */
-export type PreStepListener = (
-  event: PreStepEvent,
-) => Promise<PreStepDecision> | PreStepDecision;
+export type PreStepListener = (event: PreStepEvent) => Promise<PreStepDecision> | PreStepDecision;
 
 /**
  * Optional interface for object-based pre-step interceptors.

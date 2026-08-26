@@ -22,7 +22,11 @@ import { SystemClock } from '../../src/infra/time/system-clock.js';
 import { FinishReason, MessageRole } from '../../src/core/model/model-io.js';
 import { AgentPhase } from '../../src/core/model/state.js';
 import { EvidenceOutcome } from '../../src/core/model/evidence.js';
-import type { VerificationEngine, VerificationRequest, VerificationResult } from '../../src/core/interfaces/verification-engine.js';
+import type {
+  VerificationEngine,
+  VerificationRequest,
+  VerificationResult,
+} from '../../src/core/interfaces/verification-engine.js';
 import type { Goal } from '../../src/core/model/goal.js';
 import { GoalStatus } from '../../src/core/model/goal.js';
 
@@ -35,14 +39,25 @@ describe('Realistic Behavioral Agent Workflows Suite', { timeout: 30000 }, () =>
     const sourceFile = path.join(tempDir, 'discount.ts');
     const testFile = path.join(tempDir, 'discount.test.ts');
 
-    fs.writeFileSync(sourceFile, 'export function applyDiscount(price: number, discount: number): number { return price; }', 'utf-8');
-    fs.writeFileSync(testFile, 'import { applyDiscount } from "./discount"; // applyDiscount(100, 0.2) should be 80', 'utf-8');
+    fs.writeFileSync(
+      sourceFile,
+      'export function applyDiscount(price: number, discount: number): number { return price; }',
+      'utf-8',
+    );
+    fs.writeFileSync(
+      testFile,
+      'import { applyDiscount } from "./discount"; // applyDiscount(100, 0.2) should be 80',
+      'utf-8',
+    );
 
     // Dynamic Verification Engine validating discount calculation in file
     const verificationEngine: VerificationEngine = {
       async verify(_req: VerificationRequest): Promise<VerificationResult> {
         const content = fs.existsSync(sourceFile) ? fs.readFileSync(sourceFile, 'utf-8') : '';
-        const isCorrect = content.includes('price * (1 - discount)') || content.includes('price - price * discount') || content.includes('price - (price * discount)');
+        const isCorrect =
+          content.includes('price * (1 - discount)') ||
+          content.includes('price - price * discount') ||
+          content.includes('price - (price * discount)');
 
         return {
           status: isCorrect ? 'PASSED' : 'FAILED',
@@ -88,7 +103,8 @@ describe('Realistic Behavioral Agent Workflows Suite', { timeout: 30000 }, () =>
             name: 'write_file',
             input: {
               path: sourceFile,
-              content: 'export function applyDiscount(price: number, discount: number): number { return price - discount; }',
+              content:
+                'export function applyDiscount(price: number, discount: number): number { return price - discount; }',
             },
             id: 'c3_write_flawed',
           },
@@ -103,7 +119,8 @@ describe('Realistic Behavioral Agent Workflows Suite', { timeout: 30000 }, () =>
       },
       // Step 5: Read source again to review
       {
-        content: 'Tests failed! I need percentage calculation: price * (1 - discount). Reading file again.',
+        content:
+          'Tests failed! I need percentage calculation: price * (1 - discount). Reading file again.',
         toolCalls: [{ name: 'read_file', input: { path: sourceFile }, id: 'c5_read_review' }],
         finishReason: FinishReason.TOOL_CALL,
       },
@@ -115,7 +132,8 @@ describe('Realistic Behavioral Agent Workflows Suite', { timeout: 30000 }, () =>
             name: 'write_file',
             input: {
               path: sourceFile,
-              content: 'export function applyDiscount(price: number, discount: number): number { return price * (1 - discount); }',
+              content:
+                'export function applyDiscount(price: number, discount: number): number { return price * (1 - discount); }',
             },
             id: 'c6_write_fixed',
           },
@@ -125,7 +143,9 @@ describe('Realistic Behavioral Agent Workflows Suite', { timeout: 30000 }, () =>
       // Step 7: Run tests again (passes verification)
       {
         content: 'Re-running tests to verify fix.',
-        toolCalls: [{ name: 'run_command', input: { command: 'npm test' }, id: 'c7_run_tests_fixed' }],
+        toolCalls: [
+          { name: 'run_command', input: { command: 'npm test' }, id: 'c7_run_tests_fixed' },
+        ],
         finishReason: FinishReason.TOOL_CALL,
       },
       // Step 8: Finalize

@@ -45,17 +45,15 @@ describe('State Machine Hardening', () => {
     it('should reject VERIFICATION_PASSED → DONE without evidenceIds', () => {
       const machine = makeMachine(AgentPhase.VERIFY);
 
-      expect(() =>
-        machine.apply(StateEvent.VERIFICATION_PASSED, { evidenceIds: [] })
-      ).toThrow(HarnessError);
+      expect(() => machine.apply(StateEvent.VERIFICATION_PASSED, { evidenceIds: [] })).toThrow(
+        HarnessError,
+      );
     });
 
     it('should reject VERIFICATION_PASSED → DONE with undefined evidenceIds', () => {
       const machine = makeMachine(AgentPhase.VERIFY);
 
-      expect(() =>
-        machine.apply(StateEvent.VERIFICATION_PASSED)
-      ).toThrow(HarnessError);
+      expect(() => machine.apply(StateEvent.VERIFICATION_PASSED)).toThrow(HarnessError);
     });
 
     it('should allow VERIFICATION_PASSED → DONE with at least one evidenceId', () => {
@@ -198,7 +196,11 @@ describe('State Machine Hardening', () => {
     });
 
     it('should reject IMPLEMENT → DONE directly (must go through VERIFY)', () => {
-      const result = validateTransition(AgentPhase.IMPLEMENT, StateEvent.VERIFICATION_PASSED, false);
+      const result = validateTransition(
+        AgentPhase.IMPLEMENT,
+        StateEvent.VERIFICATION_PASSED,
+        false,
+      );
       expect(result.valid).toBe(false);
     });
 

@@ -12,15 +12,26 @@ import {
 } from '../../../../src/infra/eval/projdevbench/index.js';
 
 describe('ProjDevBench Evaluator — P010', () => {
-  const evaluator = new ProjDevEvaluator({ harnessName: 'Vi-Harness', modelId: 'claude-3-7-sonnet' });
+  const evaluator = new ProjDevEvaluator({
+    harnessName: 'Vi-Harness',
+    modelId: 'claude-3-7-sonnet',
+  });
 
   it('1. should score execution test commands and map verdicts', async () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'vi-eval-exec-'));
 
     // Write a passing test
-    fs.writeFileSync(path.join(tempDir, 'pass.js'), 'console.log("PASS"); process.exit(0);', 'utf-8');
+    fs.writeFileSync(
+      path.join(tempDir, 'pass.js'),
+      'console.log("PASS"); process.exit(0);',
+      'utf-8',
+    );
     // Write a failing test
-    fs.writeFileSync(path.join(tempDir, 'fail.js'), 'console.error("AssertionError: 1 !== 2"); process.exit(1);', 'utf-8');
+    fs.writeFileSync(
+      path.join(tempDir, 'fail.js'),
+      'console.error("AssertionError: 1 !== 2"); process.exit(1);',
+      'utf-8',
+    );
 
     const result = await evaluator.evaluateExecution(tempDir, ['node pass.js', 'node fail.js']);
 

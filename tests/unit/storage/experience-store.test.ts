@@ -3,7 +3,10 @@
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { SqliteStore } from '../../../src/infra/storage/sqlite-store.js';
-import { SqliteExperienceStore, computeTaskHash } from '../../../src/infra/storage/experience-store.js';
+import {
+  SqliteExperienceStore,
+  computeTaskHash,
+} from '../../../src/infra/storage/experience-store.js';
 
 describe('SQLite Experience Store — P013', () => {
   let store: SqliteStore;
@@ -31,7 +34,10 @@ describe('SQLite Experience Store — P013', () => {
       taskDescription: 'Implement binary search',
       outcome: 'success',
       score: 0.95,
-      trace: [{ step: 1, action: 'read_file' }, { step: 2, action: 'write_file' }],
+      trace: [
+        { step: 1, action: 'read_file' },
+        { step: 2, action: 'write_file' },
+      ],
     });
 
     const exp = await expStore.getExperience('exp-01');
@@ -160,9 +166,24 @@ describe('SQLite Experience Store — P013', () => {
   });
 
   it('10. should assign default scores based on outcome when not explicitly passed', async () => {
-    await expStore.saveExperience({ id: 'exp-s', taskDescription: 'T1', outcome: 'success', trace: {} });
-    await expStore.saveExperience({ id: 'exp-p', taskDescription: 'T2', outcome: 'partial', trace: {} });
-    await expStore.saveExperience({ id: 'exp-f', taskDescription: 'T3', outcome: 'failure', trace: {} });
+    await expStore.saveExperience({
+      id: 'exp-s',
+      taskDescription: 'T1',
+      outcome: 'success',
+      trace: {},
+    });
+    await expStore.saveExperience({
+      id: 'exp-p',
+      taskDescription: 'T2',
+      outcome: 'partial',
+      trace: {},
+    });
+    await expStore.saveExperience({
+      id: 'exp-f',
+      taskDescription: 'T3',
+      outcome: 'failure',
+      trace: {},
+    });
 
     const s = await expStore.getExperience('exp-s');
     const p = await expStore.getExperience('exp-p');

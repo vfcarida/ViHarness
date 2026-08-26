@@ -24,7 +24,10 @@ export interface SqliteExperienceStoreOptions {
 }
 
 export function computeTaskHash(taskDescription: string): string {
-  const normalized = taskDescription.toLowerCase().replace(/[^a-z0-9]/g, ' ').trim();
+  const normalized = taskDescription
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, ' ')
+    .trim();
   return crypto.createHash('sha256').update(normalized).digest('hex').slice(0, 16);
 }
 
@@ -45,8 +48,11 @@ export class SqliteExperienceStore {
     const createdAt = record.createdAt ?? now;
     const accessedAt = record.accessedAt ?? now;
     const accessCount = record.accessCount ?? 0;
-    const score = record.score ?? (record.outcome === 'success' ? 1.0 : record.outcome === 'partial' ? 0.5 : 0.0);
-    const serializedTrace = typeof record.trace === 'string' ? record.trace : JSON.stringify(record.trace);
+    const score =
+      record.score ??
+      (record.outcome === 'success' ? 1.0 : record.outcome === 'partial' ? 0.5 : 0.0);
+    const serializedTrace =
+      typeof record.trace === 'string' ? record.trace : JSON.stringify(record.trace);
 
     db.prepare(
       `INSERT INTO experiences (id, task_hash, outcome, trace, score, created_at, accessed_at, access_count)
@@ -58,7 +64,16 @@ export class SqliteExperienceStore {
          score = excluded.score,
          accessed_at = excluded.accessed_at,
          access_count = excluded.access_count`,
-    ).run(record.id, taskHash, record.outcome, serializedTrace, score, createdAt, accessedAt, accessCount);
+    ).run(
+      record.id,
+      taskHash,
+      record.outcome,
+      serializedTrace,
+      score,
+      createdAt,
+      accessedAt,
+      accessCount,
+    );
   }
 
   /**
@@ -76,7 +91,9 @@ export class SqliteExperienceStore {
 
     if (!row) return null;
 
-    db.prepare('UPDATE experiences SET accessed_at = ?, access_count = access_count + 1 WHERE id = ?').run(now, id);
+    db.prepare(
+      'UPDATE experiences SET accessed_at = ?, access_count = access_count + 1 WHERE id = ?',
+    ).run(now, id);
 
     let parsedTrace: any = row.trace;
     try {
@@ -101,7 +118,11 @@ export class SqliteExperienceStore {
   /**
    * Find similar historical execution traces by task hash or description.
    */
-  async findSimilar(taskDescription: string, minScore = 0.0, limit = 10): Promise<ExperienceRecord[]> {
+  async findSimilar(
+    taskDescription: string,
+    minScore = 0.0,
+    limit = 10,
+  ): Promise<ExperienceRecord[]> {
     const db = this.store.db;
     const taskHash = computeTaskHash(taskDescription);
     const now = Date.now();
@@ -200,7 +221,9 @@ export class SqliteExperienceStore {
       prunedCount += res1.changes;
 
       // 2. Trim excess entries beyond maxEntries keeping top scores
-      const countRow = db.prepare('SELECT COUNT(*) as count FROM experiences').get() as { count: number };
+      const countRow = db.prepare('SELECT COUNT(*) as count FROM experiences').get() as {
+        count: number;
+      };
       if (countRow.count > maxEntries) {
         const excess = countRow.count - maxEntries;
         const res2 = db

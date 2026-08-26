@@ -104,13 +104,17 @@ export class HttpTransport implements Transport {
 
     const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
     const pathname = url.pathname;
-    const clientIp = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
+    const clientIp =
+      (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
 
     // 1. CORS Headers
     if (this.enableCors) {
       res.setHeader('Access-Control-Allow-Origin', this.corsOrigin);
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+      res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization, X-Requested-With',
+      );
     }
 
     if (req.method === 'OPTIONS') {
@@ -186,7 +190,10 @@ export class HttpTransport implements Transport {
           JSON.stringify({
             jsonrpc: '2.0',
             id: null,
-            error: { code: -32600, message: 'Unsupported Media Type: Content-Type must be application/json' },
+            error: {
+              code: -32600,
+              message: 'Unsupported Media Type: Content-Type must be application/json',
+            },
           }),
         );
         return;
@@ -250,7 +257,10 @@ export class HttpTransport implements Transport {
             JSON.stringify({
               jsonrpc: '2.0',
               id: parsed?.id ?? null,
-              error: { code: -32603, message: `Internal server error: ${err?.message ?? String(err)}` },
+              error: {
+                code: -32603,
+                message: `Internal server error: ${err?.message ?? String(err)}`,
+              },
             }),
           );
         }

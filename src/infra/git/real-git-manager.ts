@@ -72,7 +72,8 @@ export class RealGitManager implements GitManager {
       return stdout;
     } catch (err: unknown) {
       const execErr = err as { stderr?: string; stdout?: string; message?: string };
-      const msg = execErr.stderr?.trim() || execErr.stdout?.trim() || execErr.message || String(err);
+      const msg =
+        execErr.stderr?.trim() || execErr.stdout?.trim() || execErr.message || String(err);
       throw new HarnessError({
         code: ErrorCode.GIT_OPERATION_FAILED,
         category: ErrorCategory.INFRASTRUCTURE,

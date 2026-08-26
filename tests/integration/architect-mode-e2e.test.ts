@@ -53,7 +53,7 @@ describe('Architect Mode (Dual-Model Plan->Execute) & Pre-Step Interception E2E 
       supportsSystemPrompt: true,
     },
     costPer1kInputTokensDollars: 0.015,
-    costPer1kOutputTokensDollars: 0.060,
+    costPer1kOutputTokensDollars: 0.06,
   };
 
   const editorDescriptor: ModelDescriptor = {
@@ -68,7 +68,7 @@ describe('Architect Mode (Dual-Model Plan->Execute) & Pre-Step Interception E2E 
       supportsSystemPrompt: true,
     },
     costPer1kInputTokensDollars: 0.00015,
-    costPer1kOutputTokensDollars: 0.00060,
+    costPer1kOutputTokensDollars: 0.0006,
   };
 
   it('1. End-to-end task execution in Architect Mode (Plan -> Execute -> Write -> Done)', async () => {
@@ -239,9 +239,7 @@ describe('Architect Mode (Dual-Model Plan->Execute) & Pre-Step Interception E2E 
     );
     expect(planEvents.length).toBeGreaterThanOrEqual(1);
 
-    const editorEvents = capturedEvents.filter(
-      (e) => e.type === AgentEventType.EditorExecuted,
-    );
+    const editorEvents = capturedEvents.filter((e) => e.type === AgentEventType.EditorExecuted);
     expect(editorEvents.length).toBeGreaterThanOrEqual(1);
 
     fs.rmSync(tempDir, { recursive: true, force: true });
@@ -326,8 +324,10 @@ describe('Architect Mode (Dual-Model Plan->Execute) & Pre-Step Interception E2E 
     });
 
     // Verify iteration recorded rejection evidence
-    expect(rejectResult.iterations[0]?.evidenceCreated.some((e) =>
-      e.summary.includes('PRE_STEP_REJECTED'),
-    )).toBe(true);
+    expect(
+      rejectResult.iterations[0]?.evidenceCreated.some((e) =>
+        e.summary.includes('PRE_STEP_REJECTED'),
+      ),
+    ).toBe(true);
   });
 });

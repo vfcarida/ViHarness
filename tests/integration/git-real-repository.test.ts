@@ -126,7 +126,11 @@ describe('Real Repository Git & Checkpoint Integration Suite', { timeout: 30000 
     await gitManager.captureBaseline();
 
     // Agent creates a feature file and modifies code
-    fs.writeFileSync(path.join(tempRepoDir, 'agent_feature.ts'), 'export const feature = 42;\n', 'utf-8');
+    fs.writeFileSync(
+      path.join(tempRepoDir, 'agent_feature.ts'),
+      'export const feature = 42;\n',
+      'utf-8',
+    );
     fs.writeFileSync(path.join(tempRepoDir, 'agent_fix.ts'), 'export const fix = true;\n', 'utf-8');
 
     const status = await gitManager.getStatus();
@@ -151,7 +155,11 @@ describe('Real Repository Git & Checkpoint Integration Suite', { timeout: 30000 
     fs.writeFileSync(path.join(tempRepoDir, 'agent_patch.ts'), 'const a = 1;\n', 'utf-8');
 
     // User also modifies a config file mid-execution
-    fs.writeFileSync(path.join(tempRepoDir, 'user_override.json'), '{ "theme": "dark" }\n', 'utf-8');
+    fs.writeFileSync(
+      path.join(tempRepoDir, 'user_override.json'),
+      '{ "theme": "dark" }\n',
+      'utf-8',
+    );
     gitManager.markFileOwner('user_override.json', 'user');
 
     const status = await gitManager.getStatus();
@@ -201,56 +209,70 @@ describe('Real Repository Git & Checkpoint Integration Suite', { timeout: 30000 
   // 6. Safe Rollback Behavior (Preserves User Changes, Reverts Agent Changes)
   // =========================================================================
 
-  it('6. Safe rollback: reverts agent-owned changes without destroying pre-existing user changes', { timeout: 60000 }, async () => {
-    // 1. User pre-existing change
-    fs.writeFileSync(path.join(tempRepoDir, 'user_uncommitted.txt'), 'User work in progress.\n', 'utf-8');
-    await gitManager.captureBaseline();
+  it(
+    '6. Safe rollback: reverts agent-owned changes without destroying pre-existing user changes',
+    { timeout: 60000 },
+    async () => {
+      // 1. User pre-existing change
+      fs.writeFileSync(
+        path.join(tempRepoDir, 'user_uncommitted.txt'),
+        'User work in progress.\n',
+        'utf-8',
+      );
+      await gitManager.captureBaseline();
 
-    // 2. Initial agent work + checkpoint
-    fs.writeFileSync(path.join(tempRepoDir, 'good_agent_code.ts'), 'console.log("good");\n', 'utf-8');
-    const cpCommitSha = await gitManager.createCommit('Checkpoint 1: Good code');
+      // 2. Initial agent work + checkpoint
+      fs.writeFileSync(
+        path.join(tempRepoDir, 'good_agent_code.ts'),
+        'console.log("good");\n',
+        'utf-8',
+      );
+      const cpCommitSha = await gitManager.createCommit('Checkpoint 1: Good code');
 
-    const checkpoint = await checkpointStore.create({
-      taskId,
-      gitRef: cpCommitSha,
-      reason: 'Good state',
-      state: {
-        id: idFactory.create<'State'>(),
+      const checkpoint = await checkpointStore.create({
         taskId,
-        phase: AgentPhase.IMPLEMENT,
-        previousPhase: AgentPhase.PLAN,
-        iterationId: idFactory.create<'Iteration'>(),
-        iterationCount: 1,
-        repairCount: 0,
-        metadata: {},
-        createdAt: clock.now(),
-        updatedAt: clock.now(),
-      },
-      agentOwnedFiles: ['good_agent_code.ts'],
-    });
+        gitRef: cpCommitSha,
+        reason: 'Good state',
+        state: {
+          id: idFactory.create<'State'>(),
+          taskId,
+          phase: AgentPhase.IMPLEMENT,
+          previousPhase: AgentPhase.PLAN,
+          iterationId: idFactory.create<'Iteration'>(),
+          iterationCount: 1,
+          repairCount: 0,
+          metadata: {},
+          createdAt: clock.now(),
+          updatedAt: clock.now(),
+        },
+        agentOwnedFiles: ['good_agent_code.ts'],
+      });
 
-    // 3. Agent creates bad file
-    fs.writeFileSync(path.join(tempRepoDir, 'bad_agent_code.ts'), 'syntax error!\n', 'utf-8');
-    gitManager.markFileOwner('bad_agent_code.ts', 'agent');
+      // 3. Agent creates bad file
+      fs.writeFileSync(path.join(tempRepoDir, 'bad_agent_code.ts'), 'syntax error!\n', 'utf-8');
+      gitManager.markFileOwner('bad_agent_code.ts', 'agent');
 
-    expect(fs.existsSync(path.join(tempRepoDir, 'bad_agent_code.ts'))).toBe(true);
+      expect(fs.existsSync(path.join(tempRepoDir, 'bad_agent_code.ts'))).toBe(true);
 
-    // 4. Rollback to checkpoint
-    const rollbackResult = await rollbackManager.rollbackToCheckpoint(
-      checkpoint.id,
-      checkpointStore,
-      gitManager,
-    );
+      // 4. Rollback to checkpoint
+      const rollbackResult = await rollbackManager.rollbackToCheckpoint(
+        checkpoint.id,
+        checkpointStore,
+        gitManager,
+      );
 
-    expect(rollbackResult.success).toBe(true);
+      expect(rollbackResult.success).toBe(true);
 
-    // Bad agent file must be removed
-    expect(fs.existsSync(path.join(tempRepoDir, 'bad_agent_code.ts'))).toBe(false);
+      // Bad agent file must be removed
+      expect(fs.existsSync(path.join(tempRepoDir, 'bad_agent_code.ts'))).toBe(false);
 
-    // Pre-existing user file MUST BE PRESERVED
-    expect(fs.existsSync(path.join(tempRepoDir, 'user_uncommitted.txt'))).toBe(true);
-    expect(fs.readFileSync(path.join(tempRepoDir, 'user_uncommitted.txt'), 'utf-8')).toBe('User work in progress.\n');
-  });
+      // Pre-existing user file MUST BE PRESERVED
+      expect(fs.existsSync(path.join(tempRepoDir, 'user_uncommitted.txt'))).toBe(true);
+      expect(fs.readFileSync(path.join(tempRepoDir, 'user_uncommitted.txt'), 'utf-8')).toBe(
+        'User work in progress.\n',
+      );
+    },
+  );
 
   // =========================================================================
   // 7. Failed Rollback Handling

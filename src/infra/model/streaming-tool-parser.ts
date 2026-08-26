@@ -78,7 +78,11 @@ export class StreamingToolParser {
     return states;
   }
 
-  private extractBalancedJson(str: string): { parsed?: Record<string, unknown>; raw?: string; isComplete: boolean } {
+  private extractBalancedJson(str: string): {
+    parsed?: Record<string, unknown>;
+    raw?: string;
+    isComplete: boolean;
+  } {
     const start = str.indexOf('{');
     if (start === -1) return { isComplete: false };
 

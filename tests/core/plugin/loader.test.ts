@@ -17,7 +17,9 @@ describe('Plugin Loader & Manifest Discovery — P017', () => {
   afterEach(() => {
     try {
       fs.rmSync(tempDir, { recursive: true, force: true });
-    } catch {}
+    } catch {
+      /* ignore cleanup error */
+    }
   });
 
   it('1. Throws descriptive error when local plugin file is not found', async () => {

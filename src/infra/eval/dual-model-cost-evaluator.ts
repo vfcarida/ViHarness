@@ -49,15 +49,15 @@ export class DualModelCostEvaluator {
     const phaseBreakdown: PhaseCostBreakdown[] = [];
 
     for (const iter of iterations) {
-      const usage = iter.tokenUsage ?? (iter as any).tokensUsed ?? { inputTokens: 0, outputTokens: 0, totalTokens: 0 };
+      const usage = iter.tokenUsage ??
+        (iter as any).tokensUsed ?? { inputTokens: 0, outputTokens: 0, totalTokens: 0 };
       const inputTokens = usage.inputTokens;
       const outputTokens = usage.outputTokens;
-      const iterTokens = usage.totalTokens ?? (inputTokens + outputTokens);
+      const iterTokens = usage.totalTokens ?? inputTokens + outputTokens;
       totalTokens += iterTokens;
 
       const isArchitectPhase =
-        iter.stateBefore === AgentPhase.PLAN ||
-        iter.stateAfter === AgentPhase.PLAN;
+        iter.stateBefore === AgentPhase.PLAN || iter.stateAfter === AgentPhase.PLAN;
 
       const modelRole = isArchitectPhase ? 'ARCHITECT' : 'EDITOR';
       const activeDescriptor = isArchitectPhase ? architectDescriptor : editorDescriptor;

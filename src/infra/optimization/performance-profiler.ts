@@ -56,7 +56,11 @@ export interface PerformanceComparison {
 export class PerformanceProfiler {
   private readonly samples: MetricSample[] = [];
 
-  record(category: TelemetryCategory, value: number, unit: 'tokens' | 'ms' | 'usd' | 'count'): void {
+  record(
+    category: TelemetryCategory,
+    value: number,
+    unit: 'tokens' | 'ms' | 'usd' | 'count',
+  ): void {
     this.samples.push({
       category,
       value,
@@ -76,19 +80,24 @@ export class PerformanceProfiler {
 
   static compare(before: PerformanceBaseline, after: PerformanceBaseline): PerformanceComparison {
     const costDiff = before.totalCostUSD - after.totalCostUSD;
-    const costReductionPercent = before.totalCostUSD > 0 ? (costDiff / before.totalCostUSD) * 100 : 0;
+    const costReductionPercent =
+      before.totalCostUSD > 0 ? (costDiff / before.totalCostUSD) * 100 : 0;
 
     const latencyDiff = before.totalLatencyMs - after.totalLatencyMs;
-    const latencyReductionPercent = before.totalLatencyMs > 0 ? (latencyDiff / before.totalLatencyMs) * 100 : 0;
+    const latencyReductionPercent =
+      before.totalLatencyMs > 0 ? (latencyDiff / before.totalLatencyMs) * 100 : 0;
 
     const tokenDiff = before.totalTokens - after.totalTokens;
-    const tokenReductionPercent = before.totalTokens > 0 ? (tokenDiff / before.totalTokens) * 100 : 0;
+    const tokenReductionPercent =
+      before.totalTokens > 0 ? (tokenDiff / before.totalTokens) * 100 : 0;
 
     const successRateImpactPercent = (after.successRate - before.successRate) * 100;
     const regressionRateImpactPercent = (after.regressionRate - before.regressionRate) * 100;
 
     // RULE: Reject any optimization that materially lowers reliability (success rate drop > 1%)
-    const satisfiesReliabilityPolicy = after.successRate >= before.successRate - 0.01 && after.regressionRate <= before.regressionRate + 0.01;
+    const satisfiesReliabilityPolicy =
+      after.successRate >= before.successRate - 0.01 &&
+      after.regressionRate <= before.regressionRate + 0.01;
 
     return {
       before,

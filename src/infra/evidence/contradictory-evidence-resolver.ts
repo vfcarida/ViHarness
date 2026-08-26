@@ -19,17 +19,27 @@ export class ContradictoryEvidenceResolver {
    * Evaluate a collection of task evidence for internal contradictions.
    */
   static evaluate(evidenceList: ReadonlyArray<Evidence>): ContradictionResolution {
-    const passes = evidenceList.filter((e) => e.outcome === EvidenceOutcome.PASS || e.pass === true);
-    const fails = evidenceList.filter((e) => e.outcome === EvidenceOutcome.FAIL || e.outcome === EvidenceOutcome.REGRESSION || e.pass === false);
+    const passes = evidenceList.filter(
+      (e) => e.outcome === EvidenceOutcome.PASS || e.pass === true,
+    );
+    const fails = evidenceList.filter(
+      (e) =>
+        e.outcome === EvidenceOutcome.FAIL ||
+        e.outcome === EvidenceOutcome.REGRESSION ||
+        e.pass === false,
+    );
 
     // Contradiction Case 1: Unit tests PASS but Static Analysis or Verification FAILS for the target
-    const verificationFails = fails.filter((e) => e.type === EvidenceType.LINT_RESULT || e.type === EvidenceType.VERIFICATION);
+    const verificationFails = fails.filter(
+      (e) => e.type === EvidenceType.LINT_RESULT || e.type === EvidenceType.VERIFICATION,
+    );
 
     if (passes.length > 0 && verificationFails.length > 0) {
       return {
         hasContradiction: true,
         conflictingEvidence: [...passes, ...verificationFails],
-        rationale: 'Contradictory evidence detected: functional unit tests pass, but static analysis or verification checks failed.',
+        rationale:
+          'Contradictory evidence detected: functional unit tests pass, but static analysis or verification checks failed.',
         requiresEscalation: true,
       };
     }

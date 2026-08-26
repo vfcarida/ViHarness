@@ -20,9 +20,18 @@ import { MockModelProvider } from '../../src/infra/model/mock-model-provider.js'
 import { FailingModelProvider } from '../../src/infra/model/failing-model-provider.js';
 import { UuidV7IdFactory } from '../../src/infra/id/uuid-id-factory.js';
 import { SystemClock } from '../../src/infra/time/system-clock.js';
-import { FinishReason, MessageRole, ProviderHealthStatus, ModelCapability } from '../../src/core/model/model-io.js';
+import {
+  FinishReason,
+  MessageRole,
+  ProviderHealthStatus,
+  ModelCapability,
+} from '../../src/core/model/model-io.js';
 import { AgentPhase } from '../../src/core/model/state.js';
-import type { VerificationEngine, VerificationRequest, VerificationResult } from '../../src/core/interfaces/verification-engine.js';
+import type {
+  VerificationEngine,
+  VerificationRequest,
+  VerificationResult,
+} from '../../src/core/interfaces/verification-engine.js';
 import type { Goal } from '../../src/core/model/goal.js';
 import { GoalStatus } from '../../src/core/model/goal.js';
 
@@ -48,15 +57,23 @@ describe('Error Handling & Resilient Recovery Integration Suite', { timeout: 300
       // Turn 1: Model requests unknown tool
       {
         content: 'I will call a non-existent tool.',
-        toolCalls: [{ name: 'unregistered_search_tool', input: { query: 'search terms' }, id: 'c_unknown' }],
+        toolCalls: [
+          { name: 'unregistered_search_tool', input: { query: 'search terms' }, id: 'c_unknown' },
+        ],
         finishReason: FinishReason.TOOL_CALL,
       },
       // Turn 2: Inspect context for error feedback and call valid tool
       (request: any) => {
         const toolMsg = request.messages.find(
           (m: any) =>
-            (m.role === MessageRole.TOOL || m.role === MessageRole.TOOL_RESULT || m.role === 'TOOL' || m.role === 'TOOL_RESULT') &&
-            (m.content.includes('UNKNOWN_TOOL') || m.content.includes('unregistered_search_tool') || m.content.includes('not found') || m.content.includes('not registered')),
+            (m.role === MessageRole.TOOL ||
+              m.role === MessageRole.TOOL_RESULT ||
+              m.role === 'TOOL' ||
+              m.role === 'TOOL_RESULT') &&
+            (m.content.includes('UNKNOWN_TOOL') ||
+              m.content.includes('unregistered_search_tool') ||
+              m.content.includes('not found') ||
+              m.content.includes('not registered')),
         );
         if (toolMsg) {
           receivedStructuredError = true;
@@ -220,8 +237,14 @@ describe('Error Handling & Resilient Recovery Integration Suite', { timeout: 300
       (request: any) => {
         const toolMsg = request.messages.find(
           (m: any) =>
-            (m.role === MessageRole.TOOL || m.role === MessageRole.TOOL_RESULT || m.role === 'TOOL' || m.role === 'TOOL_RESULT') &&
-            (m.content.includes('DENY') || m.content.includes('Forbidden') || m.content.includes('policy') || m.content.includes('sanitizer')),
+            (m.role === MessageRole.TOOL ||
+              m.role === MessageRole.TOOL_RESULT ||
+              m.role === 'TOOL' ||
+              m.role === 'TOOL_RESULT') &&
+            (m.content.includes('DENY') ||
+              m.content.includes('Forbidden') ||
+              m.content.includes('policy') ||
+              m.content.includes('sanitizer')),
         );
         if (toolMsg) {
           policyDenialReceived = true;

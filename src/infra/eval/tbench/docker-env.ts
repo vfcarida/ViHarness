@@ -75,7 +75,11 @@ export class DefaultDockerEnvironment implements DockerEnvironment {
   }
 
   async exec(container: Container, cmd: string): Promise<ExecResult> {
-    if (this.driver === 'mock' || container.metadata?.['driver'] === 'mock' || !this.isDockerAvailable()) {
+    if (
+      this.driver === 'mock' ||
+      container.metadata?.['driver'] === 'mock' ||
+      !this.isDockerAvailable()
+    ) {
       return this.mockDriver.exec(container, cmd);
     }
 
@@ -84,7 +88,9 @@ export class DefaultDockerEnvironment implements DockerEnvironment {
     }
 
     const start = Date.now();
-    const timeoutMs = container.task.timeout ? container.task.timeout * 1000 : this.defaultTimeoutMs;
+    const timeoutMs = container.task.timeout
+      ? container.task.timeout * 1000
+      : this.defaultTimeoutMs;
 
     return new Promise((resolve) => {
       const escapedCmd = cmd.replace(/'/g, "'\\''");
@@ -108,7 +114,11 @@ export class DefaultDockerEnvironment implements DockerEnvironment {
   }
 
   async verify(container: Container, testScript: string): Promise<boolean> {
-    if (this.driver === 'mock' || container.metadata?.['driver'] === 'mock' || !this.isDockerAvailable()) {
+    if (
+      this.driver === 'mock' ||
+      container.metadata?.['driver'] === 'mock' ||
+      !this.isDockerAvailable()
+    ) {
       return this.mockDriver.verify(container, testScript);
     }
 
@@ -117,7 +127,11 @@ export class DefaultDockerEnvironment implements DockerEnvironment {
   }
 
   async destroy(container: Container): Promise<void> {
-    if (this.driver === 'mock' || container.metadata?.['driver'] === 'mock' || !this.isDockerAvailable()) {
+    if (
+      this.driver === 'mock' ||
+      container.metadata?.['driver'] === 'mock' ||
+      !this.isDockerAvailable()
+    ) {
       return this.mockDriver.destroy(container);
     }
 
@@ -171,7 +185,9 @@ export class MockDockerEnvironment implements DockerEnvironment {
     }
 
     const start = Date.now();
-    const timeoutMs = container.task.timeout ? container.task.timeout * 1000 : this.defaultTimeoutMs;
+    const timeoutMs = container.task.timeout
+      ? container.task.timeout * 1000
+      : this.defaultTimeoutMs;
 
     return new Promise((resolve) => {
       // Execute command in mock container temp directory
@@ -212,9 +228,14 @@ export class MockDockerEnvironment implements DockerEnvironment {
 
     // Run via node or bash
     const isWindows = process.platform === 'win32';
-    const runnerCmd = isWindows && !testScript.includes('#!/bin/bash')
-      ? (testScript.includes('node ') ? testScript : `node -e "${testScript.replace(/"/g, '\\"')}"`)
-      : (isWindows ? `bash _tbench_verify.sh` : `/bin/bash _tbench_verify.sh`);
+    const runnerCmd =
+      isWindows && !testScript.includes('#!/bin/bash')
+        ? testScript.includes('node ')
+          ? testScript
+          : `node -e "${testScript.replace(/"/g, '\\"')}"`
+        : isWindows
+          ? `bash _tbench_verify.sh`
+          : `/bin/bash _tbench_verify.sh`;
 
     const result = await this.exec(container, runnerCmd);
     return result.exitCode === 0;

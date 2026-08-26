@@ -16,10 +16,7 @@ export class CapabilityMatcher {
   /**
    * Check if a model descriptor satisfies a routing request.
    */
-  static match(
-    descriptor: ModelDescriptor,
-    request: RoutingRequest,
-  ): CapabilityMatchResult {
+  static match(descriptor: ModelDescriptor, request: RoutingRequest): CapabilityMatchResult {
     // 1. Context window check
     if (descriptor.capabilities.maxContextTokens < request.contextTokenCount) {
       return {

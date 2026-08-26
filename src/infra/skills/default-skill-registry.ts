@@ -11,10 +11,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import type {
-  SkillRegistry,
-  SelfModification,
-} from '../../core/interfaces/skill-registry.js';
+import type { SkillRegistry, SelfModification } from '../../core/interfaces/skill-registry.js';
 import type {
   Skill,
   SkillEntry,
@@ -96,7 +93,9 @@ export class DefaultSkillRegistry implements SkillRegistry, SelfModification {
     for (const name of this.mountedSkills) {
       const skill = this.skills.get(name);
       if (skill) {
-        sections.push(`### Mounted Skill: ${skill.name}\n${skill.description}\n\n${skill.content.trim()}`);
+        sections.push(
+          `### Mounted Skill: ${skill.name}\n${skill.description}\n\n${skill.content.trim()}`,
+        );
       }
     }
 
@@ -111,11 +110,13 @@ export class DefaultSkillRegistry implements SkillRegistry, SelfModification {
     const discovered: Skill[] = [];
 
     // 1. User Directory (~/.vi-harness/skills/)
-    const userDir = options?.userSkillsDirectory ?? path.join(os.homedir(), '.vi-harness', 'skills');
+    const userDir =
+      options?.userSkillsDirectory ?? path.join(os.homedir(), '.vi-harness', 'skills');
     await this.scanDirectory(userDir, 'user', discovered);
 
     // 2. Workspace Directory (.vi-harness/skills/ or skills/)
-    const workspaceDir = options?.workspaceSkillsDirectory ?? path.join(process.cwd(), '.vi-harness', 'skills');
+    const workspaceDir =
+      options?.workspaceSkillsDirectory ?? path.join(process.cwd(), '.vi-harness', 'skills');
     await this.scanDirectory(workspaceDir, 'workspace', discovered);
 
     const altWorkspaceDir = path.join(process.cwd(), 'skills');
@@ -147,12 +148,17 @@ export class DefaultSkillRegistry implements SkillRegistry, SelfModification {
 
       for (const entry of entries) {
         const fullPath = path.join(dirPath, entry.name);
-        if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.json') || entry.name.endsWith('.txt'))) {
+        if (
+          entry.isFile() &&
+          (entry.name.endsWith('.md') ||
+            entry.name.endsWith('.json') ||
+            entry.name.endsWith('.txt'))
+        ) {
           const rawContent = fs.readFileSync(fullPath, 'utf8');
           const skillName = path.basename(entry.name, path.extname(entry.name));
 
           let description = `Skill loaded from ${entry.name}`;
-          let content = rawContent;
+          const content = rawContent;
           const tags: string[] = ['discovered', source];
 
           // Parse markdown header if available

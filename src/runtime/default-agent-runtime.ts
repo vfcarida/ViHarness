@@ -260,11 +260,10 @@ export class DefaultAgentRuntime implements AgentRuntime {
           const recentTraces = await expStore.getRecentTraces(5);
           const crossReport = HarnessDiagnosticEngine.analyzeAcrossRuns(recentTraces);
           if (crossReport.recommendations.length > 0) {
-            await HarnessAutoTuner.applyRecommendations(
-              {},
-              crossReport.recommendations,
-              { experienceStore: expStore, idFactory: this.idFactory },
-            );
+            await HarnessAutoTuner.applyRecommendations({}, crossReport.recommendations, {
+              experienceStore: expStore,
+              idFactory: this.idFactory,
+            });
           }
         }
       } catch {
@@ -419,7 +418,10 @@ export class DefaultAgentRuntime implements AgentRuntime {
         }
 
         // Handle termination decision
-        if (iterationRecord.terminationDecision.terminal || (stateMachine.phase as AgentPhase) === AgentPhase.DONE) {
+        if (
+          iterationRecord.terminationDecision.terminal ||
+          (stateMachine.phase as AgentPhase) === AgentPhase.DONE
+        ) {
           if (
             iterationRecord.terminationDecision.reason === TerminationReason.SUCCESS ||
             (stateMachine.phase as AgentPhase) === AgentPhase.DONE

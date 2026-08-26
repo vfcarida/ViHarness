@@ -3,7 +3,11 @@ import { DefaultToolRunContext } from '../../../src/core/tools/deferred-context.
 
 describe('Deferred Context & Turn Control — P018', () => {
   it('1. Collects deferred context messages in execution order', () => {
-    const ctx = new DefaultToolRunContext({ sessionId: 's1', callId: 'c1', toolName: 'write_file' });
+    const ctx = new DefaultToolRunContext({
+      sessionId: 's1',
+      callId: 'c1',
+      toolName: 'write_file',
+    });
 
     expect(ctx.getDeferredContext()).toEqual([]);
     expect(ctx.isTurnConcluded()).toBe(false);

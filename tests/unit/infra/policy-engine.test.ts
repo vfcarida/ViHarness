@@ -4,10 +4,7 @@ import {
   RiskClassifier,
   LocalDevelopmentSandbox,
 } from '../../../src/infra/index.js';
-import {
-  PolicyDecisionType,
-  ActionRiskCategory,
-} from '../../../src/core/index.js';
+import { PolicyDecisionType, ActionRiskCategory } from '../../../src/core/index.js';
 import type { PermissionContext } from '../../../src/core/index.js';
 
 describe('Security & Execution-Policy Layer', () => {

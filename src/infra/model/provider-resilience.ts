@@ -63,7 +63,8 @@ async function executeWithRetry(
   const maxRetries = options.maxRetries ?? DEFAULT_RESILIENCE_OPTIONS.maxRetries;
   const initialBackoff = options.initialBackoffMs ?? DEFAULT_RESILIENCE_OPTIONS.initialBackoffMs;
   const maxBackoff = options.maxBackoffMs ?? DEFAULT_RESILIENCE_OPTIONS.maxBackoffMs;
-  const timeoutMs = request.timeoutMs ?? options.defaultTimeoutMs ?? DEFAULT_RESILIENCE_OPTIONS.defaultTimeoutMs;
+  const timeoutMs =
+    request.timeoutMs ?? options.defaultTimeoutMs ?? DEFAULT_RESILIENCE_OPTIONS.defaultTimeoutMs;
 
   let attempt = 0;
   let totalBackoffMs = 0;
@@ -111,10 +112,7 @@ async function executeWithRetry(
       }
 
       // Calculate exponential backoff with full jitter
-      const backoff = Math.min(
-        maxBackoff,
-        initialBackoff * Math.pow(2, attempt - 1),
-      );
+      const backoff = Math.min(maxBackoff, initialBackoff * Math.pow(2, attempt - 1));
       const jitteredBackoff = Math.floor(backoff * (0.5 + Math.random() * 0.5));
       totalBackoffMs += jitteredBackoff;
 

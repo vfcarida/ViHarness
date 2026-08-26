@@ -3,18 +3,11 @@
  */
 
 // Transition table
-export {
-  TRANSITION_TABLE,
-  TRANSITION_INDEX,
-  lookupTransition,
-} from './transition-table.js';
+export { TRANSITION_TABLE, TRANSITION_INDEX, lookupTransition } from './transition-table.js';
 export type { TransitionRule } from './transition-table.js';
 
 // Transition validator
-export {
-  validateTransition,
-  validateTransitionOrThrow,
-} from './transition-validator.js';
+export { validateTransition, validateTransitionOrThrow } from './transition-validator.js';
 export type { TransitionValidationResult } from './transition-validator.js';
 
 // State machine

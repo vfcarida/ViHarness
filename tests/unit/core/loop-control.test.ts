@@ -69,10 +69,7 @@ describe('Loop Control Engine', () => {
     ...override,
   });
 
-  const createDummyIteration = (
-    seq: number,
-    fingerprint?: IterationFingerprint,
-  ): Iteration => ({
+  const createDummyIteration = (seq: number, fingerprint?: IterationFingerprint): Iteration => ({
     id: idFactory.create<'Iteration'>(),
     taskId: idFactory.create<'Task'>(),
     sequenceNumber: seq,
@@ -192,23 +189,37 @@ describe('Loop Control Engine', () => {
     it('loopFingerprintsMatch should return false when errorSignature differs', () => {
       const fp1 = createDummyFingerprint({ errorSignature: 'ERR_A' });
       const fp2 = createDummyFingerprint({ errorSignature: 'ERR_B' });
-      expect(loopFingerprintsMatch(buildLoopFingerprintFromRaw(fp1), buildLoopFingerprintFromRaw(fp2))).toBe(false);
+      expect(
+        loopFingerprintsMatch(buildLoopFingerprintFromRaw(fp1), buildLoopFingerprintFromRaw(fp2)),
+      ).toBe(false);
     });
 
     it('loopFingerprintsMatch should return false when stateTrajectory differs', () => {
       const fp1 = createDummyFingerprint({ stateTrajectory: [AgentPhase.IMPLEMENT] });
       const fp2 = createDummyFingerprint({ stateTrajectory: [AgentPhase.VERIFY] });
-      expect(loopFingerprintsMatch(buildLoopFingerprintFromRaw(fp1), buildLoopFingerprintFromRaw(fp2))).toBe(false);
+      expect(
+        loopFingerprintsMatch(buildLoopFingerprintFromRaw(fp1), buildLoopFingerprintFromRaw(fp2)),
+      ).toBe(false);
     });
 
     it('computeFingerprintHash should produce different hashes for different inputs', () => {
       const h1 = computeFingerprintHash({
-        hypothesisId: 'A', errorSignature: 'ERR', patchSignature: null,
-        toolFailureSignature: null, failingTests: [], filesModified: [], stateTrajectory: [],
+        hypothesisId: 'A',
+        errorSignature: 'ERR',
+        patchSignature: null,
+        toolFailureSignature: null,
+        failingTests: [],
+        filesModified: [],
+        stateTrajectory: [],
       });
       const h2 = computeFingerprintHash({
-        hypothesisId: 'B', errorSignature: 'ERR', patchSignature: null,
-        toolFailureSignature: null, failingTests: [], filesModified: [], stateTrajectory: [],
+        hypothesisId: 'B',
+        errorSignature: 'ERR',
+        patchSignature: null,
+        toolFailureSignature: null,
+        failingTests: [],
+        filesModified: [],
+        stateTrajectory: [],
       });
       expect(h1).not.toBe(h2);
     });
@@ -290,10 +301,7 @@ describe('Loop Control Engine', () => {
       const hypId = idFactory.create<'Hypothesis'>();
       const fp = createDummyFingerprint({ hypothesisId: hypId });
 
-      const iters = [
-        createDummyIteration(1, fp),
-        createDummyIteration(2, fp),
-      ];
+      const iters = [createDummyIteration(1, fp), createDummyIteration(2, fp)];
 
       expect(checkRepeatedHypotheses(iters, 3, 2).terminal).toBe(false);
     });
@@ -376,12 +384,66 @@ describe('Loop Control Engine', () => {
   describe('Phase-Pair Oscillation Detection', () => {
     it('should detect oscillation when transitions repeat phase pairs within window', () => {
       const transitions: StateTransition[] = [
-        { id: '1', from: AgentPhase.REPAIR, to: AgentPhase.VERIFY, event: StateEvent.REPAIR_COMPLETE, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '2', from: AgentPhase.VERIFY, to: AgentPhase.REPAIR, event: StateEvent.VERIFICATION_FAILED, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '3', from: AgentPhase.REPAIR, to: AgentPhase.VERIFY, event: StateEvent.REPAIR_COMPLETE, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '4', from: AgentPhase.VERIFY, to: AgentPhase.REPAIR, event: StateEvent.VERIFICATION_FAILED, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '5', from: AgentPhase.REPAIR, to: AgentPhase.VERIFY, event: StateEvent.REPAIR_COMPLETE, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '6', from: AgentPhase.VERIFY, to: AgentPhase.REPAIR, event: StateEvent.VERIFICATION_FAILED, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
+        {
+          id: '1',
+          from: AgentPhase.REPAIR,
+          to: AgentPhase.VERIFY,
+          event: StateEvent.REPAIR_COMPLETE,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '2',
+          from: AgentPhase.VERIFY,
+          to: AgentPhase.REPAIR,
+          event: StateEvent.VERIFICATION_FAILED,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '3',
+          from: AgentPhase.REPAIR,
+          to: AgentPhase.VERIFY,
+          event: StateEvent.REPAIR_COMPLETE,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '4',
+          from: AgentPhase.VERIFY,
+          to: AgentPhase.REPAIR,
+          event: StateEvent.VERIFICATION_FAILED,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '5',
+          from: AgentPhase.REPAIR,
+          to: AgentPhase.VERIFY,
+          event: StateEvent.REPAIR_COMPLETE,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '6',
+          from: AgentPhase.VERIFY,
+          to: AgentPhase.REPAIR,
+          event: StateEvent.VERIFICATION_FAILED,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
       ];
 
       const res = checkOscillation(transitions, 10, 3, 6);
@@ -393,9 +455,36 @@ describe('Loop Control Engine', () => {
 
     it('should not trigger oscillation when transitions are progressive', () => {
       const transitions: StateTransition[] = [
-        { id: '1', from: AgentPhase.INIT, to: AgentPhase.EXPLORE, event: StateEvent.START, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '2', from: AgentPhase.EXPLORE, to: AgentPhase.PLAN, event: StateEvent.EXPLORE_COMPLETE, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '3', from: AgentPhase.PLAN, to: AgentPhase.IMPLEMENT, event: StateEvent.PLAN_READY, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
+        {
+          id: '1',
+          from: AgentPhase.INIT,
+          to: AgentPhase.EXPLORE,
+          event: StateEvent.START,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '2',
+          from: AgentPhase.EXPLORE,
+          to: AgentPhase.PLAN,
+          event: StateEvent.EXPLORE_COMPLETE,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '3',
+          from: AgentPhase.PLAN,
+          to: AgentPhase.IMPLEMENT,
+          event: StateEvent.PLAN_READY,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
       ];
       expect(checkOscillation(transitions, 10, 3, 3).terminal).toBe(false);
     });
@@ -403,13 +492,67 @@ describe('Loop Control Engine', () => {
     it('should respect configurable windowSize — transitions outside window do not count', () => {
       // 6 transitions, only look at last 4 — pair count below threshold in window
       const transitions: StateTransition[] = [
-        { id: '1', from: AgentPhase.REPAIR, to: AgentPhase.VERIFY, event: StateEvent.REPAIR_COMPLETE, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '2', from: AgentPhase.VERIFY, to: AgentPhase.REPAIR, event: StateEvent.VERIFICATION_FAILED, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '3', from: AgentPhase.REPAIR, to: AgentPhase.VERIFY, event: StateEvent.REPAIR_COMPLETE, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
+        {
+          id: '1',
+          from: AgentPhase.REPAIR,
+          to: AgentPhase.VERIFY,
+          event: StateEvent.REPAIR_COMPLETE,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '2',
+          from: AgentPhase.VERIFY,
+          to: AgentPhase.REPAIR,
+          event: StateEvent.VERIFICATION_FAILED,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '3',
+          from: AgentPhase.REPAIR,
+          to: AgentPhase.VERIFY,
+          event: StateEvent.REPAIR_COMPLETE,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
         // New phases from here (within a window=4)
-        { id: '4', from: AgentPhase.VERIFY, to: AgentPhase.DONE, event: StateEvent.VERIFICATION_PASSED, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '5', from: AgentPhase.INIT, to: AgentPhase.EXPLORE, event: StateEvent.START, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '6', from: AgentPhase.EXPLORE, to: AgentPhase.PLAN, event: StateEvent.EXPLORE_COMPLETE, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
+        {
+          id: '4',
+          from: AgentPhase.VERIFY,
+          to: AgentPhase.DONE,
+          event: StateEvent.VERIFICATION_PASSED,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '5',
+          from: AgentPhase.INIT,
+          to: AgentPhase.EXPLORE,
+          event: StateEvent.START,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '6',
+          from: AgentPhase.EXPLORE,
+          to: AgentPhase.PLAN,
+          event: StateEvent.EXPLORE_COMPLETE,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
       ];
 
       // window=4 — last 4 are progressive, no oscillation
@@ -424,8 +567,12 @@ describe('Loop Control Engine', () => {
   describe('State Trajectory Oscillation Detection', () => {
     it('should detect 3-phase cycle: IMPLEMENT→VERIFY→REPAIR repeating', () => {
       const trajectory: AgentPhase[] = [
-        AgentPhase.IMPLEMENT, AgentPhase.VERIFY, AgentPhase.REPAIR,
-        AgentPhase.IMPLEMENT, AgentPhase.VERIFY, AgentPhase.REPAIR, // exact repeat
+        AgentPhase.IMPLEMENT,
+        AgentPhase.VERIFY,
+        AgentPhase.REPAIR,
+        AgentPhase.IMPLEMENT,
+        AgentPhase.VERIFY,
+        AgentPhase.REPAIR, // exact repeat
       ];
 
       const res = checkTrajectoryOscillation(trajectory, 3, 6);
@@ -442,8 +589,12 @@ describe('Loop Control Engine', () => {
 
     it('should not trigger when trajectory is progressive (no cycle)', () => {
       const trajectory: AgentPhase[] = [
-        AgentPhase.INIT, AgentPhase.EXPLORE, AgentPhase.PLAN,
-        AgentPhase.IMPLEMENT, AgentPhase.VERIFY, AgentPhase.DONE,
+        AgentPhase.INIT,
+        AgentPhase.EXPLORE,
+        AgentPhase.PLAN,
+        AgentPhase.IMPLEMENT,
+        AgentPhase.VERIFY,
+        AgentPhase.DONE,
       ];
       expect(checkTrajectoryOscillation(trajectory, 3, 5).terminal).toBe(false);
     });
@@ -459,8 +610,12 @@ describe('Loop Control Engine', () => {
 
     it('detectTrajectoryCycle should return null for non-repeating trajectory', () => {
       const trajectory = [
-        AgentPhase.IMPLEMENT, AgentPhase.VERIFY, AgentPhase.REPAIR,
-        AgentPhase.EXPLORE, AgentPhase.PLAN, AgentPhase.IMPLEMENT,
+        AgentPhase.IMPLEMENT,
+        AgentPhase.VERIFY,
+        AgentPhase.REPAIR,
+        AgentPhase.EXPLORE,
+        AgentPhase.PLAN,
+        AgentPhase.IMPLEMENT,
       ];
       expect(detectTrajectoryCycle(trajectory, 3)).toBeNull();
     });
@@ -590,27 +745,67 @@ describe('Loop Control Engine', () => {
       const constraints: GoalConstraints = { ...DEFAULT_GOAL_CONSTRAINTS };
 
       const transitions: StateTransition[] = [
-        { id: '1', from: AgentPhase.REPAIR, to: AgentPhase.VERIFY, event: StateEvent.REPAIR_COMPLETE, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '2', from: AgentPhase.VERIFY, to: AgentPhase.REPAIR, event: StateEvent.VERIFICATION_FAILED, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '3', from: AgentPhase.REPAIR, to: AgentPhase.VERIFY, event: StateEvent.REPAIR_COMPLETE, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
-        { id: '4', from: AgentPhase.VERIFY, to: AgentPhase.REPAIR, event: StateEvent.VERIFICATION_FAILED, timestamp: new Date(), stateId: '' as any, evidenceIds: [], metadata: {} },
+        {
+          id: '1',
+          from: AgentPhase.REPAIR,
+          to: AgentPhase.VERIFY,
+          event: StateEvent.REPAIR_COMPLETE,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '2',
+          from: AgentPhase.VERIFY,
+          to: AgentPhase.REPAIR,
+          event: StateEvent.VERIFICATION_FAILED,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '3',
+          from: AgentPhase.REPAIR,
+          to: AgentPhase.VERIFY,
+          event: StateEvent.REPAIR_COMPLETE,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
+        {
+          id: '4',
+          from: AgentPhase.VERIFY,
+          to: AgentPhase.REPAIR,
+          event: StateEvent.VERIFICATION_FAILED,
+          timestamp: new Date(),
+          stateId: '' as any,
+          evidenceIds: [],
+          metadata: {},
+        },
       ];
 
       // Default threshold=3 → should not trigger
       const resDefault = evaluateLoopControl({
-        state, constraints,
+        state,
+        constraints,
         iterations: [createDummyIteration(1)],
         transitions,
-        elapsedMs: 100, totalCostDollars: 0.1,
+        elapsedMs: 100,
+        totalCostDollars: 0.1,
       });
       expect(resDefault.terminal).toBe(false);
 
       // Custom threshold=2 → should trigger
       const resCustom = evaluateLoopControl({
-        state, constraints,
+        state,
+        constraints,
         iterations: [createDummyIteration(1)],
         transitions,
-        elapsedMs: 100, totalCostDollars: 0.1,
+        elapsedMs: 100,
+        totalCostDollars: 0.1,
         config: { ...DEFAULT_LOOP_CONTROL_CONFIG, oscillationThreshold: 2 },
       });
       expect(resCustom.terminal).toBe(true);

@@ -10,7 +10,8 @@
 const SECRET_PATTERNS: ReadonlyArray<{ pattern: RegExp; replacement: string }> = [
   // Private Keys
   {
-    pattern: /-----BEGIN\s+(?:RSA\s+|OPENSSH\s+|EC\s+|DSA\s+|PGP\s+)?PRIVATE\s+KEY-----[\s\S]*?-----END\s+(?:RSA\s+|OPENSSH\s+|EC\s+|DSA\s+|PGP\s+)?PRIVATE\s+KEY-----/gi,
+    pattern:
+      /-----BEGIN\s+(?:RSA\s+|OPENSSH\s+|EC\s+|DSA\s+|PGP\s+)?PRIVATE\s+KEY-----[\s\S]*?-----END\s+(?:RSA\s+|OPENSSH\s+|EC\s+|DSA\s+|PGP\s+)?PRIVATE\s+KEY-----/gi,
     replacement: '[REDACTED_PRIVATE_KEY]',
   },
   // OpenAI API Keys
@@ -53,12 +54,14 @@ const SECRET_PATTERNS: ReadonlyArray<{ pattern: RegExp; replacement: string }> =
   },
   // Password / Secret in JSON / Key-Value
   {
-    pattern: /(["']?(?:password|secret|api_?key|access_?token|auth_?token|client_?secret)["']?\s*[:=]\s*["'])(?:(?!\1)[^\r\n]{4,})(["'])/gi,
+    pattern:
+      /(["']?(?:password|secret|api_?key|access_?token|auth_?token|client_?secret)["']?\s*[:=]\s*["'])(?:(?!\1)[^\r\n]{4,})(["'])/gi,
     replacement: '$1[REDACTED_SECRET]$2',
   },
   // Generic high-entropy hex/base64 tokens assigned in env style
   {
-    pattern: /(^(?:export\s+)?[A-Z0-9_]*(?:SECRET|TOKEN|KEY|PASSWORD|AUTH)[A-Z0-9_]*\s*=\s*['"]?)[^\r\n"']{8,}(['"]?$)/gim,
+    pattern:
+      /(^(?:export\s+)?[A-Z0-9_]*(?:SECRET|TOKEN|KEY|PASSWORD|AUTH)[A-Z0-9_]*\s*=\s*['"]?)[^\r\n"']{8,}(['"]?$)/gim,
     replacement: '$1[REDACTED_ENV_SECRET]$2',
   },
 ];

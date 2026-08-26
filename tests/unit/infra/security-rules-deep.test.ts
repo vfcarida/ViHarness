@@ -65,7 +65,10 @@ describe('Security & Policy Deep Unit Suite', () => {
       const validSrc = PathValidator.validate('src/core/model/action.ts', workspaceRoot);
       expect(validSrc.valid).toBe(true);
 
-      const validTmp = PathValidator.validate(path.join(os.tmpdir(), 'vi-harness-temp.txt'), workspaceRoot);
+      const validTmp = PathValidator.validate(
+        path.join(os.tmpdir(), 'vi-harness-temp.txt'),
+        workspaceRoot,
+      );
       expect(validTmp.valid).toBe(true);
     });
   });

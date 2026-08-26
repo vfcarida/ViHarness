@@ -264,7 +264,9 @@ describe('Official Vi-Harness Benchmark Runner Suite', () => {
     // Verify markdown sections and table headers
     expect(markdown).toContain('# Vi-Harness Official Benchmark Evaluation Report');
     expect(markdown).toContain('## 2. Executive Comparison: Pi vs Vi-Harness');
-    expect(markdown).toContain('| Harness | Version | Runs | Success Rate | Mean Cost | Median Cost | P95 Cost |');
+    expect(markdown).toContain(
+      '| Harness | Version | Runs | Success Rate | Mean Cost | Median Cost | P95 Cost |',
+    );
     expect(markdown).toContain('**Vi-Harness**');
     expect(markdown).toContain('**Pi**');
     expect(markdown).toContain('## 3. Token Consumption Distributions');

@@ -126,7 +126,10 @@ describe('Experience Store (Meta-Harness Pattern) — P009', () => {
     expect(fs.existsSync(path.join(tempDir, 'index.json'))).toBe(true);
 
     // Verify traces.jsonl contents
-    const traceLines = fs.readFileSync(path.join(runDir, 'traces.jsonl'), 'utf-8').trim().split('\n');
+    const traceLines = fs
+      .readFileSync(path.join(runDir, 'traces.jsonl'), 'utf-8')
+      .trim()
+      .split('\n');
     expect(traceLines).toHaveLength(3);
 
     // Cleanup
@@ -208,7 +211,7 @@ describe('Experience Store (Meta-Harness Pattern) — P009', () => {
         currentValue: 0.85,
         suggestedValue: 0.65,
         evidence: ['Context token accumulation exceeded 40,000 tokens in 3 consecutive runs'],
-        confidence: 0.90,
+        confidence: 0.9,
         rationale: 'Engage progressive compaction earlier to prevent context exhaustion.',
       },
       applied: true,

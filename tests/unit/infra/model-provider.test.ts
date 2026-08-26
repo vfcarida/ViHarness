@@ -1,8 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import {
-  MockModelProvider,
-  OpenAICompatibleProvider,
-} from '../../../src/infra/index.js';
+import { MockModelProvider, OpenAICompatibleProvider } from '../../../src/infra/index.js';
 import type { ModelProvider } from '../../../src/core/interfaces/model-provider.js';
 import {
   MessageRole,
@@ -15,9 +12,7 @@ describe('ModelProvider Abstraction & Substitution', () => {
   const sampleRequest: ModelRequest = {
     modelId: 'test-model',
     systemPrompt: 'You are a helpful coding assistant.',
-    messages: [
-      { role: MessageRole.USER, content: 'Write a hello world function' },
-    ],
+    messages: [{ role: MessageRole.USER, content: 'Write a hello world function' }],
     temperature: 0.2,
     maxTokens: 500,
   };

@@ -57,16 +57,10 @@ export interface DefineToolOptions<
   readonly output?: OutputRenderer<InferParamType<TParamsDef>, TOutput>;
   readonly isConcurrencySafe?: (args: InferParamType<TParamsDef>) => boolean;
   readonly timeoutMs?: number;
-  execute(
-    args: InferParamType<TParamsDef>,
-    context?: any,
-  ): Promise<TOutput> | TOutput;
+  execute(args: InferParamType<TParamsDef>, context?: any): Promise<TOutput> | TOutput;
 }
 
-export function defineTool<
-  TParamsDef extends Record<string, ParameterField>,
-  TOutput = unknown,
->(
+export function defineTool<TParamsDef extends Record<string, ParameterField>, TOutput = unknown>(
   options: DefineToolOptions<TParamsDef, TOutput>,
 ): ToolDefinition {
   // Convert parameter field definitions to standard JSON Schema

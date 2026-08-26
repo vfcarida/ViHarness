@@ -15,7 +15,11 @@ import { DefaultToolExecutor } from '../../../../src/infra/tools/default-tool-ex
 import { ScriptedModelProvider } from '../../../../src/infra/model/scripted-model-provider.js';
 import { UuidV7IdFactory } from '../../../../src/infra/id/uuid-id-factory.js';
 import { TestClock } from '../../../../src/infra/time/test-clock.js';
-import { FinishReason, ProviderHealthStatus, type ModelRouter } from '../../../../src/core/index.js';
+import {
+  FinishReason,
+  ProviderHealthStatus,
+  type ModelRouter,
+} from '../../../../src/core/index.js';
 
 describe('Harbor Agent Adapter — P011', () => {
   const idFactory = new UuidV7IdFactory();
@@ -99,7 +103,16 @@ describe('Harbor Agent Adapter — P011', () => {
       steps: [
         {
           content: 'Writing file in container.',
-          toolCalls: [{ id: 'call-2', name: 'terminal', input: { command: 'node -e "const fs = require(\'fs\'); fs.writeFileSync(\'data.json\', \'ok\');"' } }],
+          toolCalls: [
+            {
+              id: 'call-2',
+              name: 'terminal',
+              input: {
+                command:
+                  "node -e \"const fs = require('fs'); fs.writeFileSync('data.json', 'ok');\"",
+              },
+            },
+          ],
           finishReason: FinishReason.TOOL_CALL,
         },
         {
@@ -143,7 +156,10 @@ describe('Harbor Agent Adapter — P011', () => {
     expect(result.success).toBe(true);
 
     // Verify file written in container workspace
-    const execRes = await dockerEnv.exec(container, 'node -e "const fs = require(\'fs\'); if (!fs.existsSync(\'data.json\')) process.exit(1); console.log(\'FOUND\');"');
+    const execRes = await dockerEnv.exec(
+      container,
+      "node -e \"const fs = require('fs'); if (!fs.existsSync('data.json')) process.exit(1); console.log('FOUND');\"",
+    );
     expect(execRes.exitCode).toBe(0);
     expect(execRes.stdout).toContain('FOUND');
 

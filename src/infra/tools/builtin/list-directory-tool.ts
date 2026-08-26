@@ -4,7 +4,11 @@
  * "Application-level validation: path canonicalization and workspace containment."
  */
 import type { Tool } from '../../../core/interfaces/tool.js';
-import type { ToolInput, ToolResult, ToolExecutionContext } from '../../../core/model/tool-types.js';
+import type {
+  ToolInput,
+  ToolResult,
+  ToolExecutionContext,
+} from '../../../core/model/tool-types.js';
 import { ToolCategory, ToolRiskLevel } from '../../../core/model/tool-types.js';
 import type { IdFactory } from '../../../core/types/identifiers.js';
 import { PathValidator } from '../../security/path-validator.js';
@@ -59,7 +63,11 @@ export class ListDirectoryTool implements Tool {
       output: `Listing for ${rawPath}: file1.ts, file2.ts, package.json`,
       success: true,
       durationMs: Date.now() - startTime,
-      metadata: { path: rawPath, resolvedPath: validation.resolvedPath, correlationId: context.correlationId },
+      metadata: {
+        path: rawPath,
+        resolvedPath: validation.resolvedPath,
+        correlationId: context.correlationId,
+      },
     };
   }
 }

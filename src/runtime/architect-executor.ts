@@ -170,11 +170,10 @@ export class ArchitectExecutor {
       signal,
     };
 
-    const response = await executeResiliently(
-      architectProvider,
-      modelRequest,
-      { maxRetries: 2, defaultTimeoutMs: 30000 },
-    );
+    const response = await executeResiliently(architectProvider, modelRequest, {
+      maxRetries: 2,
+      defaultTimeoutMs: 30000,
+    });
 
     return {
       plan: response.content,
@@ -192,15 +191,8 @@ export class ArchitectExecutor {
    * and tool definitions to produce structured tool calls.
    */
   static async execute(params: ArchitectExecuteParams): Promise<ArchitectExecuteResult> {
-    const {
-      plan,
-      messages,
-      editorProvider,
-      editorModelId,
-      tools,
-      signal,
-      customSystemPrompt,
-    } = params;
+    const { plan, messages, editorProvider, editorModelId, tools, signal, customSystemPrompt } =
+      params;
 
     const editorMessages: ModelMessage[] = [
       {
@@ -226,11 +218,10 @@ export class ArchitectExecutor {
       signal,
     };
 
-    const response = await executeResiliently(
-      editorProvider,
-      modelRequest,
-      { maxRetries: 2, defaultTimeoutMs: 20000 },
-    );
+    const response = await executeResiliently(editorProvider, modelRequest, {
+      maxRetries: 2,
+      defaultTimeoutMs: 20000,
+    });
 
     return {
       rawResponse: response,
@@ -278,8 +269,7 @@ export class ArchitectExecutor {
     });
 
     const architectProvider = architectRouting.selectedProvider;
-    const architectModelId =
-      dualModelConfig?.architectModelId ?? architectRouting.selectedModelId;
+    const architectModelId = dualModelConfig?.architectModelId ?? architectRouting.selectedModelId;
 
     // Phase 1: Planning
     const planResult = await ArchitectExecutor.plan({
@@ -323,8 +313,7 @@ export class ArchitectExecutor {
     });
 
     const editorProvider = editorRouting.selectedProvider;
-    const editorModelId =
-      dualModelConfig?.editorModelId ?? editorRouting.selectedModelId;
+    const editorModelId = dualModelConfig?.editorModelId ?? editorRouting.selectedModelId;
 
     // Phase 2: Execution
     const executeResult = await ArchitectExecutor.execute({
@@ -480,9 +469,7 @@ export class ArchitectExecutor {
 
       // If we already have a cached plan, ensure it is present in messages
       if (state.cachedPlan) {
-        const alreadyHasPlan = event.messages.some((m) =>
-          m.content.includes('[ARCHITECT PLAN]'),
-        );
+        const alreadyHasPlan = event.messages.some((m) => m.content.includes('[ARCHITECT PLAN]'));
         if (!alreadyHasPlan) {
           const modifiedMessages: ModelMessage[] = [
             ...event.messages,

@@ -7,10 +7,7 @@
  * 3. Dynamic Context Manager (/drop, /add, /focus) and non-dropping invariant guarantees.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  SourceCodeIndexer,
-  DynamicContextManager,
-} from '../../../src/infra/index.js';
+import { SourceCodeIndexer, DynamicContextManager } from '../../../src/infra/index.js';
 import {
   SymbolKind,
   ContextObjectType,
@@ -61,12 +58,22 @@ export async function computeScore(x: number, y: number): Promise<number> {
       expect(fileMap.exports).toContain('computeScore');
 
       const symbols = fileMap.symbols;
-      expect(symbols.find((s) => s.name === 'CodeBlock' && s.kind === SymbolKind.INTERFACE)).toBeDefined();
-      expect(symbols.find((s) => s.name === 'SymbolName' && s.kind === SymbolKind.TYPE_ALIAS)).toBeDefined();
+      expect(
+        symbols.find((s) => s.name === 'CodeBlock' && s.kind === SymbolKind.INTERFACE),
+      ).toBeDefined();
+      expect(
+        symbols.find((s) => s.name === 'SymbolName' && s.kind === SymbolKind.TYPE_ALIAS),
+      ).toBeDefined();
       expect(symbols.find((s) => s.name === 'Status' && s.kind === SymbolKind.ENUM)).toBeDefined();
-      expect(symbols.find((s) => s.name === 'TaskExecutor' && s.kind === SymbolKind.CLASS)).toBeDefined();
-      expect(symbols.find((s) => s.name === 'executeTask' && s.kind === SymbolKind.METHOD)).toBeDefined();
-      expect(symbols.find((s) => s.name === 'computeScore' && s.kind === SymbolKind.FUNCTION)).toBeDefined();
+      expect(
+        symbols.find((s) => s.name === 'TaskExecutor' && s.kind === SymbolKind.CLASS),
+      ).toBeDefined();
+      expect(
+        symbols.find((s) => s.name === 'executeTask' && s.kind === SymbolKind.METHOD),
+      ).toBeDefined();
+      expect(
+        symbols.find((s) => s.name === 'computeScore' && s.kind === SymbolKind.FUNCTION),
+      ).toBeDefined();
 
       expect(fileMap.outline).toContain('interface CodeBlock');
       expect(fileMap.outline).toContain('class TaskExecutor');
@@ -93,9 +100,17 @@ def standalone_helper(x: int) -> int:
 
       const fileMap = SourceCodeIndexer.parseFile('backend/runtime.py', pyCode);
       expect(fileMap.language).toBe('python');
-      expect(fileMap.symbols.find((s) => s.name === 'AgentRuntime' && s.kind === SymbolKind.CLASS)).toBeDefined();
-      expect(fileMap.symbols.find((s) => s.name === 'run' && s.kind === SymbolKind.METHOD)).toBeDefined();
-      expect(fileMap.symbols.find((s) => s.name === 'standalone_helper' && s.kind === SymbolKind.FUNCTION)).toBeDefined();
+      expect(
+        fileMap.symbols.find((s) => s.name === 'AgentRuntime' && s.kind === SymbolKind.CLASS),
+      ).toBeDefined();
+      expect(
+        fileMap.symbols.find((s) => s.name === 'run' && s.kind === SymbolKind.METHOD),
+      ).toBeDefined();
+      expect(
+        fileMap.symbols.find(
+          (s) => s.name === 'standalone_helper' && s.kind === SymbolKind.FUNCTION,
+        ),
+      ).toBeDefined();
     });
 
     it('should extract Go structs, methods, and functions', () => {
@@ -118,9 +133,15 @@ func MainHandler(w int) {
 
       const fileMap = SourceCodeIndexer.parseFile('cmd/server.go', goCode);
       expect(fileMap.language).toBe('go');
-      expect(fileMap.symbols.find((s) => s.name === 'ServerConfig' && s.kind === SymbolKind.CLASS)).toBeDefined();
-      expect(fileMap.symbols.find((s) => s.name === 'Start' && s.kind === SymbolKind.METHOD)).toBeDefined();
-      expect(fileMap.symbols.find((s) => s.name === 'MainHandler' && s.kind === SymbolKind.FUNCTION)).toBeDefined();
+      expect(
+        fileMap.symbols.find((s) => s.name === 'ServerConfig' && s.kind === SymbolKind.CLASS),
+      ).toBeDefined();
+      expect(
+        fileMap.symbols.find((s) => s.name === 'Start' && s.kind === SymbolKind.METHOD),
+      ).toBeDefined();
+      expect(
+        fileMap.symbols.find((s) => s.name === 'MainHandler' && s.kind === SymbolKind.FUNCTION),
+      ).toBeDefined();
     });
   });
 
@@ -365,7 +386,8 @@ export class Application {
     });
 
     it('should dynamically scale repo map token budget between 40% (no active files) and 10% (active files)', async () => {
-      const { DefaultContextCompiler } = await import('../../../src/infra/compiler/default-context-compiler.js');
+      const { DefaultContextCompiler } =
+        await import('../../../src/infra/compiler/default-context-compiler.js');
       const { SystemClock } = await import('../../../src/infra/time/system-clock.js');
       const { UuidV7IdFactory } = await import('../../../src/infra/id/uuid-id-factory.js');
       const { ModelCapability } = await import('../../../src/core/model/model-io.js');
@@ -407,11 +429,31 @@ export class ServiceModule${i} {
       };
 
       const baseRequest = {
-        goal: { id: idFactory.create<'Goal'>(), description: 'Refactor services', status: 'ACTIVE' as any, createdAt: new Date(), updatedAt: new Date() },
-        task: { id: idFactory.create<'Task'>(), goalId: idFactory.create<'Goal'>(), description: 'Refactor', status: TaskStatus.IN_PROGRESS, priority: 1, dependencies: [], createdAt: new Date(), updatedAt: new Date() },
+        goal: {
+          id: idFactory.create<'Goal'>(),
+          description: 'Refactor services',
+          status: 'ACTIVE' as any,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        task: {
+          id: idFactory.create<'Task'>(),
+          goalId: idFactory.create<'Goal'>(),
+          description: 'Refactor',
+          status: TaskStatus.IN_PROGRESS,
+          priority: 1,
+          dependencies: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
         currentState: 'IMPLEMENTING' as any,
         targetModelDescriptor,
-        budget: { maxTokens: 4000, softLimitTokens: 3500, hardLimitTokens: 4000, maxOutputTokens: 1000 },
+        budget: {
+          maxTokens: 4000,
+          softLimitTokens: 3500,
+          hardLimitTokens: 4000,
+          maxOutputTokens: 1000,
+        },
         repoSymbolMap: repoMap,
       };
 
@@ -421,8 +463,8 @@ export class ServiceModule${i} {
         currentFiles: [],
       });
 
-      const repoMapEntryNoFiles = resultNoFiles.retainedObjects.find(
-        (o) => o.tags.includes('repo_map'),
+      const repoMapEntryNoFiles = resultNoFiles.retainedObjects.find((o) =>
+        o.tags.includes('repo_map'),
       );
       expect(repoMapEntryNoFiles).toBeDefined();
       const tokensNoFiles = repoMapEntryNoFiles!.costTokens;
@@ -433,8 +475,8 @@ export class ServiceModule${i} {
         currentFiles: ['src/module_1.ts', 'src/module_2.ts'],
       });
 
-      const repoMapEntryWithFiles = resultWithFiles.retainedObjects.find(
-        (o) => o.tags.includes('repo_map'),
+      const repoMapEntryWithFiles = resultWithFiles.retainedObjects.find((o) =>
+        o.tags.includes('repo_map'),
       );
       expect(repoMapEntryWithFiles).toBeDefined();
       const tokensWithFiles = repoMapEntryWithFiles!.costTokens;

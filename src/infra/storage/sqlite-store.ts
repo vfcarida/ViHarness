@@ -144,7 +144,11 @@ export class SqliteStore implements StorageEngine {
     } catch (err: any) {
       // If corruption detected on existing file, attempt recovery by archiving corrupted db
       if (this._db && this._db.open) {
-        try { this._db.close(); } catch {}
+        try {
+          this._db.close();
+        } catch {
+          /* ignore close error on corrupted db */
+        }
       }
       if (targetPath !== ':memory:' && fs.existsSync(targetPath)) {
         const backupPath = `${targetPath}.corrupted.${Date.now()}`;
@@ -180,18 +184,15 @@ export class SqliteStore implements StorageEngine {
     `);
 
     const row = db.prepare('SELECT MAX(version) as max_version FROM schema_migrations').get() as
-      | { max_version: number | null }
-      | undefined;
+      { max_version: number | null } | undefined;
     const currentVersion = row?.max_version ?? 0;
 
     if (currentVersion < 1) {
       const apply001 = db.transaction(() => {
         db.exec(MIGRATION_001_SQL);
-        db.prepare('INSERT INTO schema_migrations (version, name, applied_at) VALUES (?, ?, ?)').run(
-          1,
-          '001-core-tables',
-          Date.now(),
-        );
+        db.prepare(
+          'INSERT INTO schema_migrations (version, name, applied_at) VALUES (?, ?, ?)',
+        ).run(1, '001-core-tables', Date.now());
       });
       apply001();
     }
@@ -240,7 +241,8 @@ export class SqliteStore implements StorageEngine {
 
   async list(namespace: string, prefix?: string): Promise<string[]> {
     const now = Date.now();
-    let query = 'SELECT key FROM kv_store WHERE namespace = ? AND (expires_at IS NULL OR expires_at > ?)';
+    let query =
+      'SELECT key FROM kv_store WHERE namespace = ? AND (expires_at IS NULL OR expires_at > ?)';
     const params: any[] = [namespace, now];
 
     if (prefix) {

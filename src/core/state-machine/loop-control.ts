@@ -32,11 +32,7 @@ import type { LifecycleGoal } from '../goal/goal-state.js';
 import type { Iteration, IterationFingerprint } from '../model/iteration.js';
 import type { AgentState, StateTransition } from '../model/state.js';
 import { AgentPhase } from '../model/state.js';
-import {
-  TerminationReason,
-  continueExecution,
-  terminate,
-} from '../model/termination.js';
+import { TerminationReason, continueExecution, terminate } from '../model/termination.js';
 import type { TerminationDecision, TerminationEvidence } from '../model/termination.js';
 import {
   buildLoopFingerprint,
@@ -156,7 +152,12 @@ export function evaluateLoopControl(params: {
   if (params.state.phase === AgentPhase.DONE) {
     return terminate({
       reason: TerminationReason.SUCCESS,
-      evidence: [{ type: 'ACCEPTANCE_GATE', description: 'Agent reached DONE phase — all acceptance criteria satisfied.' }],
+      evidence: [
+        {
+          type: 'ACCEPTANCE_GATE',
+          description: 'Agent reached DONE phase — all acceptance criteria satisfied.',
+        },
+      ],
       iterationsAnalyzed,
       evidenceIds: [],
       confidence: 1.0,
@@ -204,22 +205,33 @@ export function evaluateLoopControl(params: {
     if (check.terminal) return check;
   }
 
-
   // --- 2. Maximum cost ---
   {
-    const check = checkMaxCost(params.totalCostDollars, params.constraints.maxCostDollars, iterationsAnalyzed);
+    const check = checkMaxCost(
+      params.totalCostDollars,
+      params.constraints.maxCostDollars,
+      iterationsAnalyzed,
+    );
     if (check.terminal) return check;
   }
 
   // --- 3. Maximum duration ---
   {
-    const check = checkMaxDuration(params.elapsedMs, params.constraints.maxDurationMs, iterationsAnalyzed);
+    const check = checkMaxDuration(
+      params.elapsedMs,
+      params.constraints.maxDurationMs,
+      iterationsAnalyzed,
+    );
     if (check.terminal) return check;
   }
 
   // --- 4. Maximum consecutive repairs ---
   {
-    const check = checkMaxRepairs(params.state.repairCount, params.constraints.maxRepairAttempts, iterationsAnalyzed);
+    const check = checkMaxRepairs(
+      params.state.repairCount,
+      params.constraints.maxRepairAttempts,
+      iterationsAnalyzed,
+    );
     if (check.terminal) return check;
   }
 
@@ -231,13 +243,21 @@ export function evaluateLoopControl(params: {
 
   // --- 6. Repeated hypotheses ---
   {
-    const check = checkRepeatedHypotheses(params.iterations, config.maxRepeatedHypothesisCount, iterationsAnalyzed);
+    const check = checkRepeatedHypotheses(
+      params.iterations,
+      config.maxRepeatedHypothesisCount,
+      iterationsAnalyzed,
+    );
     if (check.terminal) return check;
   }
 
   // --- 7. Repeated tool failure ---
   {
-    const check = checkRepeatedToolFailure(params.iterations, config.maxRepeatedToolFailures, iterationsAnalyzed);
+    const check = checkRepeatedToolFailure(
+      params.iterations,
+      config.maxRepeatedToolFailures,
+      iterationsAnalyzed,
+    );
     if (check.terminal) return check;
   }
 
@@ -255,13 +275,21 @@ export function evaluateLoopControl(params: {
   // --- 9. State trajectory oscillation ---
   {
     const fullTrajectory = params.iterations.flatMap((it) => it.fingerprint.stateTrajectory ?? []);
-    const check = checkTrajectoryOscillation(fullTrajectory, config.trajectoryOscillationLength, iterationsAnalyzed);
+    const check = checkTrajectoryOscillation(
+      fullTrajectory,
+      config.trajectoryOscillationLength,
+      iterationsAnalyzed,
+    );
     if (check.terminal) return check;
   }
 
   // --- 10. No progress ---
   {
-    const check = checkNoProgress(params.iterations, config.noProgressWindowSize, iterationsAnalyzed);
+    const check = checkNoProgress(
+      params.iterations,
+      config.noProgressWindowSize,
+      iterationsAnalyzed,
+    );
     if (check.terminal) return check;
   }
 
@@ -280,11 +308,13 @@ export function checkGoalRoundBudget(
   if (roundsStarted >= maxRounds) {
     return terminate({
       reason: TerminationReason.MAX_ITERATIONS,
-      evidence: [{
-        type: 'BUDGET_LIMIT',
-        description: `Goal round budget exhausted: ${roundsStarted} rounds reached maximum of ${maxRounds}.`,
-        data: { blockerCode: 'budget-exhausted', roundsStarted, maxRounds },
-      }],
+      evidence: [
+        {
+          type: 'BUDGET_LIMIT',
+          description: `Goal round budget exhausted: ${roundsStarted} rounds reached maximum of ${maxRounds}.`,
+          data: { blockerCode: 'budget-exhausted', roundsStarted, maxRounds },
+        },
+      ],
       iterationsAnalyzed,
       recommendedAction: 'Increase goal maxRounds or clear goal',
     });
@@ -300,11 +330,13 @@ export function checkGoalTokenBudget(
   if (tokensUsed >= tokenBudget) {
     return terminate({
       reason: TerminationReason.MAX_COST,
-      evidence: [{
-        type: 'BUDGET_LIMIT',
-        description: `Goal token budget exhausted: ${tokensUsed} tokens reached configured limit of ${tokenBudget}.`,
-        data: { blockerCode: 'budget-exhausted', tokensUsed, tokenBudget },
-      }],
+      evidence: [
+        {
+          type: 'BUDGET_LIMIT',
+          description: `Goal token budget exhausted: ${tokensUsed} tokens reached configured limit of ${tokenBudget}.`,
+          data: { blockerCode: 'budget-exhausted', tokensUsed, tokenBudget },
+        },
+      ],
       iterationsAnalyzed,
       recommendedAction: 'Increase goal tokenBudget or simplify objective',
     });
@@ -320,11 +352,13 @@ export function checkGoalCostBudget(
   if (costUsed >= costBudget) {
     return terminate({
       reason: TerminationReason.MAX_COST,
-      evidence: [{
-        type: 'BUDGET_LIMIT',
-        description: `Goal cost budget exhausted: $${costUsed.toFixed(4)} reached configured limit of $${costBudget.toFixed(4)}.`,
-        data: { blockerCode: 'budget-exhausted', costUsed, costBudget },
-      }],
+      evidence: [
+        {
+          type: 'BUDGET_LIMIT',
+          description: `Goal cost budget exhausted: $${costUsed.toFixed(4)} reached configured limit of $${costBudget.toFixed(4)}.`,
+          data: { blockerCode: 'budget-exhausted', costUsed, costBudget },
+        },
+      ],
       iterationsAnalyzed,
       recommendedAction: 'Increase goal costBudget',
     });
@@ -340,11 +374,13 @@ export function checkMaxIterations(
   if (current >= max) {
     return terminate({
       reason: TerminationReason.MAX_ITERATIONS,
-      evidence: [{
-        type: 'BUDGET_LIMIT',
-        description: `Iteration count ${current} reached configured maximum of ${max}.`,
-        data: { current, max },
-      }],
+      evidence: [
+        {
+          type: 'BUDGET_LIMIT',
+          description: `Iteration count ${current} reached configured maximum of ${max}.`,
+          data: { current, max },
+        },
+      ],
       iterationsAnalyzed,
       recommendedAction: 'Increase iteration budget or simplify the task',
     });
@@ -360,11 +396,13 @@ export function checkMaxCost(
   if (currentDollars >= maxDollars) {
     return terminate({
       reason: TerminationReason.MAX_COST,
-      evidence: [{
-        type: 'BUDGET_EXHAUSTION',
-        description: `Cumulative cost $${currentDollars.toFixed(4)} reached configured maximum of $${maxDollars.toFixed(4)}.`,
-        data: { currentDollars, maxDollars },
-      }],
+      evidence: [
+        {
+          type: 'BUDGET_EXHAUSTION',
+          description: `Cumulative cost $${currentDollars.toFixed(4)} reached configured maximum of $${maxDollars.toFixed(4)}.`,
+          data: { currentDollars, maxDollars },
+        },
+      ],
       iterationsAnalyzed,
       recommendedAction: 'Increase cost budget or use a cheaper model',
     });
@@ -380,11 +418,13 @@ export function checkMaxDuration(
   if (elapsedMs >= maxMs) {
     return terminate({
       reason: TerminationReason.MAX_DURATION,
-      evidence: [{
-        type: 'BUDGET_EXHAUSTION',
-        description: `Elapsed time ${elapsedMs}ms reached configured maximum of ${maxMs}ms.`,
-        data: { elapsedMs, maxMs },
-      }],
+      evidence: [
+        {
+          type: 'BUDGET_EXHAUSTION',
+          description: `Elapsed time ${elapsedMs}ms reached configured maximum of ${maxMs}ms.`,
+          data: { elapsedMs, maxMs },
+        },
+      ],
       iterationsAnalyzed,
       recommendedAction: 'Increase time budget or decompose the task',
     });
@@ -400,11 +440,13 @@ export function checkMaxRepairs(
   if (consecutiveRepairs >= maxRepairs) {
     return terminate({
       reason: TerminationReason.MAX_REPAIRS,
-      evidence: [{
-        type: 'BUDGET_LIMIT',
-        description: `Consecutive repair count ${consecutiveRepairs} reached configured maximum of ${maxRepairs}.`,
-        data: { consecutiveRepairs, maxRepairs },
-      }],
+      evidence: [
+        {
+          type: 'BUDGET_LIMIT',
+          description: `Consecutive repair count ${consecutiveRepairs} reached configured maximum of ${maxRepairs}.`,
+          data: { consecutiveRepairs, maxRepairs },
+        },
+      ],
       iterationsAnalyzed,
       humanRequired: true,
       recommendedAction: 'Escalate to human — agent cannot self-repair',
@@ -438,18 +480,21 @@ export function checkExactRepetition(
       if (loopFingerprintsMatch(fp, fingerprints[prior]!)) {
         return terminate({
           reason: TerminationReason.EXACT_REPETITION,
-          evidence: [{
-            type: 'FINGERPRINT_MATCH',
-            description: `Iteration ${i + 1} is an exact repeat of iteration ${prior + 1} (fingerprint hash: ${fp.hash}).`,
-            data: {
-              currentIterationIndex: i,
-              priorIterationIndex: prior,
-              fingerprintHash: fp.hash,
+          evidence: [
+            {
+              type: 'FINGERPRINT_MATCH',
+              description: `Iteration ${i + 1} is an exact repeat of iteration ${prior + 1} (fingerprint hash: ${fp.hash}).`,
+              data: {
+                currentIterationIndex: i,
+                priorIterationIndex: prior,
+                fingerprintHash: fp.hash,
+              },
             },
-          }],
+          ],
           iterationsAnalyzed,
           humanRequired: true,
-          recommendedAction: 'Agent reproduced the exact same iteration state. No progress possible without external intervention.',
+          recommendedAction:
+            'Agent reproduced the exact same iteration state. No progress possible without external intervention.',
         });
       }
     }
@@ -484,14 +529,17 @@ export function checkRepeatedHypotheses(
       if (count >= maxCount) {
         return terminate({
           reason: TerminationReason.REPEATED_HYPOTHESIS,
-          evidence: [{
-            type: 'HYPOTHESIS_REPETITION',
-            description: `Hypothesis "${hId}" has been attempted ${count} times (threshold: ${maxCount}). Agent is cycling through the same approach.`,
-            data: { hypothesisId: hId, count, threshold: maxCount },
-          }],
+          evidence: [
+            {
+              type: 'HYPOTHESIS_REPETITION',
+              description: `Hypothesis "${hId}" has been attempted ${count} times (threshold: ${maxCount}). Agent is cycling through the same approach.`,
+              data: { hypothesisId: hId, count, threshold: maxCount },
+            },
+          ],
           iterationsAnalyzed,
           humanRequired: true,
-          recommendedAction: 'Agent is repeating the same hypothesis. Needs new direction from human or a different planning approach.',
+          recommendedAction:
+            'Agent is repeating the same hypothesis. Needs new direction from human or a different planning approach.',
         });
       }
     }
@@ -522,14 +570,17 @@ export function checkRepeatedToolFailure(
       if (count >= maxCount) {
         return terminate({
           reason: TerminationReason.REPEATED_TOOL_FAILURE,
-          evidence: [{
-            type: 'TOOL_FAILURE_REPETITION',
-            description: `Tool failure signature "${sig}" has occurred ${count} times (threshold: ${maxCount}). The failure appears deterministic, not transient.`,
-            data: { toolFailureSignature: sig, count, threshold: maxCount },
-          }],
+          evidence: [
+            {
+              type: 'TOOL_FAILURE_REPETITION',
+              description: `Tool failure signature "${sig}" has occurred ${count} times (threshold: ${maxCount}). The failure appears deterministic, not transient.`,
+              data: { toolFailureSignature: sig, count, threshold: maxCount },
+            },
+          ],
           iterationsAnalyzed,
           humanRequired: true,
-          recommendedAction: 'A tool is failing repeatedly with the same error. Requires human intervention or tool configuration change.',
+          recommendedAction:
+            'A tool is failing repeatedly with the same error. Requires human intervention or tool configuration change.',
         });
       }
     }
@@ -569,14 +620,17 @@ export function checkOscillation(
     if (count >= threshold) {
       return terminate({
         reason: TerminationReason.OSCILLATION,
-        evidence: [{
-          type: 'OSCILLATION_PATTERN',
-          description: `Phase pair "${pair}" occurred ${count} times within the last ${Math.min(window.length, windowSize)} transitions (threshold: ${threshold}).`,
-          data: { pair, count, threshold, windowSize },
-        }],
+        evidence: [
+          {
+            type: 'OSCILLATION_PATTERN',
+            description: `Phase pair "${pair}" occurred ${count} times within the last ${Math.min(window.length, windowSize)} transitions (threshold: ${threshold}).`,
+            data: { pair, count, threshold, windowSize },
+          },
+        ],
         iterationsAnalyzed,
         humanRequired: true,
-        recommendedAction: 'Agent is oscillating between phases. Needs human intervention or a different repair strategy.',
+        recommendedAction:
+          'Agent is oscillating between phases. Needs human intervention or a different repair strategy.',
       });
     }
   }
@@ -606,15 +660,17 @@ export function checkTrajectoryOscillation(
   if (cycle !== null) {
     return terminate({
       reason: TerminationReason.TRAJECTORY_OSCILLATION,
-      evidence: [{
-        type: 'TRAJECTORY_CYCLE',
-        description: `Detected a repeating ${cycleLength}-phase cycle in the state trajectory: ${cycle.join('→')}.`,
-        data: {
-          cycle: [...cycle],
-          cycleLength,
-          trajectoryLength: trajectory.length,
+      evidence: [
+        {
+          type: 'TRAJECTORY_CYCLE',
+          description: `Detected a repeating ${cycleLength}-phase cycle in the state trajectory: ${cycle.join('→')}.`,
+          data: {
+            cycle: [...cycle],
+            cycleLength,
+            trajectoryLength: trajectory.length,
+          },
         },
-      }],
+      ],
       iterationsAnalyzed,
       humanRequired: true,
       recommendedAction: `Agent is cycling through a ${cycleLength}-phase loop. A new approach or human direction is required.`,
@@ -655,17 +711,19 @@ export function checkNoProgress(
   );
 
   if (allSame) {
-    const evidence: TerminationEvidence[] = [{
-      type: 'NO_PROGRESS_SPAN',
-      description: `The last ${maxConsecutive} consecutive iterations produced identical fingerprints (hash: ${referenceFp.hash}). No progress was made.`,
-      data: {
-        windowSize: maxConsecutive,
-        fingerprintHash: referenceFp.hash,
-        hypothesisId: referenceFp.hypothesisId,
-        errorSignature: referenceFp.errorSignature,
-        failingTests: [...referenceFp.failingTests],
+    const evidence: TerminationEvidence[] = [
+      {
+        type: 'NO_PROGRESS_SPAN',
+        description: `The last ${maxConsecutive} consecutive iterations produced identical fingerprints (hash: ${referenceFp.hash}). No progress was made.`,
+        data: {
+          windowSize: maxConsecutive,
+          fingerprintHash: referenceFp.hash,
+          hypothesisId: referenceFp.hypothesisId,
+          errorSignature: referenceFp.errorSignature,
+          failingTests: [...referenceFp.failingTests],
+        },
       },
-    }];
+    ];
 
     return terminate({
       reason: TerminationReason.NO_PROGRESS,
@@ -688,12 +746,6 @@ export function checkNoProgress(
  * Compare two raw IterationFingerprints for semantic equality.
  * @deprecated Use loopFingerprintsMatch with LoopFingerprint objects instead.
  */
-export function fingerprintsMatch(
-  a: IterationFingerprint,
-  b: IterationFingerprint,
-): boolean {
-  return loopFingerprintsMatch(
-    buildLoopFingerprintFromRaw(a),
-    buildLoopFingerprintFromRaw(b),
-  );
+export function fingerprintsMatch(a: IterationFingerprint, b: IterationFingerprint): boolean {
+  return loopFingerprintsMatch(buildLoopFingerprintFromRaw(a), buildLoopFingerprintFromRaw(b));
 }

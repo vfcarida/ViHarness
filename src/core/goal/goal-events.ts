@@ -18,7 +18,12 @@ export type GoalMutation =
   | { readonly kind: 'block'; readonly code: string; readonly reason?: string }
   | { readonly kind: 'complete' }
   | { readonly kind: 'clear' }
-  | { readonly kind: 'record-usage'; readonly tokens: number; readonly cost: number; readonly round?: number };
+  | {
+      readonly kind: 'record-usage';
+      readonly tokens: number;
+      readonly cost: number;
+      readonly round?: number;
+    };
 
 export interface GoalChangeEvent {
   readonly goal: LifecycleGoal;
@@ -37,9 +42,7 @@ export interface GoalEvents {
  * 3. Legal phase transitions.
  * 4. Non-decreasing tokens, costs, and rounds.
  */
-export function reconstructGoalFromEvents(
-  events: ReadonlyArray<GoalChangeEvent>,
-): LifecycleGoal {
+export function reconstructGoalFromEvents(events: ReadonlyArray<GoalChangeEvent>): LifecycleGoal {
   if (!events || events.length === 0) {
     throw new HarnessError({
       code: ErrorCode.STATE_CORRUPTED,

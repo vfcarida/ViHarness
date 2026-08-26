@@ -3,7 +3,12 @@
  *
  * Represents a single executable tool available to the agent harness.
  */
-import type { ToolInput, ToolResult, ToolDefinition, ToolExecutionContext } from '../model/tool-types.js';
+import type {
+  ToolInput,
+  ToolResult,
+  ToolDefinition,
+  ToolExecutionContext,
+} from '../model/tool-types.js';
 
 export interface Tool {
   /** The tool's definition (metadata, category, risk level, schemas). */

@@ -11,7 +11,7 @@ describe('ContextBudgetBalancer Unit Tests', () => {
   it('allocates larger repository (L3) share during DISCOVER and PLAN phases', () => {
     const budget = ContextBudgetBalancer.balance(8000, 'PLAN');
     expect(budget.totalMaxTokens).toBe(8000);
-    expect(budget.allocations[ContextTier.L3_REPOSITORY].ratio).toBe(0.40);
+    expect(budget.allocations[ContextTier.L3_REPOSITORY].ratio).toBe(0.4);
     expect(budget.allocations[ContextTier.L3_REPOSITORY].maxTokens).toBe(3200);
   });
 
@@ -25,7 +25,9 @@ describe('ContextBudgetBalancer Unit Tests', () => {
   it('enforces non-starvation minimum floor tokens across all tiers', () => {
     const budget = ContextBudgetBalancer.balance(1000, 'ACT');
     for (const tier of Object.values(ContextTier)) {
-      expect(budget.allocations[tier].maxTokens).toBeGreaterThanOrEqual(budget.allocations[tier].minFloorTokens);
+      expect(budget.allocations[tier].maxTokens).toBeGreaterThanOrEqual(
+        budget.allocations[tier].minFloorTokens,
+      );
     }
   });
 });

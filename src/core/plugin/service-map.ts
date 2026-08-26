@@ -67,25 +67,25 @@ export interface PluginStorageService {
 }
 
 export interface ServiceMap {
-  'llm': ModelRouter;
-  'tools': ToolRegistry;
-  'toolExecutor': ToolExecutor;
-  'sessions': any;
-  'compaction': any;
-  'shell': ShellService;
-  'fs': FileSystemService;
-  'sandbox': SandboxService;
-  'storage': PluginStorageService;
-  'goals': GoalService;
-  'experience': any;
-  'agents': AgentRegistry;
-  'agentLoop': AgentRuntime;
-  'systemPrompt': SystemPromptAssembly;
-  'repoMap': any;
-  'security': PolicyEngine;
-  'git': GitManager;
-  'logger': Logger;
-  'clock': Clock;
-  'idFactory': IdFactory;
-  'metrics': any;
+  llm: ModelRouter;
+  tools: ToolRegistry;
+  toolExecutor: ToolExecutor;
+  sessions: any;
+  compaction: any;
+  shell: ShellService;
+  fs: FileSystemService;
+  sandbox: SandboxService;
+  storage: PluginStorageService;
+  goals: GoalService;
+  experience: any;
+  agents: AgentRegistry;
+  agentLoop: AgentRuntime;
+  systemPrompt: SystemPromptAssembly;
+  repoMap: any;
+  security: PolicyEngine;
+  git: GitManager;
+  logger: Logger;
+  clock: Clock;
+  idFactory: IdFactory;
+  metrics: any;
 }

@@ -64,7 +64,11 @@ describe('Plugin Architecture & Subsystem Composition Suite — P016 / P017', ()
     const toolRegistry = new DefaultToolRegistry();
     toolRegistry.register(new ReadFileTool(idFactory));
     const policyEngine = new DefaultPolicyEngine();
-    const baseExecutor = new DefaultToolExecutor({ registry: toolRegistry, policyEngine, idFactory });
+    const baseExecutor = new DefaultToolExecutor({
+      registry: toolRegistry,
+      policyEngine,
+      idFactory,
+    });
 
     const mockProvider = new MockModelProvider({
       providerId: 'primary-mock',
@@ -128,7 +132,11 @@ describe('Plugin Architecture & Subsystem Composition Suite — P016 / P017', ()
     toolRegistry.register(new ReadFileTool(idFactory));
 
     const policyEngine = new DefaultPolicyEngine();
-    const baseExecutor = new DefaultToolExecutor({ registry: toolRegistry, policyEngine, idFactory });
+    const baseExecutor = new DefaultToolExecutor({
+      registry: toolRegistry,
+      policyEngine,
+      idFactory,
+    });
     const parallelExecutor = new ParallelToolExecutor(baseExecutor, toolRegistry);
 
     const calls = [
@@ -205,7 +213,11 @@ describe('Plugin Architecture & Subsystem Composition Suite — P016 / P017', ()
     const sessionStore = new SqliteSessionStore({ store: sqlite, clock, idFactory });
     const toolRegistry = new DefaultToolRegistry();
     const policyEngine = new DefaultPolicyEngine();
-    const toolExecutor = new DefaultToolExecutor({ registry: toolRegistry, policyEngine, idFactory });
+    const toolExecutor = new DefaultToolExecutor({
+      registry: toolRegistry,
+      policyEngine,
+      idFactory,
+    });
     const mockProvider = new MockModelProvider({
       providerId: 'acp-mock',
       defaultResponseText: 'Step completed',

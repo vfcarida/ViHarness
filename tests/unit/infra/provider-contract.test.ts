@@ -1,20 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { OpenAICompatibleProvider } from '../../../src/infra/model/openai-compatible-provider.js';
 import { executeResiliently } from '../../../src/infra/model/provider-resilience.js';
-import {
-  MessageRole,
-  FinishReason,
-  ErrorCode,
-} from '../../../src/core/index.js';
+import { MessageRole, FinishReason, ErrorCode } from '../../../src/core/index.js';
 import type { ModelRequest } from '../../../src/core/index.js';
 
 describe('Model Provider Contract & Resilience Suite', () => {
   const sampleRequest: ModelRequest = {
     modelId: 'gpt-4o',
     systemPrompt: 'You are an autonomous enterprise coding assistant.',
-    messages: [
-      { role: MessageRole.USER, content: 'Read package.json file.' },
-    ],
+    messages: [{ role: MessageRole.USER, content: 'Read package.json file.' }],
     tools: [
       {
         name: 'read_file',
@@ -153,7 +147,10 @@ describe('Model Provider Contract & Resilience Suite', () => {
               tool_calls: [
                 {
                   id: 'call_1',
-                  function: { name: 'read_file', arguments: JSON.stringify({ path: 'src/index.ts' }) },
+                  function: {
+                    name: 'read_file',
+                    arguments: JSON.stringify({ path: 'src/index.ts' }),
+                  },
                 },
                 {
                   id: 'call_2',
@@ -214,12 +211,20 @@ describe('Model Provider Contract & Resilience Suite', () => {
       status: 200,
       json: async () => ({
         id: 'chatcmpl-fallback-ok',
-        choices: [{ finish_reason: 'stop', message: { role: 'assistant', content: 'Fallback Success' } }],
+        choices: [
+          { finish_reason: 'stop', message: { role: 'assistant', content: 'Fallback Success' } },
+        ],
       }),
     } as Response);
 
-    const primaryProvider = new OpenAICompatibleProvider({ providerId: 'primary', customFetch: primaryFetch });
-    const fallbackProvider = new OpenAICompatibleProvider({ providerId: 'fallback', customFetch: fallbackFetch });
+    const primaryProvider = new OpenAICompatibleProvider({
+      providerId: 'primary',
+      customFetch: primaryFetch,
+    });
+    const fallbackProvider = new OpenAICompatibleProvider({
+      providerId: 'fallback',
+      customFetch: fallbackFetch,
+    });
 
     const response = await executeResiliently(primaryProvider, sampleRequest, {
       maxRetries: 1,

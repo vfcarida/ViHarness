@@ -17,7 +17,8 @@ describe('TBench Docker Environment — P011', { timeout: 20000 }, () => {
     difficulty: 'easy',
     tags: ['test'],
     timeout: 5,
-    testScript: 'node -e "const fs = require(\'fs\'); if (!fs.existsSync(\'output.txt\')) process.exit(1);"',
+    testScript:
+      "node -e \"const fs = require('fs'); if (!fs.existsSync('output.txt')) process.exit(1);\"",
     environment: { TEST_VAR: 'ViHarnessEnv' },
   };
 
@@ -54,7 +55,10 @@ describe('TBench Docker Environment — P011', { timeout: 20000 }, () => {
     const env = new MockDockerEnvironment();
     const container = await env.create(sampleTask);
 
-    const execRes = await env.exec(container, 'node -e "console.error(\'CONTAINER_ERROR_MSG\'); process.exit(42);"');
+    const execRes = await env.exec(
+      container,
+      'node -e "console.error(\'CONTAINER_ERROR_MSG\'); process.exit(42);"',
+    );
 
     expect(execRes.exitCode).not.toBe(0);
     expect(execRes.stderr).toContain('CONTAINER_ERROR_MSG');
@@ -67,7 +71,10 @@ describe('TBench Docker Environment — P011', { timeout: 20000 }, () => {
     const container = await env.create(sampleTask);
 
     // Agent writes output.txt
-    await env.exec(container, 'node -e "const fs = require(\'fs\'); fs.writeFileSync(\'output.txt\', \'hello\');"');
+    await env.exec(
+      container,
+      "node -e \"const fs = require('fs'); fs.writeFileSync('output.txt', 'hello');\"",
+    );
 
     // Run verification
     const passed = await env.verify(container, sampleTask.testScript);

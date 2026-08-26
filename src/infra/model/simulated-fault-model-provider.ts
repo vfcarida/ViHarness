@@ -19,11 +19,7 @@ import type {
   ToolCall,
   TokenUsage,
 } from '../../core/model/model-io.js';
-import {
-  FinishReason,
-  ModelCapability,
-  ProviderHealthStatus,
-} from '../../core/model/model-io.js';
+import { FinishReason, ModelCapability, ProviderHealthStatus } from '../../core/model/model-io.js';
 import { HarnessError } from '../../core/errors/base-error.js';
 import { ErrorCode, ErrorCategory } from '../../core/errors/error-codes.js';
 
@@ -193,7 +189,8 @@ export class SimulatedFaultModelProvider implements ModelProvider {
     const inputTokens = step?.usage?.inputTokens ?? 120;
     const outputTokens = step?.usage?.outputTokens ?? 40;
     yield {
-      finishReason: step?.finishReason ?? (toolCalls.length > 0 ? FinishReason.TOOL_CALL : FinishReason.STOP),
+      finishReason:
+        step?.finishReason ?? (toolCalls.length > 0 ? FinishReason.TOOL_CALL : FinishReason.STOP),
       usage: {
         inputTokens,
         outputTokens,

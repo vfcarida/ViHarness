@@ -4,7 +4,12 @@
  * Wraps Docker / Container execution as a first-class Vi-Harness tool for TBench.
  */
 import type { Tool } from '../../core/interfaces/tool.js';
-import { ToolCategory, ToolRiskLevel, type ToolResult, type ToolExecutionContext } from '../../core/model/tool-types.js';
+import {
+  ToolCategory,
+  ToolRiskLevel,
+  type ToolResult,
+  type ToolExecutionContext,
+} from '../../core/model/tool-types.js';
 import type { IdFactory } from '../../core/types/identifiers.js';
 import type { DockerEnvironment, Container } from '../eval/tbench/types.js';
 
@@ -47,7 +52,10 @@ export class TerminalTool implements Tool {
     this.idFactory = options.idFactory;
   }
 
-  async execute(input: Record<string, unknown>, context?: ToolExecutionContext): Promise<ToolResult> {
+  async execute(
+    input: Record<string, unknown>,
+    context?: ToolExecutionContext,
+  ): Promise<ToolResult> {
     const cmd = String(input['command'] ?? '');
     const callId = (context?.correlationId ?? this.idFactory.create<'ToolCall'>()) as any;
 
@@ -80,7 +88,9 @@ export class TerminalTool implements Tool {
         output: outputText || '(no output)',
         success: isSuccess,
         durationMs: result.duration,
-        error: isSuccess ? undefined : result.stderr || `Command exited with code ${result.exitCode}`,
+        error: isSuccess
+          ? undefined
+          : result.stderr || `Command exited with code ${result.exitCode}`,
         metadata: {
           exitCode: result.exitCode,
           stdout: result.stdout,

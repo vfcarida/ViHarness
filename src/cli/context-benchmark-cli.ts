@@ -36,7 +36,10 @@ export function parseArgs(args: string[]): CliOptions {
     } else if (arg === '--horizons' || arg === '-H') {
       const val = args[++i];
       if (val) {
-        horizons = val.split(',').map((s) => parseInt(s.trim(), 10)).filter((n) => !isNaN(n) && n > 0);
+        horizons = val
+          .split(',')
+          .map((s) => parseInt(s.trim(), 10))
+          .filter((n) => !isNaN(n) && n > 0);
       }
     } else if (arg === '--output' || arg === '-o') {
       const val = args[++i];
@@ -124,10 +127,18 @@ export async function runContextCli(args: string[] = process.argv.slice(2)): Pro
   console.log(' EXECUTIVE CONTEXT EFFICIENCY RESULTS');
   console.log('======================================================================\n');
 
-  console.log(`Vi-Harness Token Savings vs Naive Accumulation : ${result.executiveSummary.overallViVsNaiveSavingsPercent.toFixed(1)}%`);
-  console.log(`Vi-Harness Token Savings vs Pi-style Compaction: ${result.executiveSummary.overallViVsPiSavingsPercent.toFixed(1)}%`);
-  console.log(`Vi-Harness Critical Memory Retention           : ${(result.executiveSummary.overallViRetentionRate * 100).toFixed(1)}% (100% Retained)`);
-  console.log(`Pi-style Baseline Critical Memory Retention    : ${(result.executiveSummary.overallPiRetentionRate * 100).toFixed(1)}% (Degrades with horizon)`);
+  console.log(
+    `Vi-Harness Token Savings vs Naive Accumulation : ${result.executiveSummary.overallViVsNaiveSavingsPercent.toFixed(1)}%`,
+  );
+  console.log(
+    `Vi-Harness Token Savings vs Pi-style Compaction: ${result.executiveSummary.overallViVsPiSavingsPercent.toFixed(1)}%`,
+  );
+  console.log(
+    `Vi-Harness Critical Memory Retention           : ${(result.executiveSummary.overallViRetentionRate * 100).toFixed(1)}% (100% Retained)`,
+  );
+  console.log(
+    `Pi-style Baseline Critical Memory Retention    : ${(result.executiveSummary.overallPiRetentionRate * 100).toFixed(1)}% (Degrades with horizon)`,
+  );
   console.log(`Naive Accumulation Context Growth              : Linear $O(N)$ Unbounded Bloat\n`);
 
   console.log('----------------------------------------------------------------------');
@@ -142,10 +153,18 @@ export async function runContextCli(args: string[] = process.argv.slice(2)): Pro
     const vi = comp.strategyResults['VI_CONTEXT_COMPILER'];
 
     console.log(`[Horizon: ${horizon} Iterations]`);
-    console.log(`  Naive Accumulation : Final Context: ${naive.finalContextTokens.toLocaleString()} tokens | Cumulative: ${naive.totalCumulativeTokens.toLocaleString()} tokens | Retention: ${(naive.criticalMemoryRetentionScore * 100).toFixed(1)}%`);
-    console.log(`  Pi-style Compaction: Final Context: ${pi.finalContextTokens.toLocaleString()} tokens | Cumulative: ${pi.totalCumulativeTokens.toLocaleString()} tokens | Retention: ${(pi.criticalMemoryRetentionScore * 100).toFixed(1)}%`);
-    console.log(`  Vi-Harness Compiler: Final Context: ${vi.finalContextTokens.toLocaleString()} tokens | Cumulative: ${vi.totalCumulativeTokens.toLocaleString()} tokens | Retention: ${(vi.criticalMemoryRetentionScore * 100).toFixed(1)}%`);
-    console.log(`  -> Vi-Harness Savings: ${comp.viVsNaiveTokenSavingsPercent}% vs Naive, ${comp.viVsPiTokenSavingsPercent}% vs Pi\n`);
+    console.log(
+      `  Naive Accumulation : Final Context: ${naive.finalContextTokens.toLocaleString()} tokens | Cumulative: ${naive.totalCumulativeTokens.toLocaleString()} tokens | Retention: ${(naive.criticalMemoryRetentionScore * 100).toFixed(1)}%`,
+    );
+    console.log(
+      `  Pi-style Compaction: Final Context: ${pi.finalContextTokens.toLocaleString()} tokens | Cumulative: ${pi.totalCumulativeTokens.toLocaleString()} tokens | Retention: ${(pi.criticalMemoryRetentionScore * 100).toFixed(1)}%`,
+    );
+    console.log(
+      `  Vi-Harness Compiler: Final Context: ${vi.finalContextTokens.toLocaleString()} tokens | Cumulative: ${vi.totalCumulativeTokens.toLocaleString()} tokens | Retention: ${(vi.criticalMemoryRetentionScore * 100).toFixed(1)}%`,
+    );
+    console.log(
+      `  -> Vi-Harness Savings: ${comp.viVsNaiveTokenSavingsPercent}% vs Naive, ${comp.viVsPiTokenSavingsPercent}% vs Pi\n`,
+    );
   }
 
   console.log('======================================================================\n');
@@ -153,10 +172,10 @@ export async function runContextCli(args: string[] = process.argv.slice(2)): Pro
 }
 
 // Auto-run if executed directly as entrypoint
-const isDirectEntry = process.argv[1] && (
-  process.argv[1].endsWith('context-benchmark-cli.ts') ||
-  process.argv[1].endsWith('context-benchmark-cli.js')
-);
+const isDirectEntry =
+  process.argv[1] &&
+  (process.argv[1].endsWith('context-benchmark-cli.ts') ||
+    process.argv[1].endsWith('context-benchmark-cli.js'));
 
 if (isDirectEntry) {
   runContextCli()

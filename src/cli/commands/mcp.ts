@@ -98,7 +98,9 @@ Usage:
       apiKey: args.apiKey,
     });
     await server.listen(transport);
-    console.error(`[MCP] Server listening on HTTP http://${args.host}:${args.port}/rpc (SSE: /sse)`);
+    console.error(
+      `[MCP] Server listening on HTTP http://${args.host}:${args.port}/rpc (SSE: /sse)`,
+    );
   } else {
     const transport = new StdioTransport();
     await server.listen(transport);

@@ -50,33 +50,89 @@ export class FaultInjector {
 
     switch (fault) {
       case FaultMode.MODEL_TIMEOUT:
-        throw new HarnessError({ code: ErrorCode.MODEL_TIMEOUT, category: ErrorCategory.MODEL, message: 'Simulated Model Execution Timeout (408)' });
+        throw new HarnessError({
+          code: ErrorCode.MODEL_TIMEOUT,
+          category: ErrorCategory.MODEL,
+          message: 'Simulated Model Execution Timeout (408)',
+        });
       case FaultMode.PROVIDER_OUTAGE:
-        throw new HarnessError({ code: ErrorCode.MODEL_UNAVAILABLE, category: ErrorCategory.MODEL, message: 'Simulated LLM Provider Outage (503)' });
+        throw new HarnessError({
+          code: ErrorCode.MODEL_UNAVAILABLE,
+          category: ErrorCategory.MODEL,
+          message: 'Simulated LLM Provider Outage (503)',
+        });
       case FaultMode.RATE_LIMITING:
-        throw new HarnessError({ code: ErrorCode.MODEL_RATE_LIMITED, category: ErrorCategory.MODEL, message: 'Simulated Rate Limit Exceeded (429)' });
+        throw new HarnessError({
+          code: ErrorCode.MODEL_RATE_LIMITED,
+          category: ErrorCategory.MODEL,
+          message: 'Simulated Rate Limit Exceeded (429)',
+        });
       case FaultMode.MALFORMED_MODEL_RESPONSE:
-        throw new HarnessError({ code: ErrorCode.MODEL_INVALID_RESPONSE, category: ErrorCategory.MODEL, message: 'Simulated Malformed JSON Model Output' });
+        throw new HarnessError({
+          code: ErrorCode.MODEL_INVALID_RESPONSE,
+          category: ErrorCategory.MODEL,
+          message: 'Simulated Malformed JSON Model Output',
+        });
       case FaultMode.TOOL_TIMEOUT:
-        throw new HarnessError({ code: ErrorCode.TOOL_TIMEOUT, category: ErrorCategory.TOOL, message: 'Simulated Tool Execution Timeout' });
+        throw new HarnessError({
+          code: ErrorCode.TOOL_TIMEOUT,
+          category: ErrorCategory.TOOL,
+          message: 'Simulated Tool Execution Timeout',
+        });
       case FaultMode.TOOL_CRASH:
-        throw new HarnessError({ code: ErrorCode.TOOL_EXECUTION_FAILED, category: ErrorCategory.TOOL, message: 'Simulated Native Tool Process Crash (SIGSEGV)' });
+        throw new HarnessError({
+          code: ErrorCode.TOOL_EXECUTION_FAILED,
+          category: ErrorCategory.TOOL,
+          message: 'Simulated Native Tool Process Crash (SIGSEGV)',
+        });
       case FaultMode.VERIFIER_CRASH:
-        throw new HarnessError({ code: ErrorCode.VERIFICATION_FAILED, category: ErrorCategory.VERIFICATION, message: 'Simulated Verification Engine Internal Exception' });
+        throw new HarnessError({
+          code: ErrorCode.VERIFICATION_FAILED,
+          category: ErrorCategory.VERIFICATION,
+          message: 'Simulated Verification Engine Internal Exception',
+        });
       case FaultMode.CORRUPTED_STATE:
-        throw new HarnessError({ code: ErrorCode.STATE_CORRUPTED, category: ErrorCategory.STATE, message: 'Simulated Corrupted Agent State Snapshot' });
+        throw new HarnessError({
+          code: ErrorCode.STATE_CORRUPTED,
+          category: ErrorCategory.STATE,
+          message: 'Simulated Corrupted Agent State Snapshot',
+        });
       case FaultMode.DISK_FAILURE_SIMULATION:
-        throw new HarnessError({ code: ErrorCode.RUNTIME_EXECUTION_FAILED, category: ErrorCategory.RUNTIME, message: 'Simulated Disk I/O Write Failure (ENOSPC)' });
+        throw new HarnessError({
+          code: ErrorCode.RUNTIME_EXECUTION_FAILED,
+          category: ErrorCategory.RUNTIME,
+          message: 'Simulated Disk I/O Write Failure (ENOSPC)',
+        });
       case FaultMode.INTERRUPTED_CHECKPOINT:
-        throw new HarnessError({ code: ErrorCode.RUNTIME_EXECUTION_FAILED, category: ErrorCategory.RUNTIME, message: 'Simulated Interrupted Checkpoint Commit' });
+        throw new HarnessError({
+          code: ErrorCode.RUNTIME_EXECUTION_FAILED,
+          category: ErrorCategory.RUNTIME,
+          message: 'Simulated Interrupted Checkpoint Commit',
+        });
       case FaultMode.INTERRUPTED_ROLLBACK:
-        throw new HarnessError({ code: ErrorCode.RUNTIME_EXECUTION_FAILED, category: ErrorCategory.RUNTIME, message: 'Simulated Interrupted Rollback Operation' });
+        throw new HarnessError({
+          code: ErrorCode.RUNTIME_EXECUTION_FAILED,
+          category: ErrorCategory.RUNTIME,
+          message: 'Simulated Interrupted Rollback Operation',
+        });
       case FaultMode.SUBAGENT_TIMEOUT:
-        throw new HarnessError({ code: ErrorCode.RUNTIME_EXECUTION_FAILED, category: ErrorCategory.RUNTIME, message: 'Simulated Subagent Execution Timeout' });
+        throw new HarnessError({
+          code: ErrorCode.RUNTIME_EXECUTION_FAILED,
+          category: ErrorCategory.RUNTIME,
+          message: 'Simulated Subagent Execution Timeout',
+        });
       case FaultMode.CONTEXT_COMPILER_FAILURE:
-        throw new HarnessError({ code: ErrorCode.CONTEXT_COMPILATION_FAILED, category: ErrorCategory.CONTEXT, message: 'Simulated Context Compiler Budget Failure' });
+        throw new HarnessError({
+          code: ErrorCode.CONTEXT_COMPILATION_FAILED,
+          category: ErrorCategory.CONTEXT,
+          message: 'Simulated Context Compiler Budget Failure',
+        });
       default:
-        throw new HarnessError({ code: ErrorCode.RUNTIME_EXECUTION_FAILED, category: ErrorCategory.RUNTIME, message: `Simulated Fault Triggered: ${fault}` });
+        throw new HarnessError({
+          code: ErrorCode.RUNTIME_EXECUTION_FAILED,
+          category: ErrorCategory.RUNTIME,
+          message: `Simulated Fault Triggered: ${fault}`,
+        });
     }
   }
 }

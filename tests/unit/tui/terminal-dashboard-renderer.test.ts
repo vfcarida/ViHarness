@@ -5,10 +5,7 @@
  * token accounting, tool execution table, and anomaly status display.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  TerminalDashboardRenderer,
-  ContextBudgetBalancer,
-} from '../../../src/infra/index.js';
+import { TerminalDashboardRenderer, ContextBudgetBalancer } from '../../../src/infra/index.js';
 import { AgentPhase, ContextTier } from '../../../src/core/index.js';
 
 describe('TerminalDashboardRenderer', () => {

@@ -74,7 +74,7 @@ export class SkillCurator {
       }
       // Rule 3: Boost importance if frequently used (>= 3 uses)
       else if (useCount >= 3) {
-        const targetImportance = Math.min(1.0, 0.70 + useCount * 0.05);
+        const targetImportance = Math.min(1.0, 0.7 + useCount * 0.05);
         if (record.importance < targetImportance) {
           await this.memoryStore.updateRecord(record.id, {
             importance: targetImportance,

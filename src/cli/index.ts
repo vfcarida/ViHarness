@@ -4,6 +4,8 @@
  *
  * Synthesizes patterns from Claude Code, Aider, Prime Agent, Hermes, Pi, and Meta-Harness.
  */
+import { fileURLToPath } from 'node:url';
+import * as path from 'node:path';
 import { triggerBackgroundUpdateCheck } from './update-check.js';
 import { ProfileLoader } from '../infra/profile/profile-loader.js';
 import { ProfileManager } from '../infra/profile/profile-manager.js';
@@ -124,14 +126,22 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
       return 0;
     }
     default: {
-      console.error(`Unknown command: '${command}'. Run 'vi-harness --help' for available commands.`);
+      console.error(
+        `Unknown command: '${command}'. Run 'vi-harness --help' for available commands.`,
+      );
       return 1;
     }
   }
 }
 
 // Direct execution
-const isMain = process.argv[1]?.endsWith('cli/index.js') || process.argv[1]?.endsWith('cli/index.ts');
+const isMain =
+  process.argv[1] &&
+  (path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) ||
+    /([\\/]cli[\\/]index\.(js|ts)|[\\/]vi-harness|[\\/]vih)$/.test(process.argv[1]) ||
+    process.argv[1].replace(/\\/g, '/').endsWith('cli/index.js') ||
+    process.argv[1].replace(/\\/g, '/').endsWith('cli/index.ts'));
+
 if (isMain) {
   runCli().then((code) => {
     if (code !== 0) process.exit(code);

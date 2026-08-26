@@ -8,10 +8,7 @@
  * 4. Boundary range validation.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  DefaultSession,
-  InMemorySessionStore,
-} from '../../../src/core/session/index.js';
+import { DefaultSession, InMemorySessionStore } from '../../../src/core/session/index.js';
 import { UuidV7IdFactory } from '../../../src/infra/id/uuid-id-factory.js';
 import { TestClock } from '../../../src/infra/time/test-clock.js';
 import { HarnessError } from '../../../src/core/errors/base-error.js';
@@ -139,7 +136,9 @@ describe('Session Tree Branching & Lineage (Pi Pattern) — P008', () => {
 
     const childrenOfRoot = store.findChildren(root.id);
     expect(childrenOfRoot).toHaveLength(3);
-    expect(childrenOfRoot.map((c) => c.id).sort()).toEqual([childA.id, childB.id, childC.id].sort());
+    expect(childrenOfRoot.map((c) => c.id).sort()).toEqual(
+      [childA.id, childB.id, childC.id].sort(),
+    );
   });
 
   it('6. should calculate lowest common ancestor between two arbitrary branches (findCommonAncestor)', () => {

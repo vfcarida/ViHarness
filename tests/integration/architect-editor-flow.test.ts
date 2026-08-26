@@ -21,9 +21,7 @@ import {
   TestClock,
   DualModelCostEvaluator,
 } from '../../src/infra/index.js';
-import {
-  DefaultAgentRuntime,
-} from '../../src/runtime/default-agent-runtime.js';
+import { DefaultAgentRuntime } from '../../src/runtime/default-agent-runtime.js';
 import {
   GoalStatus,
   type Goal,
@@ -47,13 +45,17 @@ describe('Architect / Editor Dual Model Integration Flow', () => {
     providerId: 'architect-provider',
     version: '1.0.0',
     capabilities: {
-      capabilities: new Set([ModelCapability.REASONING, ModelCapability.CODING, ModelCapability.TOOL_USE]),
+      capabilities: new Set([
+        ModelCapability.REASONING,
+        ModelCapability.CODING,
+        ModelCapability.TOOL_USE,
+      ]),
       maxContextTokens: 200000,
       maxOutputTokens: 32000,
       supportsSystemPrompt: true,
     },
     costPer1kInputTokensDollars: 0.015,
-    costPer1kOutputTokensDollars: 0.060, // $60/1M output tokens
+    costPer1kOutputTokensDollars: 0.06, // $60/1M output tokens
   };
 
   const editorDescriptor: ModelDescriptor = {
@@ -68,7 +70,7 @@ describe('Architect / Editor Dual Model Integration Flow', () => {
       supportsSystemPrompt: true,
     },
     costPer1kInputTokensDollars: 0.00015,
-    costPer1kOutputTokensDollars: 0.00060, // $0.60/1M output tokens (100x cheaper)
+    costPer1kOutputTokensDollars: 0.0006, // $0.60/1M output tokens (100x cheaper)
   };
 
   it('1. End-to-end multi-turn execution with Architect (PLAN) and Editor (EXECUTE)', async () => {
@@ -146,7 +148,8 @@ describe('Architect / Editor Dual Model Integration Flow', () => {
           finishReason: FinishReason.TOOL_CALL,
         },
         {
-          content: 'Architect Plan: Confirmed compute returns 0. Patch is to rewrite compute to return 42.',
+          content:
+            'Architect Plan: Confirmed compute returns 0. Patch is to rewrite compute to return 42.',
           toolCalls: [
             {
               id: 'call_edit_1',
@@ -369,7 +372,7 @@ describe('Architect / Editor Dual Model Integration Flow', () => {
 
     // Monolithic cost = (25.5k input * $0.015 + 3.1k output * $0.060) = $0.3825 + $0.186 = $0.5685
     // Dual-model cost = Architect step1 ($0.108) + Editor steps 2-4 (21.5k input * $0.00015 + 2.3k output * $0.00060 = $0.0046) = ~$0.1126
-    expect(report.monolithicTotalCostDollars).toBeGreaterThan(0.50);
+    expect(report.monolithicTotalCostDollars).toBeGreaterThan(0.5);
     expect(report.dualModelTotalCostDollars).toBeLessThan(0.15);
     expect(report.costSavingsPercentage).toBeGreaterThan(70); // >70% cost reduction!
     expect(report.phaseBreakdown).toHaveLength(4);

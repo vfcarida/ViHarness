@@ -35,9 +35,33 @@ describe('TBench Task Loader — P011', () => {
 
   it('3. should filter tasks by category', () => {
     const mockTasks: TBenchTask[] = [
-      { id: 't1', instruction: 'i1', category: 'software-engineering', difficulty: 'easy', tags: [], testScript: 'exit 0', timeout: 60 },
-      { id: 't2', instruction: 'i2', category: 'machine-learning', difficulty: 'medium', tags: [], testScript: 'exit 0', timeout: 60 },
-      { id: 't3', instruction: 'i3', category: 'security', difficulty: 'hard', tags: [], testScript: 'exit 0', timeout: 60 },
+      {
+        id: 't1',
+        instruction: 'i1',
+        category: 'software-engineering',
+        difficulty: 'easy',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
+      {
+        id: 't2',
+        instruction: 'i2',
+        category: 'machine-learning',
+        difficulty: 'medium',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
+      {
+        id: 't3',
+        instruction: 'i3',
+        category: 'security',
+        difficulty: 'hard',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
     ];
 
     const mlOnly = TBenchTaskLoader.filter(mockTasks, { categories: ['machine-learning'] });
@@ -47,9 +71,33 @@ describe('TBench Task Loader — P011', () => {
 
   it('4. should filter tasks by difficulty', () => {
     const mockTasks: TBenchTask[] = [
-      { id: 't1', instruction: 'i1', category: 'software-engineering', difficulty: 'easy', tags: [], testScript: 'exit 0', timeout: 60 },
-      { id: 't2', instruction: 'i2', category: 'machine-learning', difficulty: 'medium', tags: [], testScript: 'exit 0', timeout: 60 },
-      { id: 't3', instruction: 'i3', category: 'security', difficulty: 'hard', tags: [], testScript: 'exit 0', timeout: 60 },
+      {
+        id: 't1',
+        instruction: 'i1',
+        category: 'software-engineering',
+        difficulty: 'easy',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
+      {
+        id: 't2',
+        instruction: 'i2',
+        category: 'machine-learning',
+        difficulty: 'medium',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
+      {
+        id: 't3',
+        instruction: 'i3',
+        category: 'security',
+        difficulty: 'hard',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
     ];
 
     const hardOnly = TBenchTaskLoader.filter(mockTasks, { difficulties: ['hard'] });
@@ -59,8 +107,24 @@ describe('TBench Task Loader — P011', () => {
 
   it('5. should filter tasks by tags', () => {
     const mockTasks: TBenchTask[] = [
-      { id: 't1', instruction: 'i1', category: 'software-engineering', difficulty: 'easy', tags: ['git', 'cli'], testScript: 'exit 0', timeout: 60 },
-      { id: 't2', instruction: 'i2', category: 'machine-learning', difficulty: 'medium', tags: ['torch'], testScript: 'exit 0', timeout: 60 },
+      {
+        id: 't1',
+        instruction: 'i1',
+        category: 'software-engineering',
+        difficulty: 'easy',
+        tags: ['git', 'cli'],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
+      {
+        id: 't2',
+        instruction: 'i2',
+        category: 'machine-learning',
+        difficulty: 'medium',
+        tags: ['torch'],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
     ];
 
     const gitTagged = TBenchTaskLoader.filter(mockTasks, { tags: ['git'] });
@@ -70,8 +134,24 @@ describe('TBench Task Loader — P011', () => {
 
   it('6. should filter tasks by specific taskIds', () => {
     const mockTasks: TBenchTask[] = [
-      { id: 't1', instruction: 'i1', category: 'software-engineering', difficulty: 'easy', tags: [], testScript: 'exit 0', timeout: 60 },
-      { id: 't2', instruction: 'i2', category: 'machine-learning', difficulty: 'medium', tags: [], testScript: 'exit 0', timeout: 60 },
+      {
+        id: 't1',
+        instruction: 'i1',
+        category: 'software-engineering',
+        difficulty: 'easy',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
+      {
+        id: 't2',
+        instruction: 'i2',
+        category: 'machine-learning',
+        difficulty: 'medium',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
     ];
 
     const specific = TBenchTaskLoader.filter(mockTasks, { taskIds: ['t2'] });
@@ -81,9 +161,33 @@ describe('TBench Task Loader — P011', () => {
 
   it('7. should respect maxTasks limit', () => {
     const mockTasks: TBenchTask[] = [
-      { id: 't1', instruction: 'i1', category: 'software-engineering', difficulty: 'easy', tags: [], testScript: 'exit 0', timeout: 60 },
-      { id: 't2', instruction: 'i2', category: 'machine-learning', difficulty: 'medium', tags: [], testScript: 'exit 0', timeout: 60 },
-      { id: 't3', instruction: 'i3', category: 'security', difficulty: 'hard', tags: [], testScript: 'exit 0', timeout: 60 },
+      {
+        id: 't1',
+        instruction: 'i1',
+        category: 'software-engineering',
+        difficulty: 'easy',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
+      {
+        id: 't2',
+        instruction: 'i2',
+        category: 'machine-learning',
+        difficulty: 'medium',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
+      {
+        id: 't3',
+        instruction: 'i3',
+        category: 'security',
+        difficulty: 'hard',
+        tags: [],
+        testScript: 'exit 0',
+        timeout: 60,
+      },
     ];
 
     const limited = TBenchTaskLoader.filter(mockTasks, { maxTasks: 2 });
@@ -108,7 +212,9 @@ describe('TBench Task Loader — P011', () => {
   });
 
   it('9. should return empty array when directory does not exist', async () => {
-    const res = await TBenchTaskLoader.loadFromDir(path.join(fixturesDir, 'non-existent-dir-12345'));
+    const res = await TBenchTaskLoader.loadFromDir(
+      path.join(fixturesDir, 'non-existent-dir-12345'),
+    );
     expect(res).toEqual([]);
   });
 

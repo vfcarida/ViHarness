@@ -102,7 +102,10 @@ describe('MCP & ACP Transports End-to-End Integration — P012', () => {
         jsonrpc: '2.0',
         id: 2,
         method: 'tools/call',
-        params: { name: 'write_custom', arguments: { path: targetFile, content: 'E2E_STDIO_TEST' } },
+        params: {
+          name: 'write_custom',
+          arguments: { path: targetFile, content: 'E2E_STDIO_TEST' },
+        },
       }) + '\n',
     );
     await new Promise((r) => setTimeout(r, 20));
@@ -150,9 +153,12 @@ describe('MCP & ACP Transports End-to-End Integration — P012', () => {
 
     // 1. Connect SSE client
     const sseMessages: string[] = [];
-    const sseReq = http.request({ hostname: '127.0.0.1', port, path: '/sse', method: 'GET' }, (res) => {
-      res.on('data', (c) => sseMessages.push(c.toString()));
-    });
+    const sseReq = http.request(
+      { hostname: '127.0.0.1', port, path: '/sse', method: 'GET' },
+      (res) => {
+        res.on('data', (c) => sseMessages.push(c.toString()));
+      },
+    );
     sseReq.end();
     await new Promise((r) => setTimeout(r, 50));
 
@@ -246,7 +252,11 @@ describe('MCP & ACP Transports End-to-End Integration — P012', () => {
     await acpServer.listen(httpTransport);
     const port = httpTransport.boundPort!;
 
-    const postAcp = async (method: string, params?: Record<string, unknown>, id = 1): Promise<any> => {
+    const postAcp = async (
+      method: string,
+      params?: Record<string, unknown>,
+      id = 1,
+    ): Promise<any> => {
       return new Promise((resolve) => {
         const req = http.request(
           {
@@ -273,7 +283,11 @@ describe('MCP & ACP Transports End-to-End Integration — P012', () => {
     expect(sessionId).toBeDefined();
 
     // 2. session/send
-    const sendResult = await postAcp('session/send', { sessionId, message: 'Run regression tests' }, 2);
+    const sendResult = await postAcp(
+      'session/send',
+      { sessionId, message: 'Run regression tests' },
+      2,
+    );
     expect(sendResult.result.success).toBe(true);
 
     // 3. session/status

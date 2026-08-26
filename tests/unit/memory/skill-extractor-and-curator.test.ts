@@ -118,11 +118,7 @@ describe('Skill Extractor & Curator Lifecycle (Hermes Pattern) — P007', () => 
     const extractor = new SkillExtractor({ memoryStore, idFactory, clock });
 
     const failedExecution = createMockExecution(false, 5);
-    const memory = await extractor.extractFromExecution(
-      failedExecution,
-      'Failing task',
-      'Goal',
-    );
+    const memory = await extractor.extractFromExecution(failedExecution, 'Failing task', 'Goal');
 
     expect(memory).toBeNull();
   });
@@ -201,7 +197,7 @@ describe('Skill Extractor & Curator Lifecycle (Hermes Pattern) — P007', () => 
       content: 'Pattern: use parallel test runner for faster feedback',
       source: 'extractor',
       confidence: 0.9,
-      importance: 0.70,
+      importance: 0.7,
       status: MemoryStatus.ACTIVE,
       tags: ['pattern'],
       metadata: { iterationsSinceLastUse: 2, useCount: 4 }, // 4 uses
@@ -211,7 +207,7 @@ describe('Skill Extractor & Curator Lifecycle (Hermes Pattern) — P007', () => 
     expect(report.boostedImportance).toBe(1);
 
     const updated = await memoryStore.getRecord(pattern.id);
-    expect(updated?.importance).toBeGreaterThan(0.70);
-    expect(updated?.importance).toBeCloseTo(0.90, 2); // 0.70 + 4 * 0.05 = 0.90
+    expect(updated?.importance).toBeGreaterThan(0.7);
+    expect(updated?.importance).toBeCloseTo(0.9, 2); // 0.70 + 4 * 0.05 = 0.90
   });
 });

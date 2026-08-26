@@ -62,9 +62,24 @@ describe('TBench Report Generator — P011', () => {
     model: 'claude-opus-4-1',
     timestamp: '2026-01-01T00:00:00Z',
     leaderboard_comparison: [
-      { agent: 'Vi-Harness (Autonomous Terminal Agent)', model: 'claude-opus-4-1', resolution_rate: 66.67, is_baseline: false },
-      { agent: 'Harbor + Claude Opus 4.1', model: 'anthropic/claude-opus-4-1', resolution_rate: 52.5, is_baseline: true },
-      { agent: 'Harbor + Claude 3.5 Sonnet', model: 'anthropic/claude-3-5-sonnet', resolution_rate: 48.3, is_baseline: true },
+      {
+        agent: 'Vi-Harness (Autonomous Terminal Agent)',
+        model: 'claude-opus-4-1',
+        resolution_rate: 66.67,
+        is_baseline: false,
+      },
+      {
+        agent: 'Harbor + Claude Opus 4.1',
+        model: 'anthropic/claude-opus-4-1',
+        resolution_rate: 52.5,
+        is_baseline: true,
+      },
+      {
+        agent: 'Harbor + Claude 3.5 Sonnet',
+        model: 'anthropic/claude-3-5-sonnet',
+        resolution_rate: 48.3,
+        is_baseline: true,
+      },
     ],
   };
 

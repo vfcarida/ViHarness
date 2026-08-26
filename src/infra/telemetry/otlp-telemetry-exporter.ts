@@ -10,11 +10,7 @@
  * - Bounded buffer preventing memory leaks during collector outages
  * - Zero vendor SDK dependencies (uses standard Node.js `fetch`)
  */
-import type {
-  Span,
-  ModelMetrics,
-  ToolMetrics,
-} from '../../core/model/telemetry-types.js';
+import type { Span, ModelMetrics, ToolMetrics } from '../../core/model/telemetry-types.js';
 
 export interface OtlpExporterOptions {
   readonly endpoint?: string; // Base OTLP endpoint (e.g. http://localhost:4318)
@@ -35,11 +31,20 @@ export class OtlpTelemetryExporter {
   private readonly fetchImpl: typeof fetch;
 
   private spanQueue: Span[] = [];
-  private metricQueue: Array<{ name: string; value: number; labels?: Record<string, string>; timestamp: Date }> = [];
+  private metricQueue: Array<{
+    name: string;
+    value: number;
+    labels?: Record<string, string>;
+    timestamp: Date;
+  }> = [];
   private flushTimer?: NodeJS.Timeout;
 
   constructor(options: OtlpExporterOptions = {}) {
-    this.endpoint = (options.endpoint ?? process.env['OTEL_EXPORTER_OTLP_ENDPOINT'] ?? 'http://localhost:4318').replace(/\/+$/, '');
+    this.endpoint = (
+      options.endpoint ??
+      process.env['OTEL_EXPORTER_OTLP_ENDPOINT'] ??
+      'http://localhost:4318'
+    ).replace(/\/+$/, '');
     this.headers = options.headers ?? {};
     this.serviceName = options.serviceName ?? process.env['OTEL_SERVICE_NAME'] ?? 'vi-harness';
     this.batchSize = options.batchSize ?? 50;
@@ -89,11 +94,26 @@ export class OtlpTelemetryExporter {
    * Record standard ModelInvocation metrics.
    */
   recordModelMetrics(metrics: ModelMetrics): void {
-    this.exportMetric('agent.model.tokens.prompt', metrics.inputTokens, { model: metrics.model, provider: metrics.provider });
-    this.exportMetric('agent.model.tokens.completion', metrics.outputTokens, { model: metrics.model, provider: metrics.provider });
-    this.exportMetric('agent.model.tokens.total', metrics.inputTokens + metrics.outputTokens, { model: metrics.model, provider: metrics.provider });
-    this.exportMetric('agent.model.cost.dollars', metrics.cost, { model: metrics.model, provider: metrics.provider });
-    this.exportMetric('agent.model.latency.ms', metrics.latencyMs, { model: metrics.model, provider: metrics.provider });
+    this.exportMetric('agent.model.tokens.prompt', metrics.inputTokens, {
+      model: metrics.model,
+      provider: metrics.provider,
+    });
+    this.exportMetric('agent.model.tokens.completion', metrics.outputTokens, {
+      model: metrics.model,
+      provider: metrics.provider,
+    });
+    this.exportMetric('agent.model.tokens.total', metrics.inputTokens + metrics.outputTokens, {
+      model: metrics.model,
+      provider: metrics.provider,
+    });
+    this.exportMetric('agent.model.cost.dollars', metrics.cost, {
+      model: metrics.model,
+      provider: metrics.provider,
+    });
+    this.exportMetric('agent.model.latency.ms', metrics.latencyMs, {
+      model: metrics.model,
+      provider: metrics.provider,
+    });
   }
 
   /**
@@ -146,13 +166,20 @@ export class OtlpTelemetryExporter {
                 return {
                   traceId: s.traceId.replace(/-/g, '').padEnd(32, '0').slice(0, 32),
                   spanId: s.id.replace(/-/g, '').padEnd(16, '0').slice(0, 16),
-                  parentSpanId: s.parentId ? s.parentId.replace(/-/g, '').padEnd(16, '0').slice(0, 16) : undefined,
+                  parentSpanId: s.parentId
+                    ? s.parentId.replace(/-/g, '').padEnd(16, '0').slice(0, 16)
+                    : undefined,
                   name: s.name,
                   startTimeUnixNano: String(startTimeMs * 1000000),
                   endTimeUnixNano: String(endTimeMs * 1000000),
                   attributes: Object.entries(s.attributes).map(([k, v]) => ({
                     key: k,
-                    value: typeof v === 'number' ? { doubleValue: v } : typeof v === 'boolean' ? { boolValue: v } : { stringValue: String(v) },
+                    value:
+                      typeof v === 'number'
+                        ? { doubleValue: v }
+                        : typeof v === 'boolean'
+                          ? { boolValue: v }
+                          : { stringValue: String(v) },
                   })),
                   status: { code: s.status === 'OK' ? 1 : 2 },
                 };

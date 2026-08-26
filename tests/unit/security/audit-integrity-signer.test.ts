@@ -8,7 +8,10 @@ import { AuditIntegritySigner, SecretScrubber } from '../../../src/infra/index.j
 
 describe('AuditIntegritySigner & SecretScrubber Unit Tests', () => {
   it('signs payloads and verifies authenticity, detecting any payload tampering', () => {
-    const signer = new AuditIntegritySigner({ secretKey: 'top-secret-signing-key', keyId: 'aud-key-1' });
+    const signer = new AuditIntegritySigner({
+      secretKey: 'top-secret-signing-key',
+      keyId: 'aud-key-1',
+    });
 
     const journalEntry = {
       executionId: 'exec_123',

@@ -100,11 +100,7 @@ export class WorkspaceIsolationManager {
       const srcDir = path.join(workspacePath, 'src');
       if (!fs.existsSync(srcDir)) {
         fs.mkdirSync(srcDir, { recursive: true });
-        fs.writeFileSync(
-          path.join(srcDir, 'index.ts'),
-          'export const initial = true;\n',
-          'utf-8',
-        );
+        fs.writeFileSync(path.join(srcDir, 'index.ts'), 'export const initial = true;\n', 'utf-8');
       }
     }
 

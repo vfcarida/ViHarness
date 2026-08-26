@@ -22,7 +22,8 @@ describe('PrefixCachingCompiler Unit Tests', () => {
       activeFileContents: [
         {
           path: 'src/auth/login.ts',
-          content: 'export function login(user, pass) { db.query("SELECT * FROM users WHERE user=" + user); }',
+          content:
+            'export function login(user, pass) { db.query("SELECT * FROM users WHERE user=" + user); }',
         },
       ],
     });

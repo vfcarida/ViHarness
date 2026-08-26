@@ -13,7 +13,11 @@ import {
   WriteFileTool,
   UuidV7IdFactory,
 } from '../../../src/infra/index.js';
-import type { McpTransport, McpJsonRpcRequest, McpJsonRpcResponse } from '../../../src/infra/index.js';
+import type {
+  McpTransport,
+  McpJsonRpcRequest,
+  McpJsonRpcResponse,
+} from '../../../src/infra/index.js';
 
 describe('Model Context Protocol (MCP) Server & Client', () => {
   const idFactory = new UuidV7IdFactory();
@@ -125,7 +129,10 @@ describe('Model Context Protocol (MCP) Server & Client', () => {
 
     // Execute proxied tool
     const tool = localRegistry.getTool('mcp_postgres_query_db')!;
-    const output = await tool.execute({ sql: 'SELECT * FROM users;' }, { correlationId: 'test_call' });
+    const output = await tool.execute(
+      { sql: 'SELECT * FROM users;' },
+      { correlationId: 'test_call' },
+    );
     expect(output.output).toContain('Result for SQL: SELECT * FROM users;');
     expect(output.success).toBe(true);
   });

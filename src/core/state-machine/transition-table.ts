@@ -47,8 +47,16 @@ export const TRANSITION_TABLE: ReadonlyArray<TransitionRule> = [
   { from: AgentPhase.IMPLEMENT, event: StateEvent.BLOCK, to: AgentPhase.BLOCKED },
   { from: AgentPhase.IMPLEMENT, event: StateEvent.ESCALATE, to: AgentPhase.HUMAN_REQUIRED },
   { from: AgentPhase.IMPLEMENT, event: StateEvent.CANCEL, to: AgentPhase.CANCELLED },
-  { from: AgentPhase.IMPLEMENT, event: StateEvent.BUDGET_EXHAUSTED, to: AgentPhase.BUDGET_EXCEEDED },
-  { from: AgentPhase.IMPLEMENT, event: StateEvent.REGRESSION_FOUND, to: AgentPhase.REGRESSION_DETECTED },
+  {
+    from: AgentPhase.IMPLEMENT,
+    event: StateEvent.BUDGET_EXHAUSTED,
+    to: AgentPhase.BUDGET_EXCEEDED,
+  },
+  {
+    from: AgentPhase.IMPLEMENT,
+    event: StateEvent.REGRESSION_FOUND,
+    to: AgentPhase.REGRESSION_DETECTED,
+  },
   { from: AgentPhase.IMPLEMENT, event: StateEvent.MARK_FAILED, to: AgentPhase.FAILED },
 
   // === VERIFY ===
@@ -56,7 +64,11 @@ export const TRANSITION_TABLE: ReadonlyArray<TransitionRule> = [
   { from: AgentPhase.VERIFY, event: StateEvent.VERIFICATION_FAILED, to: AgentPhase.REPAIR },
   { from: AgentPhase.VERIFY, event: StateEvent.BLOCK, to: AgentPhase.BLOCKED },
   { from: AgentPhase.VERIFY, event: StateEvent.ESCALATE, to: AgentPhase.HUMAN_REQUIRED },
-  { from: AgentPhase.VERIFY, event: StateEvent.REGRESSION_FOUND, to: AgentPhase.REGRESSION_DETECTED },
+  {
+    from: AgentPhase.VERIFY,
+    event: StateEvent.REGRESSION_FOUND,
+    to: AgentPhase.REGRESSION_DETECTED,
+  },
   { from: AgentPhase.VERIFY, event: StateEvent.NO_PROGRESS, to: AgentPhase.HUMAN_REQUIRED },
   { from: AgentPhase.VERIFY, event: StateEvent.CANCEL, to: AgentPhase.CANCELLED },
   { from: AgentPhase.VERIFY, event: StateEvent.BUDGET_EXHAUSTED, to: AgentPhase.BUDGET_EXCEEDED },
@@ -66,12 +78,24 @@ export const TRANSITION_TABLE: ReadonlyArray<TransitionRule> = [
   { from: AgentPhase.REPAIR, event: StateEvent.REPAIR_COMPLETE, to: AgentPhase.VERIFY },
   { from: AgentPhase.REPAIR, event: StateEvent.RESET_TO_EXPLORE, to: AgentPhase.EXPLORE },
   { from: AgentPhase.REPAIR, event: StateEvent.ESCALATE, to: AgentPhase.HUMAN_REQUIRED },
-  { from: AgentPhase.REPAIR, event: StateEvent.MAX_REPAIRS_EXCEEDED, to: AgentPhase.HUMAN_REQUIRED },
-  { from: AgentPhase.REPAIR, event: StateEvent.OSCILLATION_FOUND, to: AgentPhase.OSCILLATION_DETECTED },
+  {
+    from: AgentPhase.REPAIR,
+    event: StateEvent.MAX_REPAIRS_EXCEEDED,
+    to: AgentPhase.HUMAN_REQUIRED,
+  },
+  {
+    from: AgentPhase.REPAIR,
+    event: StateEvent.OSCILLATION_FOUND,
+    to: AgentPhase.OSCILLATION_DETECTED,
+  },
   { from: AgentPhase.REPAIR, event: StateEvent.NO_PROGRESS, to: AgentPhase.HUMAN_REQUIRED },
   { from: AgentPhase.REPAIR, event: StateEvent.CANCEL, to: AgentPhase.CANCELLED },
   { from: AgentPhase.REPAIR, event: StateEvent.BUDGET_EXHAUSTED, to: AgentPhase.BUDGET_EXCEEDED },
-  { from: AgentPhase.REPAIR, event: StateEvent.REGRESSION_FOUND, to: AgentPhase.REGRESSION_DETECTED },
+  {
+    from: AgentPhase.REPAIR,
+    event: StateEvent.REGRESSION_FOUND,
+    to: AgentPhase.REGRESSION_DETECTED,
+  },
   { from: AgentPhase.REPAIR, event: StateEvent.MARK_FAILED, to: AgentPhase.FAILED },
 
   // === BLOCKED ===
@@ -116,9 +140,6 @@ export const TRANSITION_INDEX: ReadonlyMap<string, AgentPhase> =
  * Look up the target phase for a given (from, event) pair.
  * Returns undefined if the transition is not in the whitelist.
  */
-export function lookupTransition(
-  from: AgentPhase,
-  event: StateEvent,
-): AgentPhase | undefined {
+export function lookupTransition(from: AgentPhase, event: StateEvent): AgentPhase | undefined {
   return TRANSITION_INDEX.get(`${from}::${event}`);
 }

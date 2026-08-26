@@ -64,22 +64,30 @@ describe('Reliability Engineering & Fault Injection Suite', () => {
 
   it('1. Model Timeout: Catches simulated model execution timeout (408)', () => {
     injector.enableFault(FaultMode.MODEL_TIMEOUT);
-    expect(() => injector.maybeTrigger(FaultMode.MODEL_TIMEOUT)).toThrow('Simulated Model Execution Timeout');
+    expect(() => injector.maybeTrigger(FaultMode.MODEL_TIMEOUT)).toThrow(
+      'Simulated Model Execution Timeout',
+    );
   });
 
   it('2. Provider Outage: Catches simulated LLM provider outage (503)', () => {
     injector.enableFault(FaultMode.PROVIDER_OUTAGE);
-    expect(() => injector.maybeTrigger(FaultMode.PROVIDER_OUTAGE)).toThrow('Simulated LLM Provider Outage');
+    expect(() => injector.maybeTrigger(FaultMode.PROVIDER_OUTAGE)).toThrow(
+      'Simulated LLM Provider Outage',
+    );
   });
 
   it('3. Rate Limiting: Catches simulated rate limit exceeded (429)', () => {
     injector.enableFault(FaultMode.RATE_LIMITING);
-    expect(() => injector.maybeTrigger(FaultMode.RATE_LIMITING)).toThrow('Simulated Rate Limit Exceeded');
+    expect(() => injector.maybeTrigger(FaultMode.RATE_LIMITING)).toThrow(
+      'Simulated Rate Limit Exceeded',
+    );
   });
 
   it('4. Malformed Model Response: Handles invalid JSON model output gracefully', () => {
     injector.enableFault(FaultMode.MALFORMED_MODEL_RESPONSE);
-    expect(() => injector.maybeTrigger(FaultMode.MALFORMED_MODEL_RESPONSE)).toThrow('Malformed JSON');
+    expect(() => injector.maybeTrigger(FaultMode.MALFORMED_MODEL_RESPONSE)).toThrow(
+      'Malformed JSON',
+    );
   });
 
   it('5. Tool Timeout: Catches tool execution timeout', () => {
@@ -94,11 +102,15 @@ describe('Reliability Engineering & Fault Injection Suite', () => {
 
   it('7. Verifier Crash: Catches internal verification exception', () => {
     injector.enableFault(FaultMode.VERIFIER_CRASH);
-    expect(() => injector.maybeTrigger(FaultMode.VERIFIER_CRASH)).toThrow('Verification Engine Internal Exception');
+    expect(() => injector.maybeTrigger(FaultMode.VERIFIER_CRASH)).toThrow(
+      'Verification Engine Internal Exception',
+    );
   });
 
   it('8. Corrupted State: StateCorruptionValidator detects corrupted state snapshots', () => {
-    expect(() => StateCorruptionValidator.validateOrThrow(null as any)).toThrow('State object is null or undefined');
+    expect(() => StateCorruptionValidator.validateOrThrow(null as any)).toThrow(
+      'State object is null or undefined',
+    );
 
     const corruptState: any = {
       id: null,
@@ -108,7 +120,9 @@ describe('Reliability Engineering & Fault Injection Suite', () => {
       iterationCount: 1,
       repairCount: 0,
     };
-    expect(() => StateCorruptionValidator.validateOrThrow(corruptState)).toThrow('State snapshot is missing mandatory identifiers');
+    expect(() => StateCorruptionValidator.validateOrThrow(corruptState)).toThrow(
+      'State snapshot is missing mandatory identifiers',
+    );
   });
 
   it('9. Process Crash: RecoveryManager classifies crash and resumes task state', async () => {
@@ -126,7 +140,12 @@ describe('Reliability Engineering & Fault Injection Suite', () => {
     const execId = await journal.logProposal(proposal, false);
     await journal.logStart(execId);
 
-    const crashAnalysis = await recoveryManager.analyzeCrash(taskId, journal, eventStore, checkpointStore);
+    const crashAnalysis = await recoveryManager.analyzeCrash(
+      taskId,
+      journal,
+      eventStore,
+      checkpointStore,
+    );
     expect(crashAnalysis.interruptedEntries).toHaveLength(1);
     expect(crashAnalysis.recommendedPolicy).toBe(RecoveryPolicy.RETRY_SAFE);
 
@@ -137,17 +156,25 @@ describe('Reliability Engineering & Fault Injection Suite', () => {
 
   it('10. Disk Failure Simulation: Handles simulated ENOSPC disk write failure', () => {
     injector.enableFault(FaultMode.DISK_FAILURE_SIMULATION);
-    expect(() => injector.maybeTrigger(FaultMode.DISK_FAILURE_SIMULATION)).toThrow('Disk I/O Write Failure');
+    expect(() => injector.maybeTrigger(FaultMode.DISK_FAILURE_SIMULATION)).toThrow(
+      'Disk I/O Write Failure',
+    );
   });
 
   it('11. Interrupted Checkpoint: Enforces safe checkpoint creation state', () => {
     injector.enableFault(FaultMode.INTERRUPTED_CHECKPOINT);
-    expect(() => injector.maybeTrigger(FaultMode.INTERRUPTED_CHECKPOINT)).toThrow('Interrupted Checkpoint Commit');
+    expect(() => injector.maybeTrigger(FaultMode.INTERRUPTED_CHECKPOINT)).toThrow(
+      'Interrupted Checkpoint Commit',
+    );
   });
 
   it('12. Interrupted Rollback: Handles interrupted rollback operation cleanly', async () => {
     const invalidCpId = idFactory.create<'Checkpoint'>();
-    const result = await rollbackManager.rollbackToCheckpoint(invalidCpId, checkpointStore, gitManager);
+    const result = await rollbackManager.rollbackToCheckpoint(
+      invalidCpId,
+      checkpointStore,
+      gitManager,
+    );
     expect(result.success).toBe(false);
   });
 
@@ -196,11 +223,15 @@ describe('Reliability Engineering & Fault Injection Suite', () => {
 
   it('15. Subagent Timeout: Handles simulated subagent execution timeout', () => {
     injector.enableFault(FaultMode.SUBAGENT_TIMEOUT);
-    expect(() => injector.maybeTrigger(FaultMode.SUBAGENT_TIMEOUT)).toThrow('Subagent Execution Timeout');
+    expect(() => injector.maybeTrigger(FaultMode.SUBAGENT_TIMEOUT)).toThrow(
+      'Subagent Execution Timeout',
+    );
   });
 
   it('16. Context Compiler Failure: Handles simulated context compilation failure', () => {
     injector.enableFault(FaultMode.CONTEXT_COMPILER_FAILURE);
-    expect(() => injector.maybeTrigger(FaultMode.CONTEXT_COMPILER_FAILURE)).toThrow('Context Compiler Budget Failure');
+    expect(() => injector.maybeTrigger(FaultMode.CONTEXT_COMPILER_FAILURE)).toThrow(
+      'Context Compiler Budget Failure',
+    );
   });
 });

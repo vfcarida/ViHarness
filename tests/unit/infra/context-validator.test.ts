@@ -37,7 +37,11 @@ describe('ContextValidator Unit Suite', () => {
     },
   };
 
-  function createObj(id: string, isMustPreserve = false, type = ContextObjectType.OBSERVATION): ContextObject {
+  function createObj(
+    id: string,
+    isMustPreserve = false,
+    type = ContextObjectType.OBSERVATION,
+  ): ContextObject {
     return {
       id: id as ContextId,
       taskId: 'task-1' as TaskId,
@@ -95,7 +99,11 @@ describe('ContextValidator Unit Suite', () => {
 
     const report = ContextValidator.validate(retained, candidates, modelDescriptor, budget, 500);
     expect(report.valid).toBe(false);
-    expect(report.errors.some((e) => e.includes('Must-preserve object') && e.includes('must-preserve-1'))).toBe(true);
+    expect(
+      report.errors.some(
+        (e) => e.includes('Must-preserve object') && e.includes('must-preserve-1'),
+      ),
+    ).toBe(true);
   });
 
   it('5. validateOrThrow throws HarnessError on validation failure', () => {
@@ -103,11 +111,23 @@ describe('ContextValidator Unit Suite', () => {
     const criticalObj = createObj('must-preserve-1', true, ContextObjectType.GOAL_SPECIFICATION);
 
     expect(() => {
-      ContextValidator.validateOrThrow([regularObj], [regularObj, criticalObj], modelDescriptor, budget, 500);
+      ContextValidator.validateOrThrow(
+        [regularObj],
+        [regularObj, criticalObj],
+        modelDescriptor,
+        budget,
+        500,
+      );
     }).toThrowError(HarnessError);
 
     try {
-      ContextValidator.validateOrThrow([regularObj], [regularObj, criticalObj], modelDescriptor, budget, 500);
+      ContextValidator.validateOrThrow(
+        [regularObj],
+        [regularObj, criticalObj],
+        modelDescriptor,
+        budget,
+        500,
+      );
     } catch (err: any) {
       expect(err.code).toBe(ErrorCode.CONTEXT_BUDGET_EXCEEDED);
       expect(err.category).toBe(ErrorCategory.CONTEXT);

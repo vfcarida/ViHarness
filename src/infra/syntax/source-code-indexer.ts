@@ -69,7 +69,10 @@ export class SourceCodeIndexer {
     fileMaps: Map<string, FileSymbolMap>,
   ): ReferenceGraph {
     const nodes = new Set<string>(files.keys());
-    const symbolDefinitions = new Map<string, { readonly filePath: string; readonly symbol: CodeSymbol }>();
+    const symbolDefinitions = new Map<
+      string,
+      { readonly filePath: string; readonly symbol: CodeSymbol }
+    >();
 
     // 1. Index all defined symbols
     for (const [filePath, fileMap] of fileMaps.entries()) {
@@ -213,9 +216,13 @@ export class SourceCodeIndexer {
 
         const exportMultiplier = sym.isExported ? 1.5 : 1.0;
         const kindMultiplier =
-          sym.kind === SymbolKind.CLASS || sym.kind === SymbolKind.INTERFACE || sym.kind === SymbolKind.TYPE_ALIAS
+          sym.kind === SymbolKind.CLASS ||
+          sym.kind === SymbolKind.INTERFACE ||
+          sym.kind === SymbolKind.TYPE_ALIAS
             ? 1.4
-            : sym.kind === SymbolKind.FUNCTION || sym.kind === SymbolKind.METHOD || sym.kind === SymbolKind.ENUM
+            : sym.kind === SymbolKind.FUNCTION ||
+                sym.kind === SymbolKind.METHOD ||
+                sym.kind === SymbolKind.ENUM
               ? 1.2
               : 1.0;
 
@@ -261,10 +268,7 @@ export class SourceCodeIndexer {
   /**
    * Renders a compact Aider-style Repo-Map formatted string within token constraints.
    */
-  static renderRepoMap(
-    repoMap: RepoSymbolMap,
-    options?: RepoMapRenderOptions,
-  ): string {
+  static renderRepoMap(repoMap: RepoSymbolMap, options?: RepoMapRenderOptions): string {
     const maxTokens = options?.maxTokens ?? 2500;
     const focusFiles = new Set(options?.focusFiles ?? []);
     const sections: string[] = [];
@@ -277,7 +281,8 @@ export class SourceCodeIndexer {
     for (const fileMap of repoMap.files.values()) {
       let maxScore = 0;
       for (const sym of fileMap.symbols) {
-        const score = symbolRanks?.get(`${fileMap.filePath}:${sym.name}`) ?? symbolRanks?.get(sym.name) ?? 0;
+        const score =
+          symbolRanks?.get(`${fileMap.filePath}:${sym.name}`) ?? symbolRanks?.get(sym.name) ?? 0;
         if (score > maxScore) maxScore = score;
       }
       fileScores.set(fileMap.filePath, maxScore);
@@ -312,7 +317,9 @@ export class SourceCodeIndexer {
       const sectionTokens = Math.ceil(fileSection.length / 4);
 
       if (estimatedTokens + sectionTokens > maxTokens && sections.length > 0) {
-        sections.push(`\n# ... [${repoMap.totalFiles - sections.length} more files omitted for token budget]`);
+        sections.push(
+          `\n# ... [${repoMap.totalFiles - sections.length} more files omitted for token budget]`,
+        );
         break;
       }
 
@@ -344,14 +351,21 @@ export class SourceCodeIndexer {
     }
 
     const symbols = [...fileMap.symbols].sort((a, b) => {
-      const aScore = symbolRanks.get(`${fileMap.filePath}:${a.name}`) ?? symbolRanks.get(a.name) ?? 0;
-      const bScore = symbolRanks.get(`${fileMap.filePath}:${b.name}`) ?? symbolRanks.get(b.name) ?? 0;
+      const aScore =
+        symbolRanks.get(`${fileMap.filePath}:${a.name}`) ?? symbolRanks.get(a.name) ?? 0;
+      const bScore =
+        symbolRanks.get(`${fileMap.filePath}:${b.name}`) ?? symbolRanks.get(b.name) ?? 0;
       return bScore - aScore;
     });
 
-    const filteredSymbols = minRank !== undefined
-      ? symbols.filter((s) => (symbolRanks.get(`${fileMap.filePath}:${s.name}`) ?? symbolRanks.get(s.name) ?? 0) >= minRank)
-      : symbols;
+    const filteredSymbols =
+      minRank !== undefined
+        ? symbols.filter(
+            (s) =>
+              (symbolRanks.get(`${fileMap.filePath}:${s.name}`) ?? symbolRanks.get(s.name) ?? 0) >=
+              minRank,
+          )
+        : symbols;
 
     if (filteredSymbols.length > 0) {
       lines.push('  // Top Symbols:');
@@ -360,7 +374,9 @@ export class SourceCodeIndexer {
         lines.push(`${indent}${sym.signature}`);
       }
       if (symbols.length > filteredSymbols.length) {
-        lines.push(`  // ... [${symbols.length - filteredSymbols.length} lower-ranked symbols omitted]`);
+        lines.push(
+          `  // ... [${symbols.length - filteredSymbols.length} lower-ranked symbols omitted]`,
+        );
       }
     } else {
       lines.push('  // (No top-level exported symbols detected)');
@@ -484,9 +500,20 @@ export class SourceCodeIndexer {
       }
 
       // Methods inside class
-      if (currentClass && line.match(/^(public\s+|private\s+|protected\s+|static\s+|async\s+)*[A-Za-z0-9_]+\s*\([^)]*\)/)) {
+      if (
+        currentClass &&
+        line.match(
+          /^(public\s+|private\s+|protected\s+|static\s+|async\s+)*[A-Za-z0-9_]+\s*\([^)]*\)/,
+        )
+      ) {
         const methodMatch = line.match(/([A-Za-z0-9_]+)\s*\([^)]*\)/);
-        if (methodMatch && methodMatch[1] && methodMatch[1] !== 'if' && methodMatch[1] !== 'for' && methodMatch[1] !== 'while') {
+        if (
+          methodMatch &&
+          methodMatch[1] &&
+          methodMatch[1] !== 'if' &&
+          methodMatch[1] !== 'for' &&
+          methodMatch[1] !== 'while'
+        ) {
           const name = methodMatch[1];
           symbols.push({
             name,

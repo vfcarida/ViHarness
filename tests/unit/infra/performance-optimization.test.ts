@@ -49,7 +49,7 @@ describe('Performance & Cost Optimization Suite', () => {
 
     const before: PerformanceBaseline = {
       totalTokens: 10000,
-      totalCostUSD: 0.10,
+      totalCostUSD: 0.1,
       totalLatencyMs: 3000,
       successRate: 1.0,
       regressionRate: 0.0,
@@ -74,7 +74,7 @@ describe('Performance & Cost Optimization Suite', () => {
   it('2. Reliability Invariant Enforcement: Rejects optimizations that lower reliability below threshold', () => {
     const before: PerformanceBaseline = {
       totalTokens: 10000,
-      totalCostUSD: 0.10,
+      totalCostUSD: 0.1,
       totalLatencyMs: 3000,
       successRate: 1.0,
       regressionRate: 0.0,
@@ -85,7 +85,7 @@ describe('Performance & Cost Optimization Suite', () => {
       totalTokens: 2000,
       totalCostUSD: 0.02,
       totalLatencyMs: 800,
-      successRate: 0.90,
+      successRate: 0.9,
       regressionRate: 0.05,
     };
 
@@ -94,10 +94,16 @@ describe('Performance & Cost Optimization Suite', () => {
   });
 
   it('3. Adaptive Context Budget: Dynamic token allocation for SMALL_BUG vs MULTI_FILE_REFACTOR', () => {
-    const smallBugBudget = AdaptiveContextBudget.computeBudget(BaselineScenarioCategory.SMALL_BUG, 1);
+    const smallBugBudget = AdaptiveContextBudget.computeBudget(
+      BaselineScenarioCategory.SMALL_BUG,
+      1,
+    );
     expect(smallBugBudget.maxTokens).toBe(4000);
 
-    const refactorBudget = AdaptiveContextBudget.computeBudget(BaselineScenarioCategory.MULTI_FILE_REFACTOR, 1);
+    const refactorBudget = AdaptiveContextBudget.computeBudget(
+      BaselineScenarioCategory.MULTI_FILE_REFACTOR,
+      1,
+    );
     expect(refactorBudget.maxTokens).toBe(16000);
   });
 
@@ -138,7 +144,13 @@ describe('Performance & Cost Optimization Suite', () => {
 
     const policyEngine = new DefaultPolicyEngine({ idFactory, clock });
     const sandbox = new LocalDevelopmentSandbox({ idFactory });
-    const defaultExecutor = new DefaultToolExecutor({ registry, policyEngine, sandbox, idFactory, clock });
+    const defaultExecutor = new DefaultToolExecutor({
+      registry,
+      policyEngine,
+      sandbox,
+      idFactory,
+      clock,
+    });
 
     const parallelExecutor = new ParallelToolExecutor(defaultExecutor, registry);
 

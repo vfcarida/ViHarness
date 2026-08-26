@@ -5,8 +5,16 @@
  * private SSH keys, AWS credentials, or API tokens.
  */
 import type { PolicyRule } from '../../../core/interfaces/policy-engine.js';
-import type { PolicyAction, PolicyDecision, PermissionContext } from '../../../core/model/policy.js';
-import { PolicyDecisionType, ActionRiskCategory, DEFAULT_PERMISSION_CONTEXT } from '../../../core/model/policy.js';
+import type {
+  PolicyAction,
+  PolicyDecision,
+  PermissionContext,
+} from '../../../core/model/policy.js';
+import {
+  PolicyDecisionType,
+  ActionRiskCategory,
+  DEFAULT_PERMISSION_CONTEXT,
+} from '../../../core/model/policy.js';
 import { RiskClassifier } from '../risk-classifier.js';
 
 const SECRET_CONTENT_PATTERNS = [
@@ -20,7 +28,8 @@ const SECRET_CONTENT_PATTERNS = [
 export class CredentialProtectionRule implements PolicyRule {
   public readonly id = 'rule-credential-protection';
   public readonly name = 'Credential Protection';
-  public readonly description = 'Denies access to secret files, .env configurations, private keys, and credential stores.';
+  public readonly description =
+    'Denies access to secret files, .env configurations, private keys, and credential stores.';
 
   async evaluate(action: PolicyAction, context?: PermissionContext): Promise<PolicyDecision> {
     const categories = action.categories ?? RiskClassifier.classify(action);

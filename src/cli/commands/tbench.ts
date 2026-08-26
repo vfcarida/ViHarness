@@ -169,14 +169,19 @@ export async function runTBenchCli(rawArgs: string[] = process.argv.slice(2)): P
   });
 
   console.log('\n======================================================================');
-  console.log(`🏆 TBench Resolution Rate: ${results.resolution_rate.toFixed(2)}% (${results.passed}/${results.total} tasks)`);
+  console.log(
+    `🏆 TBench Resolution Rate: ${results.resolution_rate.toFixed(2)}% (${results.passed}/${results.total} tasks)`,
+  );
   console.log(`⏱ Total Benchmark Duration: ${(results.duration_total / 1000).toFixed(1)}s`);
   console.log('======================================================================\n');
 
   // Print results table
   console.log(TBenchReportGenerator.generateMarkdownReport(results));
 
-  const { jsonPath, mdPath } = await TBenchReportGenerator.writeReportFiles(results, args.outputDir);
+  const { jsonPath, mdPath } = await TBenchReportGenerator.writeReportFiles(
+    results,
+    args.outputDir,
+  );
   console.log(`📄 Saved JSON report to: ${jsonPath}`);
   console.log(`📄 Saved Markdown report to: ${mdPath}\n`);
 }

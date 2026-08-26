@@ -58,12 +58,14 @@ const AnthropicResponseSchema = z.object({
   model: z.string().optional(),
   content: z.array(AnthropicContentBlockSchema),
   stop_reason: z.string().nullable().optional(),
-  usage: z.object({
-    input_tokens: z.number().optional(),
-    output_tokens: z.number().optional(),
-    cache_creation_input_tokens: z.number().optional(),
-    cache_read_input_tokens: z.number().optional(),
-  }).optional(),
+  usage: z
+    .object({
+      input_tokens: z.number().optional(),
+      output_tokens: z.number().optional(),
+      cache_creation_input_tokens: z.number().optional(),
+      cache_read_input_tokens: z.number().optional(),
+    })
+    .optional(),
 });
 
 export class AnthropicModelProvider implements ModelProvider {
@@ -76,7 +78,11 @@ export class AnthropicModelProvider implements ModelProvider {
 
   constructor(options: AnthropicProviderOptions = {}) {
     this.providerId = options.providerId ?? 'anthropic-primary';
-    this.baseUrl = (options.baseUrl ?? process.env['ANTHROPIC_BASE_URL'] ?? 'https://api.anthropic.com/v1').replace(/\/+$/, '');
+    this.baseUrl = (
+      options.baseUrl ??
+      process.env['ANTHROPIC_BASE_URL'] ??
+      'https://api.anthropic.com/v1'
+    ).replace(/\/+$/, '');
     this.apiKey = options.apiKey ?? process.env['ANTHROPIC_API_KEY'] ?? '';
     this.defaultModelId = options.defaultModelId ?? 'claude-3-7-sonnet-20250219';
     this.fetchImpl = options.customFetch ?? globalThis.fetch;
@@ -253,13 +259,23 @@ export class AnthropicModelProvider implements ModelProvider {
     };
   }
 
-  private buildRequestBody(request: ModelRequest, modelId: string, stream: boolean): Record<string, unknown> {
-    const systemBlocks: Array<{ type: 'text'; text: string; cache_control?: { type: 'ephemeral' } }> = [];
+  private buildRequestBody(
+    request: ModelRequest,
+    modelId: string,
+    stream: boolean,
+  ): Record<string, unknown> {
+    const systemBlocks: Array<{
+      type: 'text';
+      text: string;
+      cache_control?: { type: 'ephemeral' };
+    }> = [];
     const messages: Array<{ role: 'user' | 'assistant'; content: unknown }> = [];
 
     for (const msg of request.messages) {
       if (msg.role === MessageRole.SYSTEM) {
-        const isStatic = msg.metadata?.['segmentType'] === 'STATIC' || msg.metadata?.['cacheControl'] !== undefined;
+        const isStatic =
+          msg.metadata?.['segmentType'] === 'STATIC' ||
+          msg.metadata?.['cacheControl'] !== undefined;
         systemBlocks.push({
           type: 'text',
           text: msg.content,
@@ -276,7 +292,8 @@ export class AnthropicModelProvider implements ModelProvider {
           content: msg.content,
         });
       } else if (msg.role === MessageRole.TOOL || msg.role === MessageRole.TOOL_RESULT) {
-        const toolCallId = msg.toolCallId ?? (msg.metadata?.['toolCallId'] as string) ?? 'tool-result';
+        const toolCallId =
+          msg.toolCallId ?? (msg.metadata?.['toolCallId'] as string) ?? 'tool-result';
         messages.push({
           role: 'user',
           content: [
@@ -316,7 +333,11 @@ export class AnthropicModelProvider implements ModelProvider {
     return payload;
   }
 
-  private async executeRequest(path: string, body: Record<string, unknown>, signal?: AbortSignal): Promise<Response> {
+  private async executeRequest(
+    path: string,
+    body: Record<string, unknown>,
+    signal?: AbortSignal,
+  ): Promise<Response> {
     const url = `${this.baseUrl}${path}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

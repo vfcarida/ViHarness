@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { DefaultPluginContext, type Plugin, PluginState, type Disposer } from '../../../src/core/plugin/index.js';
+import {
+  DefaultPluginContext,
+  type Plugin,
+  PluginState,
+  type Disposer,
+} from '../../../src/core/plugin/index.js';
 
 describe('Plugin Lifecycle & Reversible Effects — P017', () => {
   it('1. Loads, applies, and activates a plugin successfully', async () => {

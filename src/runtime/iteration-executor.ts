@@ -18,7 +18,13 @@
  * 9. State Transition (derived strictly from actual evidence & tool results)
  * 10. Termination Decision (evaluating stop conditions & trajectory metrics)
  */
-import type { IdFactory, ExecutionId, TaskId, HypothesisId, EvidenceId } from '../core/types/identifiers.js';
+import type {
+  IdFactory,
+  ExecutionId,
+  TaskId,
+  HypothesisId,
+  EvidenceId,
+} from '../core/types/identifiers.js';
 import type { Clock } from '../core/interfaces/clock.js';
 import type { ModelRouter } from '../core/interfaces/model-router.js';
 import type { ContextCompiler } from '../core/interfaces/context-compiler.js';
@@ -55,7 +61,11 @@ import type { Iteration } from '../core/model/iteration.js';
 import { IterationOutcome } from '../core/model/iteration.js';
 import { ContextTier } from '../core/model/context.js';
 import type { ContextObject } from '../core/model/context-object.js';
-import { VerificationProfile, VerificationStatus, type VerificationResult } from '../core/model/verification.js';
+import {
+  VerificationProfile,
+  VerificationStatus,
+  type VerificationResult,
+} from '../core/model/verification.js';
 import { PreStepPipeline } from './pre-step-pipeline.js';
 import { ArchitectExecutor, type ArchitectExecutionResult } from './architect-executor.js';
 
@@ -118,7 +128,10 @@ export class IterationExecutor {
     const currentState = stateMachine.state;
     const recentEvidence = await evidenceStore?.listForTask(task.id);
     const priorToolResultsCount = iterationsSoFar.reduce((acc, r) => acc + r.toolResults.length, 0);
-    const priorEvidenceCount = iterationsSoFar.reduce((acc, r) => acc + r.evidenceCreated.length, 0);
+    const priorEvidenceCount = iterationsSoFar.reduce(
+      (acc, r) => acc + r.evidenceCreated.length,
+      0,
+    );
 
     // -----------------------------------------------------------------------
     // PHASE 2: CONTEXT COMPILATION
@@ -127,13 +140,21 @@ export class IterationExecutor {
     const estimatedContextTokens =
       initialObjects.reduce((acc: number, o: ContextObject) => acc + o.costTokens, 0) +
       Math.ceil((goal.description.length + task.description.length) / 4) +
-      (recentEvidence ? recentEvidence.reduce((acc: number, e: Evidence) => acc + Math.ceil(e.summary.length / 4), 0) : 0);
+      (recentEvidence
+        ? recentEvidence.reduce(
+            (acc: number, e: Evidence) => acc + Math.ceil(e.summary.length / 4),
+            0,
+          )
+        : 0);
     const targetRole =
       options?.targetRole ??
-      (currentState.phase === AgentPhase.PLAN ? 'ARCHITECT' : currentState.phase === AgentPhase.IMPLEMENT || currentState.phase === AgentPhase.REPAIR ? 'EDITOR' : undefined);
+      (currentState.phase === AgentPhase.PLAN
+        ? 'ARCHITECT'
+        : currentState.phase === AgentPhase.IMPLEMENT || currentState.phase === AgentPhase.REPAIR
+          ? 'EDITOR'
+          : undefined);
 
-    const dualModelConfig =
-      options?.dualModelConfig ?? (goal.metadata?.['dualModelConfig'] as any);
+    const dualModelConfig = options?.dualModelConfig ?? (goal.metadata?.['dualModelConfig'] as any);
 
     const taskCategory =
       options?.taskCategory ??
@@ -171,7 +192,10 @@ export class IterationExecutor {
       currentState,
       targetModelDescriptor: routingDecision.selectedProvider.descriptor,
       budget: {
-        maxTokens: Math.min(10000, routingDecision.selectedProvider.descriptor.capabilities.maxContextTokens),
+        maxTokens: Math.min(
+          10000,
+          routingDecision.selectedProvider.descriptor.capabilities.maxContextTokens,
+        ),
         softLimitTokens: 8000,
       },
       relevantObjects: options?.relevantObjects,
@@ -195,18 +219,21 @@ export class IterationExecutor {
     if (compilationResult.compiledContext.entries.length > 0) {
       for (const entry of compilationResult.compiledContext.entries) {
         const roleStr = String(entry.metadata['role'] ?? '');
-        const role = (roleStr === 'system' || entry.tier === ContextTier.L3_REPOSITORY)
-          ? MessageRole.SYSTEM
-          : roleStr === 'assistant'
-          ? MessageRole.ASSISTANT
-          : roleStr === 'tool'
-          ? MessageRole.TOOL
-          : MessageRole.USER;
+        const role =
+          roleStr === 'system' || entry.tier === ContextTier.L3_REPOSITORY
+            ? MessageRole.SYSTEM
+            : roleStr === 'assistant'
+              ? MessageRole.ASSISTANT
+              : roleStr === 'tool'
+                ? MessageRole.TOOL
+                : MessageRole.USER;
 
         messages.push({
           role,
           content: entry.content,
-          toolCallId: entry.metadata['toolCallId'] ? String(entry.metadata['toolCallId']) : undefined,
+          toolCallId: entry.metadata['toolCallId']
+            ? String(entry.metadata['toolCallId'])
+            : undefined,
           name: entry.metadata['toolName'] ? String(entry.metadata['toolName']) : undefined,
         });
       }
@@ -236,7 +263,8 @@ export class IterationExecutor {
       for (const res of priorIter.toolResults) {
         const toolCallId = String(res.metadata['toolCallId'] ?? res.actionId);
         const toolName = String(res.metadata['toolName'] ?? 'tool');
-        const isError = res.status === ActionResultStatus.FAILURE || res.status === ActionResultStatus.DENIED;
+        const isError =
+          res.status === ActionResultStatus.FAILURE || res.status === ActionResultStatus.DENIED;
         messages.push(
           ProviderMessageAdapter.createToolResultMessage({
             toolCallId,
@@ -347,11 +375,10 @@ export class IterationExecutor {
         signal: options?.signal,
       };
 
-      modelResponse = await executeResiliently(
-        routingDecision.selectedProvider,
-        modelRequest,
-        { maxRetries: 2, defaultTimeoutMs: 15000 },
-      );
+      modelResponse = await executeResiliently(routingDecision.selectedProvider, modelRequest, {
+        maxRetries: 2,
+        defaultTimeoutMs: 15000,
+      });
     }
 
     observerHub.emit({
@@ -430,7 +457,12 @@ export class IterationExecutor {
       // Execute safe read-only tools concurrently
       await Promise.all(
         safeProposals.map(async ({ proposal, index }) => {
-          const res = await executeSingleProposalWithPolicy(proposal, params, clock, policyDecisions);
+          const res = await executeSingleProposalWithPolicy(
+            proposal,
+            params,
+            clock,
+            policyDecisions,
+          );
           proposalResults[index] = res;
         }),
       );
@@ -465,14 +497,20 @@ export class IterationExecutor {
 
     // Record explicit failure evidence for any tool call that failed (e.g. UNKNOWN_TOOL, POLICY_DENIED, etc.)
     for (const res of toolResults) {
-      if (res.status === ActionResultStatus.FAILURE || res.status === ActionResultStatus.DENIED || res.metadata?.['errorCode'] === 'UNKNOWN_TOOL') {
+      if (
+        res.status === ActionResultStatus.FAILURE ||
+        res.status === ActionResultStatus.DENIED ||
+        res.metadata?.['errorCode'] === 'UNKNOWN_TOOL'
+      ) {
         const isUnknownTool = res.metadata?.['errorCode'] === 'UNKNOWN_TOOL';
-        const isPolicyDenied = res.metadata?.['errorCode'] === 'POLICY_DENIED' || res.status === ActionResultStatus.DENIED;
+        const isPolicyDenied =
+          res.metadata?.['errorCode'] === 'POLICY_DENIED' ||
+          res.status === ActionResultStatus.DENIED;
         const evSummary = isUnknownTool
           ? `UNKNOWN_TOOL: Tool [${res.metadata?.['toolName'] ?? 'unknown'}] is not registered in ToolRegistry`
           : isPolicyDenied
-          ? `POLICY_DENIED: Action on [${res.metadata?.['toolName'] ?? 'tool'}] blocked by security policy`
-          : `TOOL_FAILURE: Execution failed for tool [${res.metadata?.['toolName'] ?? 'tool'}]: ${res.error ?? 'error'}`;
+            ? `POLICY_DENIED: Action on [${res.metadata?.['toolName'] ?? 'tool'}] blocked by security policy`
+            : `TOOL_FAILURE: Execution failed for tool [${res.metadata?.['toolName'] ?? 'tool'}]: ${res.error ?? 'error'}`;
 
         const ev: Evidence = {
           id: idFactory.create<'Evidence'>(),
@@ -509,7 +547,10 @@ export class IterationExecutor {
       if (res.status === ActionResultStatus.SUCCESS) {
         const toolName = String(res.metadata?.['toolName'] ?? '').toLowerCase();
         const writtenFilePath = String(
-          res.metadata?.['path'] ?? res.metadata?.['filePath'] ?? res.metadata?.['targetFile'] ?? '',
+          res.metadata?.['path'] ??
+            res.metadata?.['filePath'] ??
+            res.metadata?.['targetFile'] ??
+            '',
         );
 
         const isWriteAction =
@@ -528,7 +569,8 @@ export class IterationExecutor {
             for (const ev of iter.evidenceCreated) {
               if (
                 ev.affectedFiles.includes(writtenFilePath) &&
-                (ev.summary.includes('[AUTO-LINT FAILURE]') || ev.summary.includes('[AUTO-TEST FAILURE]'))
+                (ev.summary.includes('[AUTO-LINT FAILURE]') ||
+                  ev.summary.includes('[AUTO-TEST FAILURE]'))
               ) {
                 priorCorrectionsForFile++;
               }
@@ -550,7 +592,11 @@ export class IterationExecutor {
                     type: EvidenceType.LINT_RESULT,
                     outcome: EvidenceOutcome.FAIL,
                     summary: `[AUTO-LINT FAILURE] in ${writtenFilePath}: ${lintResult.summary}`,
-                    data: { file: writtenFilePath, lintResult, retryCount: priorCorrectionsForFile + 1 },
+                    data: {
+                      file: writtenFilePath,
+                      lintResult,
+                      retryCount: priorCorrectionsForFile + 1,
+                    },
                     createdAt: now,
                     pass: false,
                     confidence: 0.95,
@@ -587,7 +633,11 @@ export class IterationExecutor {
                     type: EvidenceType.TEST_RESULT,
                     outcome: EvidenceOutcome.FAIL,
                     summary: `[AUTO-TEST FAILURE] in ${writtenFilePath}: ${testResult.summary}`,
-                    data: { file: writtenFilePath, testResult, retryCount: priorCorrectionsForFile + 1 },
+                    data: {
+                      file: writtenFilePath,
+                      testResult,
+                      retryCount: priorCorrectionsForFile + 1,
+                    },
                     createdAt: now,
                     pass: false,
                     confidence: 0.95,
@@ -617,7 +667,9 @@ export class IterationExecutor {
     const hasTestRunAction = actionProposals.some((p) => {
       if (p.type === ActionType.TEST_RUN) return true;
       const desc = p.description.toLowerCase();
-      const cmd = String(p.parameters['cmd'] ?? p.parameters['command'] ?? p.parameters['input'] ?? '').toLowerCase();
+      const cmd = String(
+        p.parameters['cmd'] ?? p.parameters['command'] ?? p.parameters['input'] ?? '',
+      ).toLowerCase();
       return desc.includes('test') || cmd.includes('test');
     });
 
@@ -659,9 +711,11 @@ export class IterationExecutor {
           outcome: isPassed
             ? EvidenceOutcome.PASS
             : isInconclusive
-            ? EvidenceOutcome.INCONCLUSIVE
-            : EvidenceOutcome.FAIL,
-          summary: vResult.summary ?? (isPassed ? 'Verification Suite Passed' : 'Verification Suite Failed'),
+              ? EvidenceOutcome.INCONCLUSIVE
+              : EvidenceOutcome.FAIL,
+          summary:
+            vResult.summary ??
+            (isPassed ? 'Verification Suite Passed' : 'Verification Suite Failed'),
           data: { status: vResult.status },
           createdAt: now,
           pass: isPassed,
@@ -738,9 +792,15 @@ export class IterationExecutor {
     // -----------------------------------------------------------------------
     // PHASE 9: DERIVED STATE TRANSITION (STRICT RESULTS-BASED)
     // -----------------------------------------------------------------------
-    const hasFailingEvidence = evidenceCreated.some((e) => !e.pass && e.outcome === EvidenceOutcome.FAIL);
-    const hasInconclusiveEvidence = evidenceCreated.some((e) => e.outcome === EvidenceOutcome.INCONCLUSIVE);
-    const hasPassedEvidence = evidenceCreated.some((e) => e.pass && e.outcome === EvidenceOutcome.PASS);
+    const hasFailingEvidence = evidenceCreated.some(
+      (e) => !e.pass && e.outcome === EvidenceOutcome.FAIL,
+    );
+    const hasInconclusiveEvidence = evidenceCreated.some(
+      (e) => e.outcome === EvidenceOutcome.INCONCLUSIVE,
+    );
+    const hasPassedEvidence = evidenceCreated.some(
+      (e) => e.pass && e.outcome === EvidenceOutcome.PASS,
+    );
 
     const hasFileWriteAction = actionProposals.some((p) => {
       if (p.type === ActionType.FILE_WRITE || p.type === ActionType.FILE_DELETE) return true;
@@ -822,8 +882,17 @@ export class IterationExecutor {
         });
 
         // Cascade transition to DONE if verification passed or non-verification task is completed
-        if (!goal.constraints.requireVerification && isStoppingWithoutTools && !hasFailingTool && !hasFailingEvidence && !hasInconclusiveEvidence) {
-          while ((stateMachine.phase as AgentPhase) !== AgentPhase.DONE && !stateMachine.isTerminal) {
+        if (
+          !goal.constraints.requireVerification &&
+          isStoppingWithoutTools &&
+          !hasFailingTool &&
+          !hasFailingEvidence &&
+          !hasInconclusiveEvidence
+        ) {
+          while (
+            (stateMachine.phase as AgentPhase) !== AgentPhase.DONE &&
+            !stateMachine.isTerminal
+          ) {
             const currentPhase = stateMachine.phase as AgentPhase;
             if (currentPhase === AgentPhase.EXPLORE) {
               stateMachine.apply(StateEvent.EXPLORE_COMPLETE);
@@ -842,7 +911,10 @@ export class IterationExecutor {
               break;
             }
           }
-        } else if ((stateMachine.phase as AgentPhase) === AgentPhase.VERIFY && evidenceCreated.length > 0) {
+        } else if (
+          (stateMachine.phase as AgentPhase) === AgentPhase.VERIFY &&
+          evidenceCreated.length > 0
+        ) {
           if (hasPassedEvidence && !hasFailingEvidence && !hasInconclusiveEvidence) {
             const passedEvIds = evidenceCreated.filter((e) => e.pass).map((e) => e.id);
             if (passedEvIds.length > 0) {
@@ -857,7 +929,10 @@ export class IterationExecutor {
           }
         }
       } catch {
-        if (stateMachine.phase === AgentPhase.REPAIR && (hasFailingEvidence || hasInconclusiveEvidence)) {
+        if (
+          stateMachine.phase === AgentPhase.REPAIR &&
+          (hasFailingEvidence || hasInconclusiveEvidence)
+        ) {
           try {
             stateMachine.apply(StateEvent.ESCALATE);
           } catch {
@@ -884,19 +959,24 @@ export class IterationExecutor {
     const currentCost = totalCostDollars + modelResponse.estimatedCostDollars;
     const failingEvidenceIds = evidenceCreated.filter((e) => !e.pass).map((e) => e.id);
 
-    const iterationOutcome = hasFailingEvidence || hasFailingTool
-      ? IterationOutcome.VERIFICATION_FAILED
-      : (hasPassedEvidence ? IterationOutcome.VERIFICATION_PASSED : IterationOutcome.PROGRESS);
+    const iterationOutcome =
+      hasFailingEvidence || hasFailingTool
+        ? IterationOutcome.VERIFICATION_FAILED
+        : hasPassedEvidence
+          ? IterationOutcome.VERIFICATION_PASSED
+          : IterationOutcome.PROGRESS;
 
-    const iterationModels: Iteration[] = iterationsSoFar.map((rec) =>
-      rec.iterationModel ?? buildIterationDomainModel(rec, task.id),
+    const iterationModels: Iteration[] = iterationsSoFar.map(
+      (rec) => rec.iterationModel ?? buildIterationDomainModel(rec, task.id),
     );
 
     const filesModified = toolResults
       .map((r) => String(r.metadata['path'] ?? ''))
       .filter((p) => p.length > 0);
 
-    const failingTool = toolResults.find((r) => r.status === ActionResultStatus.FAILURE || r.status === ActionResultStatus.DENIED);
+    const failingTool = toolResults.find(
+      (r) => r.status === ActionResultStatus.FAILURE || r.status === ActionResultStatus.DENIED,
+    );
     const toolFailureSignature = failingTool
       ? `${failingTool.metadata['toolName'] ?? 'tool'}:${failingTool.metadata['errorCode'] ?? failingTool.status}`
       : null;
@@ -908,9 +988,12 @@ export class IterationExecutor {
       outcome: iterationOutcome,
       fingerprint: {
         filesModified,
-        hypothesisId: (actionProposals[0]?.id ? (actionProposals[0].id as unknown as HypothesisId) : null),
+        hypothesisId: actionProposals[0]?.id
+          ? (actionProposals[0].id as unknown as HypothesisId)
+          : null,
         errorSignature: hasFailingEvidence ? `ERR_VERIFICATION_SEQ_${sequenceNumber}` : null,
-        patchSignature: filesModified.length > 0 ? `patch-${filesModified.join(',')}-${sequenceNumber}` : null,
+        patchSignature:
+          filesModified.length > 0 ? `patch-${filesModified.join(',')}-${sequenceNumber}` : null,
         failingTests: failingEvidenceIds,
         phaseAtStart: stateBefore,
         stateTrajectory: stateBefore === stateAfter ? [stateBefore] : [stateBefore, stateAfter],
@@ -944,7 +1027,9 @@ export class IterationExecutor {
         priorEvidenceCount,
       },
       context: {
-        compiledTokens: compilationResult.metrics.tokensAfter ?? compilationResult.compiledContext.totalTokenEstimate,
+        compiledTokens:
+          compilationResult.metrics.tokensAfter ??
+          compilationResult.compiledContext.totalTokenEstimate,
         entriesCount: compilationResult.compiledContext.entries.length,
       },
       modelDecision: {
@@ -1061,7 +1146,8 @@ async function executeSingleProposalWithPolicy(
         listTools: (cat?: any) => params.toolExecutor?.listTools(cat) ?? [],
         validateInput: (name: string, _inp: Record<string, unknown>) => {
           const t = params.toolExecutor?.getTool(name);
-          if (!t) return { valid: false, errors: [`Tool [${name}] is not registered in ToolRegistry`] };
+          if (!t)
+            return { valid: false, errors: [`Tool [${name}] is not registered in ToolRegistry`] };
           return { valid: true };
         },
       }
@@ -1142,7 +1228,13 @@ async function executeSingleProposalWithPolicy(
         durationMs: 0,
         error: errorPayload,
         executedAt: clock.now(),
-        metadata: { toolCallId, toolName, ruleId: evaluation.ruleId, errorCode: 'POLICY_DENIED', outcome: 'POLICY_DENIED' },
+        metadata: {
+          toolCallId,
+          toolName,
+          ruleId: evaluation.ruleId,
+          errorCode: 'POLICY_DENIED',
+          outcome: 'POLICY_DENIED',
+        },
       };
     }
 
@@ -1162,7 +1254,13 @@ async function executeSingleProposalWithPolicy(
         durationMs: 0,
         error: errorPayload,
         executedAt: clock.now(),
-        metadata: { toolCallId, toolName, ruleId: evaluation.ruleId, errorCode: 'REQUIRES_APPROVAL', outcome: 'REQUIRES_APPROVAL' },
+        metadata: {
+          toolCallId,
+          toolName,
+          ruleId: evaluation.ruleId,
+          errorCode: 'REQUIRES_APPROVAL',
+          outcome: 'REQUIRES_APPROVAL',
+        },
       };
     }
   }
@@ -1175,13 +1273,13 @@ async function executeSingleProposalWithPolicy(
 
     const outputContent = result.success
       ? result.output
-      : (result.error && result.error.startsWith('{')
-          ? result.error
-          : JSON.stringify({
-              success: false,
-              errorCode: (result.metadata?.['errorCode'] as string) ?? 'TOOL_EXECUTION_FAILED',
-              message: result.error ?? 'Tool execution failed',
-            }));
+      : result.error && result.error.startsWith('{')
+        ? result.error
+        : JSON.stringify({
+            success: false,
+            errorCode: (result.metadata?.['errorCode'] as string) ?? 'TOOL_EXECUTION_FAILED',
+            message: result.error ?? 'Tool execution failed',
+          });
 
     return {
       actionId: proposal.id,
@@ -1210,21 +1308,19 @@ async function executeSingleProposalWithPolicy(
   }
 }
 
-function buildIterationDomainModel(
-  rec: IterationRecord,
-  taskId: TaskId,
-): Iteration {
+function buildIterationDomainModel(rec: IterationRecord, taskId: TaskId): Iteration {
   const hasFailingEvidence = rec.evidenceCreated.some((e) => !e.pass);
   const hasPassedEvidence = rec.evidenceCreated.some((e) => e.pass);
   const hasFailingTool = rec.toolResults.some(
     (t) => t.status === ActionResultStatus.FAILURE || t.status === ActionResultStatus.DENIED,
   );
 
-  const outcome = hasFailingEvidence || hasFailingTool
-    ? IterationOutcome.VERIFICATION_FAILED
-    : hasPassedEvidence
-    ? IterationOutcome.VERIFICATION_PASSED
-    : IterationOutcome.PROGRESS;
+  const outcome =
+    hasFailingEvidence || hasFailingTool
+      ? IterationOutcome.VERIFICATION_FAILED
+      : hasPassedEvidence
+        ? IterationOutcome.VERIFICATION_PASSED
+        : IterationOutcome.PROGRESS;
 
   const filesModified = rec.toolResults
     .map((r) => String(r.metadata['path'] ?? ''))
@@ -1238,9 +1334,8 @@ function buildIterationDomainModel(
     : null;
 
   const failingTests = rec.evidenceCreated.filter((e) => !e.pass).map((e) => e.id as string);
-  const patchSignature = filesModified.length > 0
-    ? `patch-${filesModified.join(',')}-${rec.sequenceNumber}`
-    : null;
+  const patchSignature =
+    filesModified.length > 0 ? `patch-${filesModified.join(',')}-${rec.sequenceNumber}` : null;
 
   return {
     id: rec.iterationId,
@@ -1249,16 +1344,21 @@ function buildIterationDomainModel(
     outcome,
     fingerprint: {
       filesModified,
-      hypothesisId: (rec.actionProposed?.id ? (rec.actionProposed.id as unknown as HypothesisId) : null),
+      hypothesisId: rec.actionProposed?.id
+        ? (rec.actionProposed.id as unknown as HypothesisId)
+        : null,
       errorSignature: hasFailingEvidence ? `ERR_VERIFICATION_SEQ_${rec.sequenceNumber}` : null,
       patchSignature,
       failingTests,
       phaseAtStart: rec.stateBefore,
-      stateTrajectory: rec.stateBefore === rec.stateAfter ? [rec.stateBefore] : [rec.stateBefore, rec.stateAfter],
+      stateTrajectory:
+        rec.stateBefore === rec.stateAfter ? [rec.stateBefore] : [rec.stateBefore, rec.stateAfter],
       toolFailureSignature,
     },
     evidenceIds: rec.evidenceCreated.map((e) => e.id),
-    actionIds: (rec.actionProposals ?? (rec.actionProposed ? [rec.actionProposed] : [])).map((a) => a.id),
+    actionIds: (rec.actionProposals ?? (rec.actionProposed ? [rec.actionProposed] : [])).map(
+      (a) => a.id,
+    ),
     startedAt: rec.startedAt,
     completedAt: rec.completedAt,
     durationMs: rec.completedAt.getTime() - rec.startedAt.getTime(),
@@ -1266,4 +1366,3 @@ function buildIterationDomainModel(
     metadata: {},
   };
 }
-

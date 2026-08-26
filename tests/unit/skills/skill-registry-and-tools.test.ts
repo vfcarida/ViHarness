@@ -96,7 +96,10 @@ describe('Skill Registry, Tools & Self-Modification (DSH & Hermes) — P007', ()
 
     // Write a markdown skill file
     const mdPath = path.join(skillsDir, 'fast-verify.md');
-    fs.writeFileSync(mdPath, '# Fast Test Verification\n\nRun single test files using vitest run path/to/file.test.ts.');
+    fs.writeFileSync(
+      mdPath,
+      '# Fast Test Verification\n\nRun single test files using vitest run path/to/file.test.ts.',
+    );
 
     // Write a package.json with viHarness.skills
     const pkgPath = path.join(tempDir, 'package.json');
@@ -165,13 +168,19 @@ describe('Skill Registry, Tools & Self-Modification (DSH & Hermes) — P007', ()
     const tool = createLoadSkillTool(registry, registry);
 
     // Test successful load
-    const result = await tool.execute({ name: 'database_index_rule' }, { correlationId: 'test_call' });
+    const result = await tool.execute(
+      { name: 'database_index_rule' },
+      { correlationId: 'test_call' },
+    );
     expect(result.success).toBe(true);
     expect(result.output).toContain('CREATE INDEX ON');
     expect(registry.listMounted()).toContain('database_index_rule');
 
     // Test missing skill
-    const missingResult = await tool.execute({ name: 'non_existent_skill' }, { correlationId: 'test_call' });
+    const missingResult = await tool.execute(
+      { name: 'non_existent_skill' },
+      { correlationId: 'test_call' },
+    );
     expect(missingResult.success).toBe(false);
     expect(missingResult.error).toContain('not found');
   });

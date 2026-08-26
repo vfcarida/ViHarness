@@ -41,7 +41,9 @@ export class AcceptanceEvaluator {
 
     // 2. Zero Regressions Check
     if (policy.zeroRegressionsRequired && regressions.length > 0) {
-      missingRequirements.push(`Zero regressions required, but ${regressions.length} regression(s) detected`);
+      missingRequirements.push(
+        `Zero regressions required, but ${regressions.length} regression(s) detected`,
+      );
       for (const reg of regressions) {
         const failEv = evidence.find((e) => e.id === reg.currentFailEvidenceId);
         if (failEv) regressionsDetected.push(failEv);
@@ -50,10 +52,14 @@ export class AcceptanceEvaluator {
 
     // 3. Unresolved Policy Violations Check
     const unresolvedPolicy = policyDecisions.filter(
-      (d) => d.decision === PolicyDecisionType.DENY || d.decision === PolicyDecisionType.REQUIRE_APPROVAL,
+      (d) =>
+        d.decision === PolicyDecisionType.DENY ||
+        d.decision === PolicyDecisionType.REQUIRE_APPROVAL,
     );
     if (unresolvedPolicy.length > 0) {
-      missingRequirements.push(`Task has ${unresolvedPolicy.length} unresolved policy violation(s) or pending approval(s)`);
+      missingRequirements.push(
+        `Task has ${unresolvedPolicy.length} unresolved policy violation(s) or pending approval(s)`,
+      );
     }
 
     // 4. Confidence Threshold Check
@@ -61,10 +67,13 @@ export class AcceptanceEvaluator {
     if (passEvidence.length === 0) {
       missingRequirements.push('No passing verification evidence recorded');
     } else {
-      const avgConfidence = passEvidence.reduce((acc, e) => acc + (e.confidence ?? 0.8), 0) / passEvidence.length;
+      const avgConfidence =
+        passEvidence.reduce((acc, e) => acc + (e.confidence ?? 0.8), 0) / passEvidence.length;
       const minConfidence = policy.minConfidence ?? 0.8;
       if (avgConfidence < minConfidence) {
-        missingRequirements.push(`Evidence confidence (${avgConfidence.toFixed(2)}) below required threshold (${minConfidence})`);
+        missingRequirements.push(
+          `Evidence confidence (${avgConfidence.toFixed(2)}) below required threshold (${minConfidence})`,
+        );
       }
     }
 

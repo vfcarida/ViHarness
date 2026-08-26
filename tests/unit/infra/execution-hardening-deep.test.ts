@@ -36,12 +36,7 @@ import {
   validateTransition,
   validateTransitionOrThrow,
 } from '../../../src/core/index.js';
-import type {
-  Goal,
-  Tool,
-  ToolExecutionRequest,
-  PolicyRule,
-} from '../../../src/core/index.js';
+import type { Goal, Tool, ToolExecutionRequest, PolicyRule } from '../../../src/core/index.js';
 import { DefaultAgentRuntime } from '../../../src/runtime/default-agent-runtime.js';
 
 describe('Execution Hardening Deep Suite', () => {
@@ -118,7 +113,9 @@ describe('Execution Hardening Deep Suite', () => {
       expect(iter1!.toolResults[0]!.metadata?.['errorCode']).toBe('UNKNOWN_TOOL');
 
       // Verify explicit failure evidence was recorded
-      expect(iter1!.evidenceCreated.some((e) => !e.pass && e.outcome === EvidenceOutcome.FAIL)).toBe(true);
+      expect(
+        iter1!.evidenceCreated.some((e) => !e.pass && e.outcome === EvidenceOutcome.FAIL),
+      ).toBe(true);
 
       // Verify state was NOT falsely advanced to PLAN or IMPLEMENT during the failed tool iteration
       expect(iter1!.phases.observation.stateBefore).toBe(AgentPhase.INIT);
@@ -194,7 +191,11 @@ describe('Execution Hardening Deep Suite', () => {
       expect(result.success).toBe(false);
       const evList = await evidenceStore.listForTask(result.taskId);
       expect(evList.some((e) => e.outcome === EvidenceOutcome.INCONCLUSIVE && !e.pass)).toBe(true);
-      expect(result.iterations[0]!.evidenceCreated.some((e) => e.outcome === EvidenceOutcome.INCONCLUSIVE)).toBe(true);
+      expect(
+        result.iterations[0]!.evidenceCreated.some(
+          (e) => e.outcome === EvidenceOutcome.INCONCLUSIVE,
+        ),
+      ).toBe(true);
     });
 
     it('DefaultVerificationEngine should return INCONCLUSIVE when verification check crashes or times out', async () => {
@@ -245,7 +246,10 @@ describe('Execution Hardening Deep Suite', () => {
         description: 'Blocks all system inspection tools',
         priority: 100,
         evaluate: (action) => {
-          if (action.resource.includes('inspect_system') || (action.metadata as any)?.['toolName'] === 'inspect_system') {
+          if (
+            action.resource.includes('inspect_system') ||
+            (action.metadata as any)?.['toolName'] === 'inspect_system'
+          ) {
             return {
               decision: PolicyDecisionType.DENY,
               reason: 'Inspection of system components is strictly prohibited by security policy',
@@ -281,9 +285,15 @@ describe('Execution Hardening Deep Suite', () => {
   describe('Pillar 4: Strict State Flow Hardening', () => {
     it('should reject LLM emission of runtime-only events (MARK_DONE, VERIFICATION_PASSED, OSCILLATION_FOUND)', () => {
       expect(validateTransition(AgentPhase.VERIFY, StateEvent.MARK_DONE, true).valid).toBe(false);
-      expect(validateTransition(AgentPhase.VERIFY, StateEvent.VERIFICATION_PASSED, true).valid).toBe(false);
-      expect(validateTransition(AgentPhase.REPAIR, StateEvent.OSCILLATION_FOUND, true).valid).toBe(false);
-      expect(validateTransition(AgentPhase.IMPLEMENT, StateEvent.BUDGET_EXHAUSTED, true).valid).toBe(false);
+      expect(
+        validateTransition(AgentPhase.VERIFY, StateEvent.VERIFICATION_PASSED, true).valid,
+      ).toBe(false);
+      expect(validateTransition(AgentPhase.REPAIR, StateEvent.OSCILLATION_FOUND, true).valid).toBe(
+        false,
+      );
+      expect(
+        validateTransition(AgentPhase.IMPLEMENT, StateEvent.BUDGET_EXHAUSTED, true).valid,
+      ).toBe(false);
     });
 
     it('should reject transition to DONE without valid evidenceIds in automated path', () => {
@@ -296,9 +306,9 @@ describe('Execution Hardening Deep Suite', () => {
       });
 
       // Trying to transition to DONE with empty evidenceIds
-      expect(() =>
-        sm.apply(StateEvent.VERIFICATION_PASSED, { evidenceIds: [] }),
-      ).toThrow(HarnessError);
+      expect(() => sm.apply(StateEvent.VERIFICATION_PASSED, { evidenceIds: [] })).toThrow(
+        HarnessError,
+      );
 
       try {
         sm.apply(StateEvent.VERIFICATION_PASSED, { evidenceIds: [] });
@@ -308,9 +318,15 @@ describe('Execution Hardening Deep Suite', () => {
     });
 
     it('should reject invalid direct transitions (e.g. INIT -> DONE, EXPLORE -> DONE, IMPLEMENT -> DONE)', () => {
-      expect(() => validateTransitionOrThrow(AgentPhase.INIT, StateEvent.MARK_DONE)).toThrow(HarnessError);
-      expect(() => validateTransitionOrThrow(AgentPhase.EXPLORE, StateEvent.MARK_DONE)).toThrow(HarnessError);
-      expect(() => validateTransitionOrThrow(AgentPhase.IMPLEMENT, StateEvent.MARK_DONE)).toThrow(HarnessError);
+      expect(() => validateTransitionOrThrow(AgentPhase.INIT, StateEvent.MARK_DONE)).toThrow(
+        HarnessError,
+      );
+      expect(() => validateTransitionOrThrow(AgentPhase.EXPLORE, StateEvent.MARK_DONE)).toThrow(
+        HarnessError,
+      );
+      expect(() => validateTransitionOrThrow(AgentPhase.IMPLEMENT, StateEvent.MARK_DONE)).toThrow(
+        HarnessError,
+      );
     });
   });
 });

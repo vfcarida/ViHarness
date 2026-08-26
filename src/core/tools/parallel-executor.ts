@@ -6,10 +6,21 @@
  * executing consecutive safe tools concurrently up to `maxParallelToolCalls` while
  * enforcing strict sequential ordering for state-mutating tools.
  */
-import type { ToolCall, ToolResult, ToolDefinition, ToolExecutionContext } from '../model/tool-types.js';
+import type {
+  ToolCall,
+  ToolResult,
+  ToolDefinition,
+  ToolExecutionContext,
+} from '../model/tool-types.js';
 import type { ToolRegistry } from '../interfaces/tool-registry.js';
 import type { ToolCallId } from '../types/identifiers.js';
-import { type SpillStore, type SpillPolicy, DEFAULT_SPILL_POLICY, defaultSpillStore, createSpillPreview } from './spill/index.js';
+import {
+  type SpillStore,
+  type SpillPolicy,
+  DEFAULT_SPILL_POLICY,
+  defaultSpillStore,
+  createSpillPreview,
+} from './spill/index.js';
 import { DefaultToolRunContext } from './deferred-context.js';
 
 export interface ParallelConfig {
@@ -44,10 +55,7 @@ export class ParallelToolExecutor {
   private readonly registry: ToolRegistry;
   private readonly defaultExecutor?: any;
 
-  constructor(
-    registryOrDefaultExecutor: any,
-    optionsOrRegistry?: any,
-  ) {
+  constructor(registryOrDefaultExecutor: any, optionsOrRegistry?: any) {
     if (optionsOrRegistry && typeof optionsOrRegistry.getTool === 'function') {
       // Called as: new ParallelToolExecutor(defaultExecutor, registry)
       this.defaultExecutor = registryOrDefaultExecutor;
@@ -121,14 +129,26 @@ export class ParallelToolExecutor {
         // Execute all calls in parallel concurrently
         await Promise.all(
           group.calls.map(async ({ call, originalIndex }) => {
-            const res = await this.executeSingleCall(call, sessionId, spillPolicy, spillStore, options.signal);
+            const res = await this.executeSingleCall(
+              call,
+              sessionId,
+              spillPolicy,
+              spillStore,
+              options.signal,
+            );
             results[originalIndex] = res;
           }),
         );
       } else {
         // Exclusive barrier: run sequentially
         const item = group.calls[0]!;
-        const res = await this.executeSingleCall(item.call, sessionId, spillPolicy, spillStore, options.signal);
+        const res = await this.executeSingleCall(
+          item.call,
+          sessionId,
+          spillPolicy,
+          spillStore,
+          options.signal,
+        );
         results[item.originalIndex] = res;
       }
     }
@@ -144,8 +164,14 @@ export class ParallelToolExecutor {
     context?: Partial<ToolExecutionContext>,
   ): Promise<ReadonlyArray<ToolResult>> {
     if (this.defaultExecutor && typeof this.defaultExecutor.execute === 'function') {
-      const safeCalls: { call: { toolName: string; input: Record<string, unknown> }; index: number }[] = [];
-      const mutatingCalls: { call: { toolName: string; input: Record<string, unknown> }; index: number }[] = [];
+      const safeCalls: {
+        call: { toolName: string; input: Record<string, unknown> };
+        index: number;
+      }[] = [];
+      const mutatingCalls: {
+        call: { toolName: string; input: Record<string, unknown> };
+        index: number;
+      }[] = [];
 
       for (let i = 0; i < calls.length; i++) {
         const call = calls[i]!;
@@ -260,12 +286,11 @@ export class ParallelToolExecutor {
       let executePromise: Promise<ToolResult>;
       if (timeoutMs > 0) {
         executePromise = new Promise<ToolResult>((resolve) => {
-          let timer: NodeJS.Timeout | undefined;
-          const abortTimer = () => {
+          const abortTimer = (): void => {
             if (timer) clearTimeout(timer);
           };
 
-          timer = setTimeout(() => {
+          const timer = setTimeout(() => {
             resolve({
               toolCallId: call.id,
               name: call.name,

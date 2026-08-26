@@ -52,8 +52,8 @@ describe('ArchitectExecutor (Dual-Model Plan -> Execute)', () => {
       maxOutputTokens: 32000,
       supportsSystemPrompt: true,
     },
-    costPer1kInputTokensDollars: 0.020,
-    costPer1kOutputTokensDollars: 0.080,
+    costPer1kInputTokensDollars: 0.02,
+    costPer1kOutputTokensDollars: 0.08,
   };
 
   const editorDescriptor: ModelDescriptor = {
@@ -68,7 +68,7 @@ describe('ArchitectExecutor (Dual-Model Plan -> Execute)', () => {
       supportsSystemPrompt: true,
     },
     costPer1kInputTokensDollars: 0.00015,
-    costPer1kOutputTokensDollars: 0.00060,
+    costPer1kOutputTokensDollars: 0.0006,
   };
 
   const mockToolDef: ToolDefinition = {
@@ -287,21 +287,15 @@ describe('ArchitectExecutor (Dual-Model Plan -> Execute)', () => {
     expect(result.architect.providerId).toBe('architect-provider');
     expect(result.editor.providerId).toBe('editor-provider');
     expect(result.combinedResponse.toolCalls).toHaveLength(1);
-    expect(result.totalCostDollars).toBe(
-      result.architect.costDollars + result.editor.costDollars,
-    );
+    expect(result.totalCostDollars).toBe(result.architect.costDollars + result.editor.costDollars);
 
     // Verify Telemetry Events
-    const planEvent = capturedEvents.find(
-      (e) => e.type === AgentEventType.ArchitectPlanGenerated,
-    );
+    const planEvent = capturedEvents.find((e) => e.type === AgentEventType.ArchitectPlanGenerated);
     expect(planEvent).toBeDefined();
     expect(planEvent.data.plan).toBe(architectPlanText);
     expect(planEvent.data.providerId).toBe('architect-provider');
 
-    const editorEvent = capturedEvents.find(
-      (e) => e.type === AgentEventType.EditorExecuted,
-    );
+    const editorEvent = capturedEvents.find((e) => e.type === AgentEventType.EditorExecuted);
     expect(editorEvent).toBeDefined();
     expect(editorEvent.data.toolCalls).toHaveLength(1);
     expect(editorEvent.data.providerId).toBe('editor-provider');
@@ -333,18 +327,13 @@ describe('ArchitectExecutor (Dual-Model Plan -> Execute)', () => {
     router.registerProvider(architectProvider);
 
     const preStepState = {};
-    const listener = ArchitectExecutor.createPreStepListener(
-      router,
-      sampleGoal,
-      sampleTask,
-      {
-        dualModelConfig: {
-          architectProviderId: 'architect-provider',
-          architectModelId: 'o3-architect',
-        },
-        state: preStepState,
+    const listener = ArchitectExecutor.createPreStepListener(router, sampleGoal, sampleTask, {
+      dualModelConfig: {
+        architectProviderId: 'architect-provider',
+        architectModelId: 'o3-architect',
       },
-    );
+      state: preStepState,
+    });
 
     // Step 1: Generates plan and injects
     const step1Decision = await listener({
@@ -355,9 +344,7 @@ describe('ArchitectExecutor (Dual-Model Plan -> Execute)', () => {
 
     expect(step1Decision.kind).toBe('enter');
     if (step1Decision.kind === 'enter') {
-      const planMsg = step1Decision.messages.find((m) =>
-        m.content.includes('[ARCHITECT PLAN]'),
-      );
+      const planMsg = step1Decision.messages.find((m) => m.content.includes('[ARCHITECT PLAN]'));
       expect(planMsg).toBeDefined();
       expect(planMsg?.content).toContain(architectPlanText);
     }
@@ -371,9 +358,7 @@ describe('ArchitectExecutor (Dual-Model Plan -> Execute)', () => {
 
     expect(step2Decision.kind).toBe('enter');
     if (step2Decision.kind === 'enter') {
-      const planMsg = step2Decision.messages.find((m) =>
-        m.content.includes('[ARCHITECT PLAN]'),
-      );
+      const planMsg = step2Decision.messages.find((m) => m.content.includes('[ARCHITECT PLAN]'));
       expect(planMsg).toBeDefined();
       expect(planMsg?.content).toContain(architectPlanText);
     }

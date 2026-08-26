@@ -11,7 +11,10 @@
  */
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
-import type { VerificationEngine, VerificationTarget } from '../../core/interfaces/verification-engine.js';
+import type {
+  VerificationEngine,
+  VerificationTarget,
+} from '../../core/interfaces/verification-engine.js';
 import type { EvidenceStore } from '../../core/interfaces/evidence-store.js';
 import type { IdFactory, TaskId, EvidenceId } from '../../core/types/identifiers.js';
 import type { Clock } from '../../core/interfaces/clock.js';
@@ -21,10 +24,7 @@ import type {
   VerificationResult,
   VerificationSuite,
 } from '../../core/model/verification.js';
-import {
-  VerificationProfile,
-  VerificationStatus,
-} from '../../core/model/verification.js';
+import { VerificationProfile, VerificationStatus } from '../../core/model/verification.js';
 import type { Evidence } from '../../core/model/evidence.js';
 import { EvidenceOutcome, EvidenceType } from '../../core/model/evidence.js';
 import type { Regression } from '../../core/model/regression.js';
@@ -64,22 +64,53 @@ export class DefaultVerificationEngine implements VerificationEngine {
       target.type === 'command' ||
       target.type === 'script' ||
       target.type === 'shell' ||
-      (typeof target.content === 'string' && /^(node|npm|npx|bash|sh|python|cmd|echo|exit)\b/i.test(target.content.trim()));
+      (typeof target.content === 'string' &&
+        /^(node|npm|npx|bash|sh|python|cmd|echo|exit)\b/i.test(target.content.trim()));
 
     if (!isExplicitCommand) {
-      const targetContent = String(target.content ?? target.path ?? target.type ?? '').toLowerCase();
-      const isFailing = targetContent.includes('fail') || targetContent === 'error' || targetContent.startsWith('error:');
-      const isInconclusive = targetContent.includes('flaky') || targetContent.includes('inconclusive');
+      const targetContent = String(
+        target.content ?? target.path ?? target.type ?? '',
+      ).toLowerCase();
+      const isFailing =
+        targetContent.includes('fail') ||
+        targetContent === 'error' ||
+        targetContent.startsWith('error:');
+      const isInconclusive =
+        targetContent.includes('flaky') || targetContent.includes('inconclusive');
       const isWarning = targetContent.includes('warn');
 
       if (isFailing) {
-        return this.createDirectResult(target, profile, taskId, now, startTime, VerificationStatus.FAILED, 0.10);
+        return this.createDirectResult(
+          target,
+          profile,
+          taskId,
+          now,
+          startTime,
+          VerificationStatus.FAILED,
+          0.1,
+        );
       }
       if (isInconclusive) {
-        return this.createDirectResult(target, profile, taskId, now, startTime, VerificationStatus.INCONCLUSIVE, 0.50);
+        return this.createDirectResult(
+          target,
+          profile,
+          taskId,
+          now,
+          startTime,
+          VerificationStatus.INCONCLUSIVE,
+          0.5,
+        );
       }
       if (isWarning) {
-        return this.createDirectResult(target, profile, taskId, now, startTime, VerificationStatus.WARNING, 0.75);
+        return this.createDirectResult(
+          target,
+          profile,
+          taskId,
+          now,
+          startTime,
+          VerificationStatus.WARNING,
+          0.75,
+        );
       }
     }
 
@@ -143,14 +174,15 @@ export class DefaultVerificationEngine implements VerificationEngine {
       const evidence: Evidence = {
         id: evId,
         taskId,
-        type: check.category === 'unit-test' || check.category === 'integration-test'
-          ? EvidenceType.TEST_RESULT
-          : EvidenceType.VERIFICATION,
+        type:
+          check.category === 'unit-test' || check.category === 'integration-test'
+            ? EvidenceType.TEST_RESULT
+            : EvidenceType.VERIFICATION,
         outcome: pass
           ? EvidenceOutcome.PASS
           : execution.status === VerificationStatus.INCONCLUSIVE
-          ? EvidenceOutcome.INCONCLUSIVE
-          : EvidenceOutcome.FAIL,
+            ? EvidenceOutcome.INCONCLUSIVE
+            : EvidenceOutcome.FAIL,
         summary: `Check [${check.name}] ${execution.status}: ${execution.actualResult}`,
         data: {
           checkId: check.checkId,
@@ -162,7 +194,7 @@ export class DefaultVerificationEngine implements VerificationEngine {
         createdAt: now,
         pass,
         checkId: check.checkId,
-        confidence: pass ? 0.95 : 0.20,
+        confidence: pass ? 0.95 : 0.2,
         affectedFiles: target.path ? [target.path] : [],
       };
 
@@ -172,9 +204,10 @@ export class DefaultVerificationEngine implements VerificationEngine {
     }
 
     const durationMs = Date.now() - startTime;
-    const summary = overallStatus === VerificationStatus.PASSED
-      ? `Verification PASSED (${executions.length} check(s) verified under ${profile} profile)`
-      : `Verification ${overallStatus} (${executions.filter((e) => e.status !== VerificationStatus.PASSED).length} check(s) failed/inconclusive under ${profile} profile)`;
+    const summary =
+      overallStatus === VerificationStatus.PASSED
+        ? `Verification PASSED (${executions.length} check(s) verified under ${profile} profile)`
+        : `Verification ${overallStatus} (${executions.filter((e) => e.status !== VerificationStatus.PASSED).length} check(s) failed/inconclusive under ${profile} profile)`;
 
     return {
       status: overallStatus,
@@ -184,7 +217,7 @@ export class DefaultVerificationEngine implements VerificationEngine {
       verifiedAt: now,
       suiteId: `suite-${profile.toLowerCase()}`,
       durationMs,
-      confidence: overallStatus === VerificationStatus.PASSED ? 0.95 : 0.30,
+      confidence: overallStatus === VerificationStatus.PASSED ? 0.95 : 0.3,
       scope: 'repository',
       affectedFiles: target.path ? [target.path] : [],
       checkExecutions: executions,
@@ -214,9 +247,10 @@ export class DefaultVerificationEngine implements VerificationEngine {
       const evidence: Evidence = {
         id: evId,
         taskId,
-        type: check.category === 'unit-test' || check.category === 'integration-test'
-          ? EvidenceType.TEST_RESULT
-          : EvidenceType.VERIFICATION,
+        type:
+          check.category === 'unit-test' || check.category === 'integration-test'
+            ? EvidenceType.TEST_RESULT
+            : EvidenceType.VERIFICATION,
         outcome: pass ? EvidenceOutcome.PASS : EvidenceOutcome.FAIL,
         summary: `Suite check [${check.name}] ${execution.status}`,
         data: {
@@ -228,7 +262,7 @@ export class DefaultVerificationEngine implements VerificationEngine {
         pass,
         checkId: check.checkId,
         suiteId: suite.id,
-        confidence: pass ? 0.95 : 0.10,
+        confidence: pass ? 0.95 : 0.1,
         affectedFiles: check.affectedFiles ?? [],
       };
 
@@ -245,7 +279,7 @@ export class DefaultVerificationEngine implements VerificationEngine {
       verifiedAt: now,
       suiteId: suite.id,
       durationMs: Date.now() - startTime,
-      confidence: overallStatus === VerificationStatus.PASSED ? 0.95 : 0.20,
+      confidence: overallStatus === VerificationStatus.PASSED ? 0.95 : 0.2,
       scope: 'repository',
       affectedFiles: Array.from(new Set(suite.checks.flatMap((c) => c.affectedFiles ?? []))),
       checkExecutions: executions,
@@ -302,13 +336,14 @@ export class DefaultVerificationEngine implements VerificationEngine {
     const evidenceId = this.idFactory.create<'Evidence'>();
     const pass = status === VerificationStatus.PASSED;
 
-    const outcome = status === VerificationStatus.PASSED
-      ? EvidenceOutcome.PASS
-      : status === VerificationStatus.INCONCLUSIVE
-      ? EvidenceOutcome.INCONCLUSIVE
-      : status === VerificationStatus.WARNING
-      ? EvidenceOutcome.WARNING
-      : EvidenceOutcome.FAIL;
+    const outcome =
+      status === VerificationStatus.PASSED
+        ? EvidenceOutcome.PASS
+        : status === VerificationStatus.INCONCLUSIVE
+          ? EvidenceOutcome.INCONCLUSIVE
+          : status === VerificationStatus.WARNING
+            ? EvidenceOutcome.WARNING
+            : EvidenceOutcome.FAIL;
 
     const summary = `Verification ${status} for target [${target.type}] under ${profile} profile`;
 
@@ -371,10 +406,12 @@ export class DefaultVerificationEngine implements VerificationEngine {
       target.type === 'command' ||
       target.type === 'script' ||
       target.type === 'shell' ||
-      (typeof target.content === 'string' && /^(node|npm|npx|bash|sh|python|cmd|echo|exit)\b/i.test(target.content.trim()));
-    const targetCommand = isExplicitCommand && typeof target.content === 'string' && target.content.trim().length > 0
-      ? target.content
-      : undefined;
+      (typeof target.content === 'string' &&
+        /^(node|npm|npx|bash|sh|python|cmd|echo|exit)\b/i.test(target.content.trim()));
+    const targetCommand =
+      isExplicitCommand && typeof target.content === 'string' && target.content.trim().length > 0
+        ? target.content
+        : undefined;
 
     if (targetCommand) {
       return [
@@ -500,9 +537,13 @@ export class DefaultVerificationEngine implements VerificationEngine {
     const timeoutMs = check.timeoutMs ?? (isTestEnv ? 2500 : 30000);
     const now = this.clock.now();
 
-    const commandToRun = (isTestEnv && (check.command.includes('npm test') || check.command.includes('npm run') || check.command.includes('npx tsc')))
-      ? 'node -e "process.exit(0)"'
-      : check.command;
+    const commandToRun =
+      isTestEnv &&
+      (check.command.includes('npm test') ||
+        check.command.includes('npm run') ||
+        check.command.includes('npx tsc'))
+        ? 'node -e "process.exit(0)"'
+        : check.command;
 
     try {
       const { stdout, stderr } = await execAsync(commandToRun, {

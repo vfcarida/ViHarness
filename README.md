@@ -246,7 +246,7 @@ Vi-Harness includes a rich, ANSI-rendered live terminal dashboard:
 
 ```
 ============================================================================
- VI-HARNESS v0.4.0 — DETERMINISTIC CODING AGENT RUNTIME
+ VI-HARNESS v0.1.0 — DETERMINISTIC CODING AGENT RUNTIME
 ============================================================================
  Task ID: task-018f3a9e-7b2c-7000-8000-000000000001
  Goal: Implement HMAC authentication middleware with unit tests.
@@ -576,7 +576,7 @@ If you use Vi-Harness in your research, evaluations, or software engineering pro
   title = {Vi-Harness: Enterprise-Grade, Model-Agnostic Coding-Agent Runtime and Harness},
   year = {2026},
   url = {https://github.com/vfcarida/Vi-Harness},
-  version = {0.4.0}
+  version = {0.1.0}
 }
 ```
 

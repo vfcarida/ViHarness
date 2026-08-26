@@ -130,7 +130,10 @@ export class DefaultBenchmarkRunner implements BenchmarkRunner {
         }
 
         const completedAt = this.clock.now();
-        const latency = Math.max(1, executionResult.duration || (completedAt.getTime() - startedAt.getTime()));
+        const latency = Math.max(
+          1,
+          executionResult.duration || completedAt.getTime() - startedAt.getTime(),
+        );
 
         const runRecord: BenchmarkRun = {
           runId: this.idFactory.create<'Trace'>(),
@@ -267,7 +270,10 @@ export class DefaultBenchmarkRunner implements BenchmarkRunner {
           }
 
           const completedAt = this.clock.now();
-          const latency = Math.max(1, executionResult.duration || (completedAt.getTime() - startedAt.getTime()));
+          const latency = Math.max(
+            1,
+            executionResult.duration || completedAt.getTime() - startedAt.getTime(),
+          );
 
           const runRecord: BenchmarkRun = {
             runId: this.idFactory.create<'Trace'>(),
@@ -334,16 +340,24 @@ export class DefaultBenchmarkRunner implements BenchmarkRunner {
         harnessVersion: adapter.version,
         totalRuns,
         overallSuccessRate,
-        costDistribution: StatisticalCalculator.computeDistribution(runs.map((r) => r.estimatedCost)),
-        iterationDistribution: StatisticalCalculator.computeDistribution(runs.map((r) => r.iterations)),
+        costDistribution: StatisticalCalculator.computeDistribution(
+          runs.map((r) => r.estimatedCost),
+        ),
+        iterationDistribution: StatisticalCalculator.computeDistribution(
+          runs.map((r) => r.iterations),
+        ),
         tokenDistribution: {
           inputTokens: StatisticalCalculator.computeDistribution(runs.map((r) => r.inputTokens)),
           outputTokens: StatisticalCalculator.computeDistribution(runs.map((r) => r.outputTokens)),
           totalTokens: StatisticalCalculator.computeDistribution(runs.map((r) => r.totalTokens)),
         },
         latencyDistribution: StatisticalCalculator.computeDistribution(runs.map((r) => r.latency)),
-        testPassRateDistribution: StatisticalCalculator.computeDistribution(runs.map((r) => r.testPassRate)),
-        regressionsDistribution: StatisticalCalculator.computeDistribution(runs.map((r) => r.regressions)),
+        testPassRateDistribution: StatisticalCalculator.computeDistribution(
+          runs.map((r) => r.testPassRate),
+        ),
+        regressionsDistribution: StatisticalCalculator.computeDistribution(
+          runs.map((r) => r.regressions),
+        ),
       };
     }
 
@@ -366,9 +380,13 @@ export class DefaultBenchmarkRunner implements BenchmarkRunner {
           overallSuccessRate: totalTasks > 0 ? successfulTasks / totalTasks : 1.0,
           avgTestPassRate:
             totalTasks > 0
-              ? flatResults.reduce((acc, r) => acc + (r.correctness?.testPassRate ?? 1.0), 0) / totalTasks
+              ? flatResults.reduce((acc, r) => acc + (r.correctness?.testPassRate ?? 1.0), 0) /
+                totalTasks
               : 1.0,
-          totalTokens: flatResults.reduce((acc, r) => acc + r.tokenDistribution.totalTokens.mean, 0),
+          totalTokens: flatResults.reduce(
+            (acc, r) => acc + r.tokenDistribution.totalTokens.mean,
+            0,
+          ),
           totalCostUSD: flatResults.reduce((acc, r) => acc + r.costDistribution.mean, 0),
           avgIterations:
             totalTasks > 0
@@ -379,7 +397,8 @@ export class DefaultBenchmarkRunner implements BenchmarkRunner {
         },
         variance: {
           stdDevSuccessRate: harnessSummaries[singleAdapterName]?.costDistribution.stdDev ?? 0,
-          stdDevTotalTokens: harnessSummaries[singleAdapterName]?.tokenDistribution.totalTokens.stdDev ?? 0,
+          stdDevTotalTokens:
+            harnessSummaries[singleAdapterName]?.tokenDistribution.totalTokens.stdDev ?? 0,
           stdDevTotalCostUSD: harnessSummaries[singleAdapterName]?.costDistribution.stdDev ?? 0,
         },
         generatedAt: this.clock.now(),
@@ -427,16 +446,26 @@ export class DefaultBenchmarkRunner implements BenchmarkRunner {
     const successfulRuns = runs.filter((r) => r.success).length;
     const successRate = totalRuns > 0 ? successfulRuns / totalRuns : 0;
 
-    const costDistribution = StatisticalCalculator.computeDistribution(runs.map((r) => r.estimatedCost));
-    const iterationDistribution = StatisticalCalculator.computeDistribution(runs.map((r) => r.iterations));
+    const costDistribution = StatisticalCalculator.computeDistribution(
+      runs.map((r) => r.estimatedCost),
+    );
+    const iterationDistribution = StatisticalCalculator.computeDistribution(
+      runs.map((r) => r.iterations),
+    );
     const tokenDistribution = {
       inputTokens: StatisticalCalculator.computeDistribution(runs.map((r) => r.inputTokens)),
       outputTokens: StatisticalCalculator.computeDistribution(runs.map((r) => r.outputTokens)),
       totalTokens: StatisticalCalculator.computeDistribution(runs.map((r) => r.totalTokens)),
     };
-    const latencyDistribution = StatisticalCalculator.computeDistribution(runs.map((r) => r.latency));
-    const testPassRateDistribution = StatisticalCalculator.computeDistribution(runs.map((r) => r.testPassRate));
-    const regressionsDistribution = StatisticalCalculator.computeDistribution(runs.map((r) => r.regressions));
+    const latencyDistribution = StatisticalCalculator.computeDistribution(
+      runs.map((r) => r.latency),
+    );
+    const testPassRateDistribution = StatisticalCalculator.computeDistribution(
+      runs.map((r) => r.testPassRate),
+    );
+    const regressionsDistribution = StatisticalCalculator.computeDistribution(
+      runs.map((r) => r.regressions),
+    );
 
     const metadata = {
       modelId: modelConfig.modelId,
@@ -472,8 +501,14 @@ export class DefaultBenchmarkRunner implements BenchmarkRunner {
         taskSuccess: successRate >= 1.0,
         testPassRate: testPassRateDistribution.mean > 0 ? testPassRateDistribution.mean : 1.0,
         regressionRate: regressionsDistribution.mean,
-        totalTestsRun: Math.max(1, runs.reduce((acc, r) => acc + r.totalTests, 0)),
-        testsPassed: Math.max(1, runs.reduce((acc, r) => acc + r.testsPassed, 0)),
+        totalTestsRun: Math.max(
+          1,
+          runs.reduce((acc, r) => acc + r.totalTests, 0),
+        ),
+        testsPassed: Math.max(
+          1,
+          runs.reduce((acc, r) => acc + r.testsPassed, 0),
+        ),
         regressionsDetected: runs.reduce((acc, r) => acc + r.regressions, 0),
       },
       efficiency: {

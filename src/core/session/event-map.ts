@@ -115,9 +115,9 @@ export interface SessionEventMap {
   'compaction/summary': CompactionSummaryData;
   'compaction/end': { readonly turn: number | null; readonly error?: string };
   'goal/change': GoalChangeData;
-  'user_message'?: UserMessage | { content: string; [key: string]: unknown };
-  'agent_message'?: AssistantMessage | { content: string; [key: string]: unknown };
-  'custom'?: Record<string, unknown>;
+  user_message?: UserMessage | { content: string; [key: string]: unknown };
+  agent_message?: AssistantMessage | { content: string; [key: string]: unknown };
+  custom?: Record<string, unknown>;
   [key: string]: any;
 }
 

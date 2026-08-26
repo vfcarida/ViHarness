@@ -143,7 +143,8 @@ export class ViContextCompilerStrategy implements ContextBenchmarkStrategy {
       id: this.idFactory.create<'Context'>(),
       tier: ContextTier.L0_HOT,
       type: ContextObjectType.USER_INSTRUCTION,
-      content: 'SYSTEM DIRECTIVE: Vi-Harness Tiered Context Management. Preserve invariants and eliminate bloat.',
+      content:
+        'SYSTEM DIRECTIVE: Vi-Harness Tiered Context Management. Preserve invariants and eliminate bloat.',
       source: 'system',
       timestamp: now,
       importance: 1.0,
@@ -268,7 +269,7 @@ export class ViContextCompilerStrategy implements ContextBenchmarkStrategy {
         content: step.content,
         source: 'agent',
         timestamp: now,
-        importance: 0.10,
+        importance: 0.1,
         confidence: 0.2,
         scope: ContextScope.TASK,
         dependencies: [],
@@ -291,7 +292,7 @@ export class ViContextCompilerStrategy implements ContextBenchmarkStrategy {
         content: step.content,
         source: 'agent',
         timestamp: now,
-        importance: 0.70,
+        importance: 0.7,
         confidence: 0.95,
         scope: ContextScope.TASK,
         dependencies: [],
@@ -318,7 +319,9 @@ export class ViContextCompilerStrategy implements ContextBenchmarkStrategy {
       },
     });
 
-    this.currentCompiledText = compilationResult.compiledContext.entries.map((e) => e.content).join('\n\n');
+    this.currentCompiledText = compilationResult.compiledContext.entries
+      .map((e) => e.content)
+      .join('\n\n');
     this.currentTokenCount = compilationResult.metrics.tokensAfter;
 
     return {

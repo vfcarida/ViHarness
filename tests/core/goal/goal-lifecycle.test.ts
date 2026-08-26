@@ -28,11 +28,7 @@ import {
   AgentPhase,
   TerminationReason,
 } from '../../../src/core/index.js';
-import type {
-  GoalChangeEvent,
-  TokenAttribution,
-  LifecycleGoal,
-} from '../../../src/core/index.js';
+import type { GoalChangeEvent, TokenAttribution, LifecycleGoal } from '../../../src/core/index.js';
 import { UuidV7IdFactory, TestClock } from '../../../src/infra/index.js';
 
 describe('Event-Sourced Goal Lifecycle + Token Budgets + Attribution (P006)', () => {
@@ -473,7 +469,10 @@ describe('Event-Sourced Goal Lifecycle + Token Budgets + Attribution (P006)', ()
 
       const goal = service.create('agent-1', { description: 'Event task' });
       const edited = service.edit({ id: goal.id, revision: 1 }, { tokenBudget: 25000 });
-      const used = service.recordUsage({ id: goal.id, revision: edited.revision }, { tokens: 500, cost: 0.01 });
+      const used = service.recordUsage(
+        { id: goal.id, revision: edited.revision },
+        { tokens: 500, cost: 0.01 },
+      );
       service.complete({ id: goal.id, revision: used.revision });
 
       expect(events).toHaveLength(4);
@@ -613,7 +612,7 @@ describe('Event-Sourced Goal Lifecycle + Token Budgets + Attribution (P006)', ()
       const tree = tracker.buildTree({
         executionId: rootId,
         tokensOwn: 5000,
-        costOwn: 0.10,
+        costOwn: 0.1,
       });
 
       // Total tokens = Root (5000) + Explore (3000) + Coder (7000) + Tester (2500) = 17500

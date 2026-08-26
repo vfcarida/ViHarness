@@ -113,7 +113,7 @@ export class ViHarness {
     const repositoryPath = task.repositoryPath ?? task.workingDirectory ?? task.repoPath ?? '';
 
     const goal: Goal = {
-      id: (task.id ? (task.id as unknown as GoalId) : this.idFactory.create<'Goal'>()),
+      id: task.id ? (task.id as unknown as GoalId) : this.idFactory.create<'Goal'>(),
       description: task.description,
       constraints: {
         maxCostDollars: maxCostUSD,
@@ -165,7 +165,8 @@ export class ViHarness {
       const modifiedSet = new Set<string>();
       for (const iteration of executionResult.iterations) {
         for (const tr of iteration.toolResults) {
-          const pathVal = tr.metadata['path'] ?? tr.metadata['filePath'] ?? tr.metadata['targetFile'];
+          const pathVal =
+            tr.metadata['path'] ?? tr.metadata['filePath'] ?? tr.metadata['targetFile'];
           if (tr.status === ActionResultStatus.SUCCESS && pathVal) {
             modifiedSet.add(String(pathVal));
           }
@@ -174,7 +175,10 @@ export class ViHarness {
           const desc = prop.description.toLowerCase();
           const typeStr = String(prop.type);
           if (desc.includes('write') || typeStr.includes('WRITE') || typeStr === 'FILE_WRITE') {
-            const pathVal = prop.parameters['path'] ?? prop.parameters['filePath'] ?? prop.parameters['targetFile'];
+            const pathVal =
+              prop.parameters['path'] ??
+              prop.parameters['filePath'] ??
+              prop.parameters['targetFile'];
             if (pathVal) {
               modifiedSet.add(String(pathVal));
             }
@@ -182,10 +186,11 @@ export class ViHarness {
         }
       }
       changedFiles = Array.from(modifiedSet);
-      finalDiff = changedFiles.length > 0
-        ? `--- Agent Workspace Changes (${changedFiles.length} files modified)\n` +
-          changedFiles.map((f) => `+++ ${f}\n@@ modified by Vi-Harness @@`).join('\n')
-        : '';
+      finalDiff =
+        changedFiles.length > 0
+          ? `--- Agent Workspace Changes (${changedFiles.length} files modified)\n` +
+            changedFiles.map((f) => `+++ ${f}\n@@ modified by Vi-Harness @@`).join('\n')
+          : '';
     }
 
     // 5. Aggregate Test & Verification Results
@@ -206,7 +211,8 @@ export class ViHarness {
       }
     }
 
-    const testPassRate = totalTests > 0 ? passedTests / totalTests : (executionResult.success ? 1.0 : 0.0);
+    const testPassRate =
+      totalTests > 0 ? passedTests / totalTests : executionResult.success ? 1.0 : 0.0;
     const tests: PiTestResults = {
       total: totalTests,
       passed: passedTests,
@@ -234,7 +240,10 @@ export class ViHarness {
     };
 
     // 7. Calculate Duration, Model Calls, Final State, & Termination Reason
-    const duration = Math.max(1, executionResult.durationMs ?? (this.clock.now().getTime() - startTimeMs));
+    const duration = Math.max(
+      1,
+      executionResult.durationMs ?? this.clock.now().getTime() - startTimeMs,
+    );
     const modelCalls = executionResult.iterations.length;
     const lastIteration = executionResult.iterations[executionResult.iterations.length - 1];
     const finalState = lastIteration ? String(lastIteration.stateAfter) : 'DONE';

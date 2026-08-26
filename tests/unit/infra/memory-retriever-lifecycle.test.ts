@@ -53,27 +53,51 @@ describe('MemoryRetriever & MemoryLifecycle Unit Suite', () => {
       expect(MemoryLifecycle.shouldPromote(createRecord({ type: MemoryType.DECISION }))).toBe(true);
       expect(MemoryLifecycle.shouldPromote(createRecord({ type: MemoryType.PATTERN }))).toBe(true);
       expect(MemoryLifecycle.shouldPromote(createRecord({ tags: ['architecture'] }))).toBe(true);
-      expect(MemoryLifecycle.shouldPromote(createRecord({ type: MemoryType.FAILURE_AVOIDANCE }))).toBe(true);
-      expect(MemoryLifecycle.shouldPromote(createRecord({ tags: ['failure_prevention'] }))).toBe(true);
+      expect(
+        MemoryLifecycle.shouldPromote(createRecord({ type: MemoryType.FAILURE_AVOIDANCE })),
+      ).toBe(true);
+      expect(MemoryLifecycle.shouldPromote(createRecord({ tags: ['failure_prevention'] }))).toBe(
+        true,
+      );
     });
 
     it('3. shouldPromote evaluates high importance + recurrence & reuse history', () => {
-      expect(MemoryLifecycle.shouldPromote(createRecord({ importance: 0.8, recurrenceCount: 2 }))).toBe(true);
-      expect(MemoryLifecycle.shouldPromote(createRecord({ importance: 0.5, recurrenceCount: 2 }))).toBe(false);
+      expect(
+        MemoryLifecycle.shouldPromote(createRecord({ importance: 0.8, recurrenceCount: 2 })),
+      ).toBe(true);
+      expect(
+        MemoryLifecycle.shouldPromote(createRecord({ importance: 0.5, recurrenceCount: 2 })),
+      ).toBe(false);
       expect(MemoryLifecycle.shouldPromote(createRecord({ successCount: 1 }))).toBe(true);
       expect(MemoryLifecycle.shouldPromote(createRecord({ accessCount: 2 }))).toBe(true);
     });
 
     it('4. shouldPromote returns false for STALE, INVALIDATED or ARCHIVED records', () => {
-      expect(MemoryLifecycle.shouldPromote(createRecord({ status: MemoryStatus.STALE, source: 'user' }))).toBe(false);
-      expect(MemoryLifecycle.shouldPromote(createRecord({ status: MemoryStatus.INVALIDATED, source: 'user' }))).toBe(false);
-      expect(MemoryLifecycle.shouldPromote(createRecord({ status: MemoryStatus.ARCHIVED, source: 'user' }))).toBe(false);
+      expect(
+        MemoryLifecycle.shouldPromote(createRecord({ status: MemoryStatus.STALE, source: 'user' })),
+      ).toBe(false);
+      expect(
+        MemoryLifecycle.shouldPromote(
+          createRecord({ status: MemoryStatus.INVALIDATED, source: 'user' }),
+        ),
+      ).toBe(false);
+      expect(
+        MemoryLifecycle.shouldPromote(
+          createRecord({ status: MemoryStatus.ARCHIVED, source: 'user' }),
+        ),
+      ).toBe(false);
     });
 
     it('5. determinePromotedTier selects PROCEDURAL for workflows/patterns and SEMANTIC otherwise', () => {
-      expect(MemoryLifecycle.determinePromotedTier(createRecord({ tags: ['workflow'] }))).toBe(MemoryTier.PROCEDURAL);
-      expect(MemoryLifecycle.determinePromotedTier(createRecord({ tags: ['skill'] }))).toBe(MemoryTier.PROCEDURAL);
-      expect(MemoryLifecycle.determinePromotedTier(createRecord({ tags: ['general'] }))).toBe(MemoryTier.SEMANTIC);
+      expect(MemoryLifecycle.determinePromotedTier(createRecord({ tags: ['workflow'] }))).toBe(
+        MemoryTier.PROCEDURAL,
+      );
+      expect(MemoryLifecycle.determinePromotedTier(createRecord({ tags: ['skill'] }))).toBe(
+        MemoryTier.PROCEDURAL,
+      );
+      expect(MemoryLifecycle.determinePromotedTier(createRecord({ tags: ['general'] }))).toBe(
+        MemoryTier.SEMANTIC,
+      );
     });
 
     it('6. isExpired checks TTL timestamp accurately', () => {
@@ -88,10 +112,18 @@ describe('MemoryRetriever & MemoryLifecycle Unit Suite', () => {
 
   describe('MemoryRetriever & MemoryScorer', () => {
     it('7. Retrieves and filters candidates by status, tags, and minimum thresholds', () => {
-      const activeMatch = createRecord({ id: 'mem-1' as MemoryId, tags: ['security'], importance: 0.9, confidence: 0.9 });
+      const activeMatch = createRecord({
+        id: 'mem-1' as MemoryId,
+        tags: ['security'],
+        importance: 0.9,
+        confidence: 0.9,
+      });
       const inactiveRecord = createRecord({ id: 'mem-2' as MemoryId, status: MemoryStatus.STALE });
       const lowImportance = createRecord({ id: 'mem-3' as MemoryId, importance: 0.2 });
-      const expiredRecord = createRecord({ id: 'mem-4' as MemoryId, expiresAt: new Date('2024-01-01T08:00:00Z') });
+      const expiredRecord = createRecord({
+        id: 'mem-4' as MemoryId,
+        expiresAt: new Date('2024-01-01T08:00:00Z'),
+      });
 
       const query: MemoryQuery = {
         activeOnly: true,
@@ -100,7 +132,11 @@ describe('MemoryRetriever & MemoryLifecycle Unit Suite', () => {
         minConfidence: 0.5,
       };
 
-      const results = MemoryRetriever.retrieve([activeMatch, inactiveRecord, lowImportance, expiredRecord], query, now);
+      const results = MemoryRetriever.retrieve(
+        [activeMatch, inactiveRecord, lowImportance, expiredRecord],
+        query,
+        now,
+      );
       expect(results).toHaveLength(1);
       expect(results[0]?.record.id).toBe('mem-1');
       expect(results[0]?.relevanceScore).toBeGreaterThan(0);

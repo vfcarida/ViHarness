@@ -58,9 +58,7 @@ describe('Container', () => {
     const container = new Container();
     const token = Symbol('unregistered');
 
-    expect(() => container.resolve(token)).toThrow(
-      /No registration found for token/,
-    );
+    expect(() => container.resolve(token)).toThrow(/No registration found for token/);
   });
 
   it('has() should return true for registered tokens', () => {
@@ -124,9 +122,7 @@ describe('Container', () => {
     const t1 = Symbol('t1');
     const t2 = Symbol('t2');
 
-    const result = container
-      .register(t1, () => 'a')
-      .registerSingleton(t2, () => 'b');
+    const result = container.register(t1, () => 'a').registerSingleton(t2, () => 'b');
 
     expect(result).toBe(container);
     expect(container.has(t1)).toBe(true);

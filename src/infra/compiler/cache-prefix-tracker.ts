@@ -30,10 +30,7 @@ export class CachePrefixTracker {
     const metrics = response.cacheMetrics;
     this.lastCacheMetrics = metrics;
 
-    const cacheReadTokens =
-      metrics?.cacheReadInputTokens ??
-      response.usage.cacheReadTokens ??
-      0;
+    const cacheReadTokens = metrics?.cacheReadInputTokens ?? response.usage.cacheReadTokens ?? 0;
 
     this.lastCachedTokenCount = cacheReadTokens;
     this.cachedPrefixIds.clear();
@@ -110,7 +107,7 @@ export class CachePrefixTracker {
     const createTokens =
       response.cacheMetrics?.cacheCreationInputTokens ?? response.usage.cacheWriteTokens ?? 0;
     const deleteTokens = response.cacheMetrics?.cacheDeletedInputTokens ?? 0;
-    const inputTokens = response.usage.inputTokens || (readTokens + createTokens);
+    const inputTokens = response.usage.inputTokens || readTokens + createTokens;
 
     const hitRatio = inputTokens > 0 ? readTokens / inputTokens : 0;
 

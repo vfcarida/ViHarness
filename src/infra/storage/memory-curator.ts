@@ -49,7 +49,11 @@ export class SqliteMemoryCurator {
 
     // If stale, reactivate back to active upon access
     const newStatus = row.status === 'stale' ? 'active' : row.status;
-    db.prepare('UPDATE memory SET accessed_at = ?, status = ? WHERE id = ?').run(now, newStatus, row.id);
+    db.prepare('UPDATE memory SET accessed_at = ?, status = ? WHERE id = ?').run(
+      now,
+      newStatus,
+      row.id,
+    );
 
     return row.value;
   }
@@ -86,7 +90,8 @@ export class SqliteMemoryCurator {
    */
   async list(scope?: MemoryScope, status?: MemoryStatus): Promise<MemoryEntry[]> {
     const db = this.store.db;
-    let query = 'SELECT id, scope, key, value, status, created_at, updated_at, accessed_at FROM memory WHERE 1=1';
+    let query =
+      'SELECT id, scope, key, value, status, created_at, updated_at, accessed_at FROM memory WHERE 1=1';
     const params: any[] = [];
 
     if (scope) {

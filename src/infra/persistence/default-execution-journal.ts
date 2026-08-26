@@ -29,18 +29,21 @@ export class DefaultExecutionJournal implements ExecutionJournal {
     this.clock = options.clock;
   }
 
-  async logProposal(proposal: ActionProposal, isDestructiveOverride?: boolean): Promise<ExecutionId> {
+  async logProposal(
+    proposal: ActionProposal,
+    isDestructiveOverride?: boolean,
+  ): Promise<ExecutionId> {
     const executionId: ExecutionId = (proposal.id as any) ?? this.idFactory.create<'Execution'>();
     const now = this.clock.now();
 
-    const isDestructive = isDestructiveOverride ?? (
-      proposal.type === ActionType.FILE_DELETE ||
-      proposal.irreversible ||
-      proposal.description.toLowerCase().includes('rm ') ||
-      proposal.description.toLowerCase().includes('delete') ||
-      proposal.description.toLowerCase().includes('drop') ||
-      proposal.description.toLowerCase().includes('format')
-    );
+    const isDestructive =
+      isDestructiveOverride ??
+      (proposal.type === ActionType.FILE_DELETE ||
+        proposal.irreversible ||
+        proposal.description.toLowerCase().includes('rm ') ||
+        proposal.description.toLowerCase().includes('delete') ||
+        proposal.description.toLowerCase().includes('drop') ||
+        proposal.description.toLowerCase().includes('format'));
 
     const entry: JournalEntry = {
       executionId,

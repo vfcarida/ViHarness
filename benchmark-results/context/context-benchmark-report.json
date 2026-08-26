@@ -1,6 +1,6 @@
 {
   "suiteId": "context-efficiency-suite-v1",
-  "generatedAt": "2026-08-14T19:27:29.728Z",
+  "generatedAt": "2026-08-26T14:12:35.424Z",
   "horizons": [
     10,
     25,
@@ -313,7 +313,7 @@
             "CM-002"
           ],
           "taskSuccess": false,
-          "durationMs": 1
+          "durationMs": 0
         },
         "VI_CONTEXT_COMPILER": {
           "strategy": "VI_CONTEXT_COMPILER",
@@ -464,7 +464,7 @@
           ],
           "lostFacts": [],
           "taskSuccess": true,
-          "durationMs": 27
+          "durationMs": 19
         }
       },
       "viVsNaiveTokenSavingsPercent": 82.7,
@@ -821,7 +821,7 @@
           ],
           "lostFacts": [],
           "taskSuccess": true,
-          "durationMs": 4
+          "durationMs": 1
         },
         "PI_COMPACTION": {
           "strategy": "PI_COMPACTION",
@@ -1515,7 +1515,7 @@
           ],
           "lostFacts": [],
           "taskSuccess": true,
-          "durationMs": 61
+          "durationMs": 45
         }
       },
       "viVsNaiveTokenSavingsPercent": 85.2,
@@ -2871,7 +2871,7 @@
             "CM-004"
           ],
           "taskSuccess": false,
-          "durationMs": 3
+          "durationMs": 2
         },
         "VI_CONTEXT_COMPILER": {
           "strategy": "VI_CONTEXT_COMPILER",
@@ -3544,7 +3544,7 @@
           ],
           "lostFacts": [],
           "taskSuccess": true,
-          "durationMs": 287
+          "durationMs": 105
         }
       },
       "viVsNaiveTokenSavingsPercent": 86,
@@ -4878,7 +4878,7 @@
           ],
           "lostFacts": [],
           "taskSuccess": true,
-          "durationMs": 41
+          "durationMs": 28
         },
         "PI_COMPACTION": {
           "strategy": "PI_COMPACTION",
@@ -6202,7 +6202,7 @@
             "CM-005"
           ],
           "taskSuccess": false,
-          "durationMs": 5
+          "durationMs": 2
         },
         "VI_CONTEXT_COMPILER": {
           "strategy": "VI_CONTEXT_COMPILER",
@@ -7526,7 +7526,7 @@
           ],
           "lostFacts": [],
           "taskSuccess": true,
-          "durationMs": 433
+          "durationMs": 381
         }
       },
       "viVsNaiveTokenSavingsPercent": 87.1,

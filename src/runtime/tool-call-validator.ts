@@ -33,7 +33,14 @@ export class ToolCallValidator {
         isUnknownTool: true,
         sanitizedInput: {},
         error: errorMsg,
-        modelFeedbackMessage: `ERROR: Tool call is missing the tool name. Available tools: ${toolRegistry ? toolRegistry.listTools().map((t) => t.definition.name).join(', ') : 'none'}.`,
+        modelFeedbackMessage: `ERROR: Tool call is missing the tool name. Available tools: ${
+          toolRegistry
+            ? toolRegistry
+                .listTools()
+                .map((t) => t.definition.name)
+                .join(', ')
+            : 'none'
+        }.`,
       };
     }
 
@@ -49,7 +56,10 @@ export class ToolCallValidator {
 
     const tool = toolRegistry.getTool(rawName) ?? toolRegistry.getTool(rawName.toLowerCase());
     if (!tool) {
-      const availableTools = toolRegistry.listTools().map((t) => t.definition.name).join(', ');
+      const availableTools = toolRegistry
+        .listTools()
+        .map((t) => t.definition.name)
+        .join(', ');
       const errorMsg = `UNKNOWN_TOOL: Tool [${rawName}] is not registered in ToolRegistry`;
       return {
         valid: false,

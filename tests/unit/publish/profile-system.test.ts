@@ -2,14 +2,8 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import {
-  ProfileLoader,
-  BUILTIN_PROFILES,
-} from '../../../src/infra/profile/profile-loader.js';
-import {
-  ProfileManager,
-  KNOWN_BUNDLES,
-} from '../../../src/infra/profile/profile-manager.js';
+import { ProfileLoader, BUILTIN_PROFILES } from '../../../src/infra/profile/profile-loader.js';
+import { ProfileManager, KNOWN_BUNDLES } from '../../../src/infra/profile/profile-manager.js';
 
 describe('Profile System (DeepSeek Harness Reference)', () => {
   let tmpProfilesDir: string;

@@ -128,9 +128,29 @@ export interface TBenchResults {
  * Published Baseline Standings from Terminal-Bench (ICLR 2026 / Harbor Leaderboard).
  */
 export const TBENCH_KNOWN_LEADERBOARD: ReadonlyArray<TBenchLeaderboardEntry> = [
-  { agent: 'Harbor + Claude Opus 4.1', model: 'anthropic/claude-opus-4-1', resolution_rate: 52.5, is_baseline: true },
-  { agent: 'Harbor + Claude 3.5 Sonnet', model: 'anthropic/claude-3-5-sonnet', resolution_rate: 48.3, is_baseline: true },
+  {
+    agent: 'Harbor + Claude Opus 4.1',
+    model: 'anthropic/claude-opus-4-1',
+    resolution_rate: 52.5,
+    is_baseline: true,
+  },
+  {
+    agent: 'Harbor + Claude 3.5 Sonnet',
+    model: 'anthropic/claude-3-5-sonnet',
+    resolution_rate: 48.3,
+    is_baseline: true,
+  },
   { agent: 'Harbor + GPT-4o', model: 'openai/gpt-4o', resolution_rate: 43.8, is_baseline: true },
-  { agent: 'Harbor + Gemini 1.5 Pro', model: 'google/gemini-1.5-pro', resolution_rate: 38.5, is_baseline: true },
-  { agent: 'Harbor + DeepSeek V3', model: 'deepseek/deepseek-chat-v3', resolution_rate: 36.2, is_baseline: true },
+  {
+    agent: 'Harbor + Gemini 1.5 Pro',
+    model: 'google/gemini-1.5-pro',
+    resolution_rate: 38.5,
+    is_baseline: true,
+  },
+  {
+    agent: 'Harbor + DeepSeek V3',
+    model: 'deepseek/deepseek-chat-v3',
+    resolution_rate: 36.2,
+    is_baseline: true,
+  },
 ];

@@ -85,7 +85,9 @@ describe('TrajectoryDatasetExporter', () => {
         totalTokens: 2700,
         costDollars: 0.01,
         messages: [{ role: MessageRole.USER, content: 'Fix bug in auth' }],
-        proposedToolCalls: [{ name: 'run_command', input: { command: 'invalid-test-cmd' }, id: 'c_fail' }],
+        proposedToolCalls: [
+          { name: 'run_command', input: { command: 'invalid-test-cmd' }, id: 'c_fail' },
+        ],
         policyDecisions: [],
         executedToolResults: [
           {

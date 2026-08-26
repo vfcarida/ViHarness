@@ -43,14 +43,18 @@ export class ContextBudgetBalancer {
       // Planning needs broad repo architecture and outline
       l0Ratio = 0.25;
       l1Ratio = 0.25;
-      l2Ratio = 0.10;
-      l3Ratio = 0.40;
-    } else if (normalizedPhase.includes('ACT') || normalizedPhase.includes('EXECUTE') || normalizedPhase.includes('IMPLEMENT')) {
+      l2Ratio = 0.1;
+      l3Ratio = 0.4;
+    } else if (
+      normalizedPhase.includes('ACT') ||
+      normalizedPhase.includes('EXECUTE') ||
+      normalizedPhase.includes('IMPLEMENT')
+    ) {
       // Implementation needs deep focus on active files and current plan step
       l0Ratio = 0.45;
       l1Ratio = 0.25;
-      l2Ratio = 0.10;
-      l3Ratio = 0.20;
+      l2Ratio = 0.1;
+      l3Ratio = 0.2;
     } else if (normalizedPhase.includes('REPAIR') || normalizedPhase.includes('FIX')) {
       // Repair needs error stack traces, failure evidence, and prior failed attempts
       l0Ratio = 0.45;
@@ -59,10 +63,10 @@ export class ContextBudgetBalancer {
       l3Ratio = 0.15;
     } else if (normalizedPhase.includes('VERIFY') || normalizedPhase.includes('ACCEPT')) {
       // Verification needs test evidence, diff summaries, and acceptance criteria
-      l0Ratio = 0.40;
-      l1Ratio = 0.30;
-      l2Ratio = 0.10;
-      l3Ratio = 0.20;
+      l0Ratio = 0.4;
+      l1Ratio = 0.3;
+      l2Ratio = 0.1;
+      l3Ratio = 0.2;
     }
 
     const minFloor = Math.max(50, Math.floor(total * 0.05));

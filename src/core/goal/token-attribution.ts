@@ -45,7 +45,10 @@ export interface ReconcileResult {
 
 export class TokenAttributionTracker {
   private readonly attributions = new Map<ExecutionId, TokenAttribution[]>();
-  private readonly childNodeMap = new Map<ExecutionId, { tokensOwn: number; costOwn: number; goalId?: GoalId }>();
+  private readonly childNodeMap = new Map<
+    ExecutionId,
+    { tokensOwn: number; costOwn: number; goalId?: GoalId }
+  >();
 
   /**
    * Record a completed subagent's token and cost attribution to its parent execution.

@@ -46,7 +46,8 @@ export class PiCompactionStrategy implements ContextBenchmarkStrategy {
   }
 
   reset(): void {
-    this.systemPrompt = 'SYSTEM: You are an autonomous coding agent operating in a conversational sliding window.';
+    this.systemPrompt =
+      'SYSTEM: You are an autonomous coding agent operating in a conversational sliding window.';
     this.summaryParagraph = '';
     this.recentTurns = [];
     this.assembleContext();
@@ -140,7 +141,9 @@ export class PiCompactionStrategy implements ContextBenchmarkStrategy {
   private formatStep(step: TrajectoryStep): string {
     const parts: string[] = [`[Iter ${step.iteration}] ${step.content}`];
     if (step.toolName) {
-      parts.push(`Tool ${step.toolName}: ${step.toolOutput ? step.toolOutput.slice(0, 300) : 'Done'}`);
+      parts.push(
+        `Tool ${step.toolName}: ${step.toolOutput ? step.toolOutput.slice(0, 300) : 'Done'}`,
+      );
     }
     return parts.join('\n');
   }

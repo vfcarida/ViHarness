@@ -33,7 +33,11 @@ export const ViHarnessConfig = z.object({
       maxTokenBudget: z.number().default(4096),
       languages: z.array(z.string()).default(['typescript', 'python', 'javascript']),
     })
-    .default({ enabled: true, maxTokenBudget: 4096, languages: ['typescript', 'python', 'javascript'] }),
+    .default({
+      enabled: true,
+      maxTokenBudget: 4096,
+      languages: ['typescript', 'python', 'javascript'],
+    }),
   git: z
     .object({
       twoPhaseCommit: z.boolean().default(true),

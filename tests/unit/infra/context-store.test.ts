@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  InMemoryContextStore,
-  UuidV7IdFactory,
-  TestClock,
-} from '../../../src/infra/index.js';
+import { InMemoryContextStore, UuidV7IdFactory, TestClock } from '../../../src/infra/index.js';
 import {
   ContextTier,
   ContextObjectType,

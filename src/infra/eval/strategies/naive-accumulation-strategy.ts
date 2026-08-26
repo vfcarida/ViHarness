@@ -76,7 +76,9 @@ export class NaiveAccumulationStrategy implements ContextBenchmarkStrategy {
   }
 
   private formatStep(step: TrajectoryStep): string {
-    const parts: string[] = [`[Iter ${step.iteration} - ${step.role.toUpperCase()}] ${step.content}`];
+    const parts: string[] = [
+      `[Iter ${step.iteration} - ${step.role.toUpperCase()}] ${step.content}`,
+    ];
     if (step.toolName) {
       parts.push(`TOOL_CALL: ${step.toolName}(${JSON.stringify(step.toolInput ?? {})})`);
     }

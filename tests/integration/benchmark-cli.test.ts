@@ -33,14 +33,7 @@ describe('Vi-Harness Benchmark CLI Integration', () => {
   });
 
   it('2. CLI Execution: Runs benchmark and produces JSON & Markdown report files', async () => {
-    const exitCode = await runCli([
-      '--runs',
-      '1',
-      '--model',
-      'gpt-4o',
-      '--output',
-      testOutDir,
-    ]);
+    const exitCode = await runCli(['--runs', '1', '--model', 'gpt-4o', '--output', testOutDir]);
 
     expect(exitCode).toBe(0);
 

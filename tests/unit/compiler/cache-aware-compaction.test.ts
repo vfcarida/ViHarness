@@ -295,9 +295,7 @@ describe('Cache-Aware Compaction + Per-Tool Budget Caps (P002)', () => {
     );
     expect(prefixExplanations.length).toBe(2);
     expect(prefixExplanations.every((e) => e.action === 'RETAINED')).toBe(true);
-    expect(
-      prefixExplanations.some((e) => e.reason.includes('Cache-Aware Compaction')),
-    ).toBe(true);
+    expect(prefixExplanations.some((e) => e.reason.includes('Cache-Aware Compaction'))).toBe(true);
 
     // Verify uncached items after prefix were compacted/snipped
     expect(result.omitted.some((o) => o.id === uncachedObservationId)).toBe(true);

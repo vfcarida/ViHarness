@@ -64,7 +64,9 @@ export function formatUpdateNotice(currentVersion: string, latestVersion: string
 /**
  * Perform the update check against npm registry.
  */
-export async function checkForUpdates(options: UpdateCheckOptions = {}): Promise<UpdateCheckResult | null> {
+export async function checkForUpdates(
+  options: UpdateCheckOptions = {},
+): Promise<UpdateCheckResult | null> {
   const currentVersion = options.currentVersion ?? '0.1.0';
   const checkIntervalMs = options.checkIntervalMs ?? 24 * 60 * 60 * 1000; // 24 hours
   const registryUrl = options.registryUrl ?? 'https://registry.npmjs.org/vi-harness/latest';
@@ -72,7 +74,8 @@ export async function checkForUpdates(options: UpdateCheckOptions = {}): Promise
   const fetchImpl = options.fetchFn ?? globalThis.fetch;
 
   const defaultCacheFile =
-    process.env['VI_HARNESS_UPDATE_CACHE'] ?? path.join(os.homedir(), '.vi-harness', 'update-check.json');
+    process.env['VI_HARNESS_UPDATE_CACHE'] ??
+    path.join(os.homedir(), '.vi-harness', 'update-check.json');
   const cacheFile = options.cacheFilePath ?? defaultCacheFile;
 
   const now = Date.now();

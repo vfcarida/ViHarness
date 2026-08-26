@@ -70,7 +70,8 @@ export class SkillExtractor {
     const toolsUsedList = Array.from(toolNames).sort();
 
     // Summarize successful approach
-    const approachSummary = execution.summary || `Executed in ${execution.iterationCount} iterations`;
+    const approachSummary =
+      execution.summary || `Executed in ${execution.iterationCount} iterations`;
     const patternContent = `When facing problem type '${problemType}': Approach '${approachSummary}' succeeded in ${execution.iterationCount} iteration(s) utilizing tools: [${toolsUsedList.join(', ')}].`;
 
     // Persist as a high-confidence learned pattern memory
@@ -80,7 +81,7 @@ export class SkillExtractor {
       type: MemoryType.PATTERN,
       content: patternContent,
       source: `self_improvement:execution_${execution.executionId}`,
-      confidence: 0.90,
+      confidence: 0.9,
       importance: 0.85,
       scope: MemoryScope.REPOSITORY,
       topic: `learned_pattern_${problemType.toLowerCase()}`,
@@ -122,13 +123,38 @@ export class SkillExtractor {
 
   private inferProblemType(taskDesc: string, goalDesc: string): string {
     const combined = `${taskDesc} ${goalDesc}`.toLowerCase();
-    if (combined.includes('auth') || combined.includes('token') || combined.includes('login')) return 'AUTHENTICATION';
-    if (combined.includes('refactor') || combined.includes('clean') || combined.includes('structure')) return 'REFACTORING';
-    if (combined.includes('bug') || combined.includes('fix') || combined.includes('error') || combined.includes('repair')) return 'BUG_FIX';
-    if (combined.includes('test') || combined.includes('coverage') || combined.includes('spec')) return 'TESTING';
-    if (combined.includes('database') || combined.includes('sql') || combined.includes('migration') || combined.includes('schema')) return 'DATABASE';
-    if (combined.includes('api') || combined.includes('endpoint') || combined.includes('route')) return 'API_INTEGRATION';
-    if (combined.includes('cache') || combined.includes('performance') || combined.includes('optimize')) return 'PERFORMANCE_OPTIMIZATION';
+    if (combined.includes('auth') || combined.includes('token') || combined.includes('login'))
+      return 'AUTHENTICATION';
+    if (
+      combined.includes('refactor') ||
+      combined.includes('clean') ||
+      combined.includes('structure')
+    )
+      return 'REFACTORING';
+    if (
+      combined.includes('bug') ||
+      combined.includes('fix') ||
+      combined.includes('error') ||
+      combined.includes('repair')
+    )
+      return 'BUG_FIX';
+    if (combined.includes('test') || combined.includes('coverage') || combined.includes('spec'))
+      return 'TESTING';
+    if (
+      combined.includes('database') ||
+      combined.includes('sql') ||
+      combined.includes('migration') ||
+      combined.includes('schema')
+    )
+      return 'DATABASE';
+    if (combined.includes('api') || combined.includes('endpoint') || combined.includes('route'))
+      return 'API_INTEGRATION';
+    if (
+      combined.includes('cache') ||
+      combined.includes('performance') ||
+      combined.includes('optimize')
+    )
+      return 'PERFORMANCE_OPTIMIZATION';
     return 'GENERAL_CODING';
   }
 }

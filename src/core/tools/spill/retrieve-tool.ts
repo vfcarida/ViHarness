@@ -20,7 +20,8 @@ const inputSchema = {
   properties: {
     locator_id: {
       type: 'string',
-      description: 'The unique locator identifier returned when output was spilled (e.g. spill-session-1-call-1)',
+      description:
+        'The unique locator identifier returned when output was spilled (e.g. spill-session-1-call-1)',
     },
     start_line: {
       type: 'integer',
@@ -36,7 +37,9 @@ const inputSchema = {
   required: ['locator_id', 'start_line', 'end_line'],
 };
 
-export function createRetrieveOutputTool(spillStore: SpillStore = defaultSpillStore): ToolDefinition {
+export function createRetrieveOutputTool(
+  spillStore: SpillStore = defaultSpillStore,
+): ToolDefinition {
   return {
     name: 'retrieve_output',
     version: '1.0.0',

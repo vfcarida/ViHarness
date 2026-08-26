@@ -13,7 +13,7 @@ export interface EventMap {
   'step/complete': { turn: number; step: number; durationMs: number; timestamp: Date };
   'model/called': { modelId: string; tokensIn?: number; tokensOut?: number; timestamp: Date };
   'tool/executed': { toolName: string; durationMs: number; success: boolean; timestamp: Date };
-  'error': { error: Error; context?: Record<string, unknown>; timestamp: Date };
+  error: { error: Error; context?: Record<string, unknown>; timestamp: Date };
 }
 
 export type EventHandler<K extends keyof EventMap> = (data: EventMap[K]) => void | Promise<void>;

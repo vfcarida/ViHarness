@@ -3,7 +3,7 @@
 **Benchmark Objective**: Empirically evaluate whether the **Vi-Harness Context Compiler** eliminates context bloat while preserving critical domain memory across long-horizon trajectories (10, 25, 50, 100 iterations) compared to **Naive Transcript Accumulation** and **Pi-style Sliding Window Compaction**.
 
 - **Suite ID**: `context-efficiency-suite-v1`
-- **Generated At**: `2026-08-14T19:27:29.728Z`
+- **Generated At**: `2026-08-26T14:12:35.424Z`
 - **Evaluated Horizons**: 10 iterations, 25 iterations, 50 iterations, 100 iterations
 
 ## 1. Executive Comparison Summary

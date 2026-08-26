@@ -93,7 +93,12 @@ describe('Crash-Safe Execution & Persistence Subsystem', () => {
     expect(entry?.status).toBe(ActionExecutionStatus.PROPOSED);
 
     // Simulate process crash before logStart
-    const analysis = await recoveryManager.analyzeCrash(taskId, journal, eventStore, checkpointStore);
+    const analysis = await recoveryManager.analyzeCrash(
+      taskId,
+      journal,
+      eventStore,
+      checkpointStore,
+    );
     expect(analysis.interruptedEntries).toHaveLength(1);
     expect(analysis.interruptedEntries[0]!.executionId).toBe(execId);
   });
@@ -112,7 +117,12 @@ describe('Crash-Safe Execution & Persistence Subsystem', () => {
     expect(entry?.status).toBe(ActionExecutionStatus.STARTED);
 
     // Simulate crash mid-execution
-    const analysis = await recoveryManager.analyzeCrash(taskId, journal, eventStore, checkpointStore);
+    const analysis = await recoveryManager.analyzeCrash(
+      taskId,
+      journal,
+      eventStore,
+      checkpointStore,
+    );
     expect(analysis.interruptedEntries).toHaveLength(1);
     expect(analysis.requiresHumanReview).toBe(false);
     expect(analysis.recommendedPolicy).toBe(RecoveryPolicy.RETRY_SAFE);
@@ -129,7 +139,12 @@ describe('Crash-Safe Execution & Persistence Subsystem', () => {
     await journal.logStart(execId);
 
     // Simulate process crash during destructive operation
-    const analysis = await recoveryManager.analyzeCrash(taskId, journal, eventStore, checkpointStore);
+    const analysis = await recoveryManager.analyzeCrash(
+      taskId,
+      journal,
+      eventStore,
+      checkpointStore,
+    );
 
     // The status must be updated to UNKNOWN
     const updatedEntry = await journal.getEntry(execId);
@@ -165,7 +180,12 @@ describe('Crash-Safe Execution & Persistence Subsystem', () => {
     });
 
     // Simulate crash after logCompletion
-    const analysis = await recoveryManager.analyzeCrash(taskId, journal, eventStore, checkpointStore);
+    const analysis = await recoveryManager.analyzeCrash(
+      taskId,
+      journal,
+      eventStore,
+      checkpointStore,
+    );
     expect(analysis.interruptedEntries).toHaveLength(0);
     expect(analysis.requiresHumanReview).toBe(false);
 
@@ -276,9 +296,9 @@ describe('Crash-Safe Execution & Persistence Subsystem', () => {
     });
 
     // Attempt transition — EventStore append throws
-    await expect(
-      durableStateStore.transition(taskId, StateEvent.START),
-    ).rejects.toThrow('Simulated ENOSPC write failure');
+    await expect(durableStateStore.transition(taskId, StateEvent.START)).rejects.toThrow(
+      'Simulated ENOSPC write failure',
+    );
 
     // State machine MUST remain in INIT phase
     const state = await durableStateStore.getState(taskId);
@@ -303,7 +323,12 @@ describe('Crash-Safe Execution & Persistence Subsystem', () => {
       throw new Error('Process killed during checkpoint commit');
     } catch {
       // Recovery manager scans existing checkpoints
-      const analysis = await recoveryManager.analyzeCrash(taskId, journal, eventStore, checkpointStore);
+      const analysis = await recoveryManager.analyzeCrash(
+        taskId,
+        journal,
+        eventStore,
+        checkpointStore,
+      );
       expect(analysis.lastCheckpointId).toBe(validCp.id);
 
       const decision = recoveryManager.createRecoveryDecision(analysis);

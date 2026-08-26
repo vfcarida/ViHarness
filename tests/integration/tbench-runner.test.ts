@@ -25,11 +25,7 @@ import {
   TestClock,
 } from '../../src/infra/index.js';
 import { DefaultAgentRuntime } from '../../src/runtime/index.js';
-import {
-  type ModelRouter,
-  ProviderHealthStatus,
-  FinishReason,
-} from '../../src/core/index.js';
+import { type ModelRouter, ProviderHealthStatus, FinishReason } from '../../src/core/index.js';
 
 describe('TBench End-to-End Runner Integration — P011', () => {
   const idFactory = new UuidV7IdFactory();
@@ -51,7 +47,8 @@ describe('TBench End-to-End Runner Integration — P011', () => {
               id: 'call-1',
               name: 'terminal',
               input: {
-                command: 'node -e "const fs = require(\'fs\'); fs.writeFileSync(\'regression.js\', \'module.exports = { compute: () => 42 };\');"',
+                command:
+                  "node -e \"const fs = require('fs'); fs.writeFileSync('regression.js', 'module.exports = { compute: () => 42 };');\"",
               },
             },
           ],
@@ -114,7 +111,10 @@ describe('TBench End-to-End Runner Integration — P011', () => {
     expect(results.tasks[0]?.task_id).toBe('git-bisect-bug');
     expect(results.tasks[0]?.passed).toBe(true);
 
-    const { jsonPath, mdPath } = await TBenchReportGenerator.writeReportFiles(results, tempReportDir);
+    const { jsonPath, mdPath } = await TBenchReportGenerator.writeReportFiles(
+      results,
+      tempReportDir,
+    );
     expect(fs.existsSync(jsonPath)).toBe(true);
     expect(fs.existsSync(mdPath)).toBe(true);
 

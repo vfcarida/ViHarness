@@ -195,7 +195,9 @@ describe('Derived History & Reconstructability Invariant (DSH) — P008', () => 
       { role: MessageRole.ASSISTANT, content: 'Unlogged phantom response' },
     ];
 
-    expect(() => assertModelHistoryReconstructable(session.log, actualMessages)).toThrow(HarnessError);
+    expect(() => assertModelHistoryReconstructable(session.log, actualMessages)).toThrow(
+      HarnessError,
+    );
   });
 
   it('7. should throw STATE_CORRUPTED on reconstructability role mismatch', () => {
@@ -209,7 +211,9 @@ describe('Derived History & Reconstructability Invariant (DSH) — P008', () => 
       { role: MessageRole.SYSTEM, content: 'Hello' }, // role mismatch
     ];
 
-    expect(() => assertModelHistoryReconstructable(session.log, actualMessages)).toThrow(HarnessError);
+    expect(() => assertModelHistoryReconstructable(session.log, actualMessages)).toThrow(
+      HarnessError,
+    );
   });
 
   it('8. should throw STATE_CORRUPTED on reconstructability content mismatch', () => {
@@ -223,6 +227,8 @@ describe('Derived History & Reconstructability Invariant (DSH) — P008', () => 
       { role: MessageRole.USER, content: 'Modified prompt that was never logged' },
     ];
 
-    expect(() => assertModelHistoryReconstructable(session.log, actualMessages)).toThrow(HarnessError);
+    expect(() => assertModelHistoryReconstructable(session.log, actualMessages)).toThrow(
+      HarnessError,
+    );
   });
 });

@@ -4,14 +4,23 @@
  * Denies outbound network requests unless explicitly enabled in PermissionContext.
  */
 import type { PolicyRule } from '../../../core/interfaces/policy-engine.js';
-import type { PolicyAction, PolicyDecision, PermissionContext } from '../../../core/model/policy.js';
-import { PolicyDecisionType, ActionRiskCategory, DEFAULT_PERMISSION_CONTEXT } from '../../../core/model/policy.js';
+import type {
+  PolicyAction,
+  PolicyDecision,
+  PermissionContext,
+} from '../../../core/model/policy.js';
+import {
+  PolicyDecisionType,
+  ActionRiskCategory,
+  DEFAULT_PERMISSION_CONTEXT,
+} from '../../../core/model/policy.js';
 import { RiskClassifier } from '../risk-classifier.js';
 
 export class NetworkAccessRule implements PolicyRule {
   public readonly id = 'rule-network-access';
   public readonly name = 'Network Access Control';
-  public readonly description = 'Controls outbound network access based on permission context settings.';
+  public readonly description =
+    'Controls outbound network access based on permission context settings.';
 
   async evaluate(action: PolicyAction, context?: PermissionContext): Promise<PolicyDecision> {
     const categories = action.categories ?? RiskClassifier.classify(action);

@@ -194,7 +194,9 @@ describe('Stdio Transport — P012', () => {
     });
 
     await transport.start();
-    inStream.write('\n   \n\n' + JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'valid' }) + '\n\n');
+    inStream.write(
+      '\n   \n\n' + JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'valid' }) + '\n\n',
+    );
     await new Promise((r) => setTimeout(r, 20));
 
     expect(callCount).toBe(1);

@@ -178,7 +178,9 @@ export function parseProfileYaml(content: string): Profile {
     if (content.trim().startsWith('{')) {
       return JSON.parse(content);
     }
-  } catch {}
+  } catch {
+    /* ignore and fallback to yaml parser */
+  }
 
   // Simple line-based YAML parser for Profile
   const lines = content.split('\n');
@@ -213,7 +215,10 @@ export function parseProfileYaml(content: string): Profile {
       const [k, ...v] = trimmed.split(':');
       if (k && v.length > 0) {
         const key = k.trim();
-        const val = v.join(':').trim().replace(/^['"]|['"]$/g, '');
+        const val = v
+          .join(':')
+          .trim()
+          .replace(/^['"]|['"]$/g, '');
         if (key === 'target') currentPatch.target = val;
         if (key === 'plugin') currentPatch.plugin = val;
         if (key === 'disabled') currentPatch.disabled = val === 'true';

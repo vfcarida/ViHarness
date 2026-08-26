@@ -27,11 +27,7 @@ import {
   TestClock,
 } from '../../src/infra/index.js';
 import { DefaultAgentRuntime } from '../../src/runtime/index.js';
-import {
-  type ModelRouter,
-  ProviderHealthStatus,
-  FinishReason,
-} from '../../src/core/index.js';
+import { type ModelRouter, ProviderHealthStatus, FinishReason } from '../../src/core/index.js';
 
 describe('ProjDevBench End-to-End Runner Integration — P010', () => {
   const idFactory = new UuidV7IdFactory();
@@ -129,7 +125,10 @@ export function parseMarkdown(markdown) {
     });
 
     const workspaceManager = new ProjDevWorkspaceManager();
-    const evaluator = new ProjDevEvaluator({ harnessName: 'Vi-Harness', modelId: 'claude-3-7-sonnet' });
+    const evaluator = new ProjDevEvaluator({
+      harnessName: 'Vi-Harness',
+      modelId: 'claude-3-7-sonnet',
+    });
     const adapter = new ProjDevExecutionAdapter({ runtime, idFactory, clock, evaluator });
 
     // 4. Run Problem
@@ -159,7 +158,10 @@ export function parseMarkdown(markdown) {
     expect(report.overallScore).toBe(100.0);
     expect(report.completedProblems).toBe(1);
 
-    const { jsonPath, mdPath } = await ProjDevReportGenerator.writeReportFiles(report, tempReportDir);
+    const { jsonPath, mdPath } = await ProjDevReportGenerator.writeReportFiles(
+      report,
+      tempReportDir,
+    );
     expect(fs.existsSync(jsonPath)).toBe(true);
     expect(fs.existsSync(mdPath)).toBe(true);
 

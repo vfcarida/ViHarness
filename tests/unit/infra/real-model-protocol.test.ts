@@ -58,9 +58,7 @@ describe('Real Model Protocol Suite', () => {
       const msg: ModelMessage = {
         role: MessageRole.ASSISTANT,
         content: 'I will inspect the file.',
-        toolCalls: [
-          { id: 'call_123', name: 'read_file', input: { path: 'src/main.ts' } },
-        ],
+        toolCalls: [{ id: 'call_123', name: 'read_file', input: { path: 'src/main.ts' } }],
       };
       expect(msg.role).toBe(MessageRole.ASSISTANT);
       expect(msg.toolCalls).toHaveLength(1);
@@ -113,7 +111,9 @@ describe('Real Model Protocol Suite', () => {
       expect(openAIMessages[2]!.role).toBe('assistant');
       expect((openAIMessages[2] as any).tool_calls).toHaveLength(1);
       expect((openAIMessages[2] as any).tool_calls[0].function.name).toBe('search_files');
-      expect(JSON.parse((openAIMessages[2] as any).tool_calls[0].function.arguments)).toEqual({ query: 'login' });
+      expect(JSON.parse((openAIMessages[2] as any).tool_calls[0].function.arguments)).toEqual({
+        query: 'login',
+      });
 
       // Tool Result
       expect(openAIMessages[3]!.role).toBe('tool');
@@ -136,7 +136,12 @@ describe('Real Model Protocol Suite', () => {
             content: 'Matches found on line 42',
             toolCallId: 'toolu_1',
             name: 'grep',
-            toolResult: { toolCallId: 'toolu_1', name: 'grep', output: 'Matches found on line 42', isError: false },
+            toolResult: {
+              toolCallId: 'toolu_1',
+              name: 'grep',
+              output: 'Matches found on line 42',
+              isError: false,
+            },
           },
         ],
       };
@@ -157,7 +162,9 @@ describe('Real Model Protocol Suite', () => {
       // 3. User message with tool_result block
       expect(anthropicPayload.messages[2]!.role).toBe('user');
       const userBlocks = anthropicPayload.messages[2]!.content as Array<AnthropicToolResultBlock>;
-      expect(userBlocks.some((b) => b.type === 'tool_result' && b.tool_use_id === 'toolu_1')).toBe(true);
+      expect(userBlocks.some((b) => b.type === 'tool_result' && b.tool_use_id === 'toolu_1')).toBe(
+        true,
+      );
     });
   });
 
@@ -204,7 +211,9 @@ describe('Real Model Protocol Suite', () => {
       expect(result.valid).toBe(false);
       expect(result.isUnknownTool).toBe(false);
       expect(result.error).toContain('parameter validation failed');
-      expect(result.modelFeedbackMessage).toContain('ERROR: Invalid parameters for tool [write_file]');
+      expect(result.modelFeedbackMessage).toContain(
+        'ERROR: Invalid parameters for tool [write_file]',
+      );
 
       // 2. Unknown tool name
       const unknownCall: ToolCall = {
@@ -300,10 +309,15 @@ describe('Real Model Protocol Suite', () => {
       const req2 = modelProvider.requestHistory[1]!;
 
       const hasAssistantToolCall = req2.messages.some(
-        (m) => m.role === MessageRole.ASSISTANT && m.toolCalls && m.toolCalls.some((tc) => tc.name === 'inspect_data'),
+        (m) =>
+          m.role === MessageRole.ASSISTANT &&
+          m.toolCalls &&
+          m.toolCalls.some((tc) => tc.name === 'inspect_data'),
       );
       const hasToolResult = req2.messages.some(
-        (m) => (m.role === MessageRole.TOOL_RESULT || m.role === MessageRole.TOOL) && m.content.includes('DATA_PAYLOAD_SUCCESS'),
+        (m) =>
+          (m.role === MessageRole.TOOL_RESULT || m.role === MessageRole.TOOL) &&
+          m.content.includes('DATA_PAYLOAD_SUCCESS'),
       );
 
       expect(hasAssistantToolCall).toBe(true);

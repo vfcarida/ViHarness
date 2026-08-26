@@ -30,10 +30,13 @@ export function createRuntime(options: CreateRuntimeOptions = {}): DefaultAgentR
     try {
       const loader = new ProfileLoader(options.profilesDir);
       const manager = new ProfileManager();
-      loader.loadProfile(options.profile).then((config) => {
-        const resolved = manager.resolveProfile(config);
-        manager.applyEnvironment(resolved);
-      }).catch(() => {});
+      loader
+        .loadProfile(options.profile)
+        .then((config) => {
+          const resolved = manager.resolveProfile(config);
+          manager.applyEnvironment(resolved);
+        })
+        .catch(() => {});
     } catch {
       // Ignore profile resolution errors on startup
     }

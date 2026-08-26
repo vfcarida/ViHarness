@@ -51,7 +51,8 @@ export class SqliteSessionStore {
     const now = this.clock.now().getTime();
     let effectiveMeta = metadata;
     if (Object.keys(metadata).length === 0) {
-      const existing = db.prepare('SELECT metadata FROM sessions WHERE id = ?').get(header.id) as { metadata: string | null } | undefined;
+      const existing = db.prepare('SELECT metadata FROM sessions WHERE id = ?').get(header.id) as
+        { metadata: string | null } | undefined;
       if (existing?.metadata) {
         try {
           effectiveMeta = JSON.parse(existing.metadata);
@@ -72,7 +73,14 @@ export class SqliteSessionStore {
            branch_point = excluded.branch_point,
            updated_at = excluded.updated_at,
            metadata = excluded.metadata`,
-      ).run(header.id, header.parentId ?? null, header.branchPoint ?? null, header.createdAt, now, serializedMeta);
+      ).run(
+        header.id,
+        header.parentId ?? null,
+        header.branchPoint ?? null,
+        header.createdAt,
+        now,
+        serializedMeta,
+      );
 
       // 2. Upsert messages / events
       const insertMsg = db.prepare(
@@ -88,7 +96,12 @@ export class SqliteSessionStore {
 
       for (let seq = 0; seq < session.log.length; seq++) {
         const ev = session.log[seq]!;
-        const role = ev.type === 'user_message' ? 'user' : ev.type === 'agent_message' ? 'assistant' : 'system';
+        const role =
+          ev.type === 'user_message'
+            ? 'user'
+            : ev.type === 'agent_message'
+              ? 'assistant'
+              : 'system';
         const content = JSON.stringify(ev.data ?? {});
         insertMsg.run(header.id, seq, role, content, null, null, null, ev.time ?? now);
       }
@@ -100,10 +113,14 @@ export class SqliteSessionStore {
   /**
    * Load session by ID and reconstruct its event log and metadata.
    */
-  async loadSession(sessionId: string): Promise<{ session: DefaultSession; metadata: Record<string, unknown> } | null> {
+  async loadSession(
+    sessionId: string,
+  ): Promise<{ session: DefaultSession; metadata: Record<string, unknown> } | null> {
     const db = this.store.db;
     const sessionRow = db
-      .prepare('SELECT id, parent_id, branch_point, created_at, updated_at, metadata FROM sessions WHERE id = ?')
+      .prepare(
+        'SELECT id, parent_id, branch_point, created_at, updated_at, metadata FROM sessions WHERE id = ?',
+      )
       .get(sessionId) as
       | {
           id: string;
@@ -128,7 +145,12 @@ export class SqliteSessionStore {
       .prepare(
         'SELECT sequence, role, content, created_at FROM messages WHERE session_id = ? ORDER BY sequence ASC',
       )
-      .all(sessionId) as Array<{ sequence: number; role: string; content: string; created_at: number }>;
+      .all(sessionId) as Array<{
+      sequence: number;
+      role: string;
+      content: string;
+      created_at: number;
+    }>;
 
     const initialLog: SessionEvent[] = messageRows.map((row) => {
       let data: any = {};
@@ -138,7 +160,12 @@ export class SqliteSessionStore {
         data = { content: row.content };
       }
 
-      const type = row.role === 'user' ? 'user_message' : row.role === 'assistant' ? 'agent_message' : 'custom';
+      const type =
+        row.role === 'user'
+          ? 'user_message'
+          : row.role === 'assistant'
+            ? 'agent_message'
+            : 'custom';
 
       return {
         type: type as any,

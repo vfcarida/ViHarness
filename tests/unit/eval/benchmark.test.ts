@@ -7,10 +7,7 @@ import {
   UuidV7IdFactory,
   TestClock,
 } from '../../../src/index.js';
-import type {
-  BenchmarkRunOptions,
-  BenchmarkReport,
-} from '../../../src/index.js';
+import type { BenchmarkRunOptions, BenchmarkReport } from '../../../src/index.js';
 
 describe('Benchmark and Evaluation Framework', () => {
   let idFactory: UuidV7IdFactory;

@@ -247,7 +247,10 @@ describe('HTTP & SSE Transport — P012', () => {
     await transport.sendNotification('notifications/progress', { step: 1 });
 
     const startNotif = Date.now();
-    while (!sseEvents.join('').includes('notifications/progress') && Date.now() - startNotif < 1000) {
+    while (
+      !sseEvents.join('').includes('notifications/progress') &&
+      Date.now() - startNotif < 1000
+    ) {
       await new Promise((r) => setTimeout(r, 20));
     }
 
@@ -300,7 +303,12 @@ describe('HTTP & SSE Transport — P012', () => {
     await transport.start();
     const port = transport.boundPort!;
 
-    const largePayload = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'test', data: 'x'.repeat(200) });
+    const largePayload = JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'test',
+      data: 'x'.repeat(200),
+    });
 
     const res = await makeRequest(
       {

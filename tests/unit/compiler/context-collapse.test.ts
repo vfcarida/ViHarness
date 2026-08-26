@@ -63,7 +63,7 @@ describe('Context Collapse — Virtual Projection & Reversible Reconstruction', 
     const result = await ContextCollapser.applyCollapsesIfNeeded(originalObjects, collapseStore, {
       modelMaxTokens: 500,
       currentTokens: 500,
-      collapseThreshold: 0.70,
+      collapseThreshold: 0.7,
       now,
     });
 
@@ -90,7 +90,7 @@ describe('Context Collapse — Virtual Projection & Reversible Reconstruction', 
     const result = await ContextCollapser.applyCollapsesIfNeeded(originalObjects, collapseStore, {
       modelMaxTokens: 1000,
       currentTokens: rawTokens,
-      collapseThreshold: 0.70,
+      collapseThreshold: 0.7,
       now,
     });
 
@@ -109,7 +109,7 @@ describe('Context Collapse — Virtual Projection & Reversible Reconstruction', 
       {
         modelMaxTokens: 600,
         currentTokens: 720,
-        collapseThreshold: 0.70,
+        collapseThreshold: 0.7,
         now,
       },
     );
@@ -138,7 +138,7 @@ describe('Context Collapse — Virtual Projection & Reversible Reconstruction', 
     const result = await ContextCollapser.applyCollapsesIfNeeded(originalObjects, collapseStore, {
       modelMaxTokens: 1000,
       currentTokens: 200,
-      collapseThreshold: 0.70,
+      collapseThreshold: 0.7,
       now,
     });
 
@@ -158,7 +158,7 @@ describe('Context Collapse — Virtual Projection & Reversible Reconstruction', 
     const result = await ContextCollapser.applyCollapsesIfNeeded(originalObjects, collapseStore, {
       modelMaxTokens: 400,
       currentTokens: 560,
-      collapseThreshold: 0.70,
+      collapseThreshold: 0.7,
       now,
     });
 
@@ -226,7 +226,7 @@ describe('Context Collapse — Virtual Projection & Reversible Reconstruction', 
     const result = await ContextCollapser.applyCollapsesIfNeeded(objects, collapseStore, {
       modelMaxTokens: 600,
       currentTokens: 870,
-      collapseThreshold: 0.70,
+      collapseThreshold: 0.7,
       now,
     });
 
@@ -234,9 +234,7 @@ describe('Context Collapse — Virtual Projection & Reversible Reconstruction', 
     const retainedInstructions = result.projected.filter(
       (o) => o.type === ContextObjectType.USER_INSTRUCTION,
     );
-    const retainedDecisions = result.projected.filter(
-      (o) => o.type === ContextObjectType.DECISION,
-    );
+    const retainedDecisions = result.projected.filter((o) => o.type === ContextObjectType.DECISION);
 
     expect(retainedInstructions.length).toBe(1);
     expect(retainedDecisions.length).toBe(1);

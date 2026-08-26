@@ -4,7 +4,11 @@
  * Computes composite relevance score for selective retrieval:
  * Relevance = w_sim * textSimilarity + w_imp * importance + w_conf * confidence + w_rec * recency + w_succ * successRate - stalePenalty
  */
-import type { MemoryRecord, ScoredMemoryRecord, MemoryQuery } from '../../core/model/memory-types.js';
+import type {
+  MemoryRecord,
+  ScoredMemoryRecord,
+  MemoryQuery,
+} from '../../core/model/memory-types.js';
 import { MemoryStatus } from '../../core/model/memory-types.js';
 
 export interface ScorerWeights {
@@ -20,7 +24,7 @@ export const DEFAULT_MEMORY_SCORER_WEIGHTS: Readonly<ScorerWeights> = {
   importanceWeight: 0.25,
   confidenceWeight: 0.15,
   recencyWeight: 0.15,
-  successRateWeight: 0.10,
+  successRateWeight: 0.1,
 };
 
 export class MemoryScorer {
@@ -44,14 +48,16 @@ export class MemoryScorer {
     const recencyScore = 1 / (1 + ageHours / 48);
 
     // 3. Success Rate Score
-    const successRate =
-      record.accessCount > 0 ? record.successCount / record.accessCount : 0.5;
+    const successRate = record.accessCount > 0 ? record.successCount / record.accessCount : 0.5;
 
     // 4. Staleness / Invalidation Penalty
     let stalePenalty = 0.0;
     if (record.status === MemoryStatus.STALE) {
       stalePenalty = 0.5;
-    } else if (record.status === MemoryStatus.INVALIDATED || record.status === MemoryStatus.EXPIRED) {
+    } else if (
+      record.status === MemoryStatus.INVALIDATED ||
+      record.status === MemoryStatus.EXPIRED
+    ) {
       stalePenalty = 1.0;
     }
 
@@ -81,8 +87,16 @@ export class MemoryScorer {
   }
 
   private static calculateKeywordSimilarity(content: string, query: string): number {
-    const contentTokens = new Set(content.toLowerCase().split(/[\W_]+/).filter((t) => t.length > 2));
-    const queryTokens = query.toLowerCase().split(/[\W_]+/).filter((t) => t.length > 2);
+    const contentTokens = new Set(
+      content
+        .toLowerCase()
+        .split(/[\W_]+/)
+        .filter((t) => t.length > 2),
+    );
+    const queryTokens = query
+      .toLowerCase()
+      .split(/[\W_]+/)
+      .filter((t) => t.length > 2);
 
     if (queryTokens.length === 0) return 0.5;
 

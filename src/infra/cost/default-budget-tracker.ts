@@ -51,11 +51,7 @@ export class DefaultBudgetTracker implements BudgetTracker {
     this.modelCosts.set(modelKey, modelCurrent + costUSD);
   }
 
-  checkBudget(
-    taskId: TaskId,
-    modelId: string,
-    additionalCostUSD: number,
-  ): BudgetCheckResult {
+  checkBudget(taskId: TaskId, modelId: string, additionalCostUSD: number): BudgetCheckResult {
     const currentTaskCost = this.taskCosts.get(taskId) ?? 0;
     const newTaskCost = currentTaskCost + additionalCostUSD;
     const taskBudget = this.taskBudgets.get(taskId);

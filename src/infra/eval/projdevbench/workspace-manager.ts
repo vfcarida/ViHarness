@@ -49,7 +49,11 @@ export class ProjDevWorkspaceManager {
       const copyDirRecursive = (src: string, dest: string, relPath = '') => {
         const entries = fs.readdirSync(src, { withFileTypes: true });
         for (const entry of entries) {
-          if (entry.name === 'problem.json' || entry.name === 'config.json' || entry.name === '.git') {
+          if (
+            entry.name === 'problem.json' ||
+            entry.name === 'config.json' ||
+            entry.name === '.git'
+          ) {
             continue;
           }
           const srcFull = path.join(src, entry.name);

@@ -14,7 +14,8 @@ export interface PathValidationResult {
   readonly valid: boolean;
   readonly resolvedPath: string;
   readonly error?: string;
-  readonly errorCode?: 'PATH_TRAVERSAL' | 'SYMLINK_ESCAPE' | 'NULL_BYTE' | 'FORBIDDEN_PATH' | 'INVALID_PATH';
+  readonly errorCode?:
+    'PATH_TRAVERSAL' | 'SYMLINK_ESCAPE' | 'NULL_BYTE' | 'FORBIDDEN_PATH' | 'INVALID_PATH';
 }
 
 const FORBIDDEN_PATH_SUBSTRINGS: ReadonlyArray<string> = [
@@ -42,10 +43,7 @@ export class PathValidator {
   /**
    * Validate that a target path is safe, within the allowed root, and not escaping via traversal or symlinks.
    */
-  static validate(
-    targetPath: string,
-    workspaceRoot: string = process.cwd(),
-  ): PathValidationResult {
+  static validate(targetPath: string, workspaceRoot: string = process.cwd()): PathValidationResult {
     if (!targetPath || typeof targetPath !== 'string') {
       return {
         valid: false,
@@ -106,8 +104,13 @@ export class PathValidator {
     const normTmp = path.normalize(os.tmpdir()).toLowerCase().replace(/\\/g, '/');
 
     // 5. Workspace Boundary Bounds Check
-    const isInsideRoot = normResolved === normRoot || normResolved.startsWith(normRoot.endsWith('/') ? normRoot : `${normRoot}/`);
-    const isInsideTmp = !hasExplicitRoot && (normResolved === normTmp || normResolved.startsWith(normTmp.endsWith('/') ? normTmp : `${normTmp}/`));
+    const isInsideRoot =
+      normResolved === normRoot ||
+      normResolved.startsWith(normRoot.endsWith('/') ? normRoot : `${normRoot}/`);
+    const isInsideTmp =
+      !hasExplicitRoot &&
+      (normResolved === normTmp ||
+        normResolved.startsWith(normTmp.endsWith('/') ? normTmp : `${normTmp}/`));
 
     if (!isInsideRoot && !isInsideTmp) {
       return {
@@ -135,8 +138,13 @@ export class PathValidator {
       if (fs.existsSync(resolvedPath)) {
         const realPath = fs.realpathSync(resolvedPath);
         const normReal = path.normalize(realPath).toLowerCase().replace(/\\/g, '/');
-        const isRealInsideRoot = normReal === normRoot || normReal.startsWith(normRoot.endsWith('/') ? normRoot : `${normRoot}/`);
-        const isRealInsideTmp = !hasExplicitRoot && (normReal === normTmp || normReal.startsWith(normTmp.endsWith('/') ? normTmp : `${normTmp}/`));
+        const isRealInsideRoot =
+          normReal === normRoot ||
+          normReal.startsWith(normRoot.endsWith('/') ? normRoot : `${normRoot}/`);
+        const isRealInsideTmp =
+          !hasExplicitRoot &&
+          (normReal === normTmp ||
+            normReal.startsWith(normTmp.endsWith('/') ? normTmp : `${normTmp}/`));
 
         if (!isRealInsideRoot && !isRealInsideTmp) {
           return {
@@ -162,13 +170,21 @@ export class PathValidator {
     } catch {
       // If filesystem check fails, check parent directories
       let currentParent = path.dirname(resolvedPath);
-      while (currentParent && currentParent !== canonicalRoot && currentParent !== path.dirname(currentParent)) {
+      while (
+        currentParent &&
+        currentParent !== canonicalRoot &&
+        currentParent !== path.dirname(currentParent)
+      ) {
         try {
           if (fs.existsSync(currentParent)) {
             const realParent = fs.realpathSync(currentParent);
             const normRealParent = path.normalize(realParent).toLowerCase().replace(/\\/g, '/');
-            const isRealParentInside = (normRealParent === normRoot || normRealParent.startsWith(normRoot.endsWith('/') ? normRoot : `${normRoot}/`)) ||
-              (!hasExplicitRoot && (normRealParent === normTmp || normRealParent.startsWith(normTmp.endsWith('/') ? normTmp : `${normTmp}/`)));
+            const isRealParentInside =
+              normRealParent === normRoot ||
+              normRealParent.startsWith(normRoot.endsWith('/') ? normRoot : `${normRoot}/`) ||
+              (!hasExplicitRoot &&
+                (normRealParent === normTmp ||
+                  normRealParent.startsWith(normTmp.endsWith('/') ? normTmp : `${normTmp}/`)));
             if (!isRealParentInside) {
               return {
                 valid: false,

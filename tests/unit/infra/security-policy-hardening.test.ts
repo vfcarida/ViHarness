@@ -44,7 +44,10 @@ describe('Security Policy Boundary & Hardening Suite', () => {
       idempotent: true,
       defaultTimeoutMs: 1000,
       requiredPermissions: ['fs:write'],
-      inputSchema: { type: 'object', properties: { path: { type: 'string' }, content: { type: 'string' } } },
+      inputSchema: {
+        type: 'object',
+        properties: { path: { type: 'string' }, content: { type: 'string' } },
+      },
     },
     execute: async () => ({
       toolCallId: idFactory.create<'ToolCall'>(),

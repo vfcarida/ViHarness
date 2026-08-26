@@ -85,7 +85,10 @@ describe('Hardened Memory Subsystem Unit Test Suite', () => {
       tags: ['security'],
     });
 
-    const invalidatedRec = await store.invalidate(activeRec.id, 'Secret rotated and removed from codebase');
+    const invalidatedRec = await store.invalidate(
+      activeRec.id,
+      'Secret rotated and removed from codebase',
+    );
     expect(invalidatedRec.status).toBe(MemoryStatus.INVALIDATED);
 
     const activeQuery = await store.retrieve({ activeOnly: true });

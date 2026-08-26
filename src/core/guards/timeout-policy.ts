@@ -51,15 +51,14 @@ export class DefaultTimeoutPolicy implements TimeoutPolicy {
     }
 
     return new Promise<ToolResult>((resolve) => {
-      let timer: NodeJS.Timeout | undefined;
       let completed = false;
 
-      const cleanup = () => {
+      const cleanup = (): void => {
         completed = true;
-        if (timer) clearTimeout(timer);
+        clearTimeout(timer);
       };
 
-      timer = setTimeout(() => {
+      const timer = setTimeout(() => {
         if (!completed) {
           cleanup();
           controller.abort();

@@ -28,7 +28,7 @@ export const BASELINE_SCENARIOS: ReadonlyArray<BenchmarkTask> = [
     },
     budget: {
       maxTokens: 10000,
-      maxCostUSD: 0.10,
+      maxCostUSD: 0.1,
       maxIterations: 5,
     },
     timeout: {
@@ -88,7 +88,7 @@ export const BASELINE_SCENARIOS: ReadonlyArray<BenchmarkTask> = [
     },
     budget: {
       maxTokens: 50000,
-      maxCostUSD: 0.50,
+      maxCostUSD: 0.5,
       maxIterations: 15,
     },
     timeout: {
@@ -117,7 +117,7 @@ export const BASELINE_SCENARIOS: ReadonlyArray<BenchmarkTask> = [
     },
     budget: {
       maxTokens: 20000,
-      maxCostUSD: 0.20,
+      maxCostUSD: 0.2,
       maxIterations: 8,
     },
     timeout: {
@@ -146,7 +146,7 @@ export const BASELINE_SCENARIOS: ReadonlyArray<BenchmarkTask> = [
     },
     budget: {
       maxTokens: 80000,
-      maxCostUSD: 0.80,
+      maxCostUSD: 0.8,
       maxIterations: 20,
     },
     timeout: {
@@ -175,7 +175,7 @@ export const BASELINE_SCENARIOS: ReadonlyArray<BenchmarkTask> = [
     },
     budget: {
       maxTokens: 30000,
-      maxCostUSD: 0.30,
+      maxCostUSD: 0.3,
       maxIterations: 10,
     },
     timeout: {
@@ -217,6 +217,7 @@ export const BASELINE_SCENARIOS: ReadonlyArray<BenchmarkTask> = [
 export const CANONICAL_BASELINE_SUITE: TaskSuite = {
   suiteId: 'suite-baseline-v1',
   name: 'Canonical Harness Baseline Evaluation Suite v1',
-  description: 'Standard 7-scenario suite for model-agnostic evaluation of Vi-Harness agent runtime capabilities.',
+  description:
+    'Standard 7-scenario suite for model-agnostic evaluation of Vi-Harness agent runtime capabilities.',
   tasks: BASELINE_SCENARIOS,
 };

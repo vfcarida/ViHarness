@@ -64,9 +64,7 @@ export class PiHarnessAdapterRunner implements HarnessAdapter {
       completionTokens,
     );
     const estimatedCost =
-      costEstimate.estimatedCostUSD > 0
-        ? costEstimate.estimatedCostUSD
-        : totalTokens * 0.000015;
+      costEstimate.estimatedCostUSD > 0 ? costEstimate.estimatedCostUSD : totalTokens * 0.000015;
 
     // Pi self-reported success (without empirical verification check)
     const success = true;

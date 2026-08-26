@@ -32,10 +32,7 @@ export class ContextDeduplicator {
       }
 
       // Check duplicate tool outputs / observations
-      if (
-        obj.type === ContextObjectType.OBSERVATION ||
-        obj.type === ContextObjectType.EVIDENCE
-      ) {
+      if (obj.type === ContextObjectType.OBSERVATION || obj.type === ContextObjectType.EVIDENCE) {
         const obsHash = `OBS:${obj.source}:${normalizedContent.slice(0, 100)}`;
         if (seenHashes.has(obsHash)) {
           deduplicatedCount++;

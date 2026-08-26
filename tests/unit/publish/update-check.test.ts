@@ -123,8 +123,7 @@ describe('CLI Update Checker', () => {
     });
 
     it('handles 404/500 HTTP responses gracefully', async () => {
-      const errorFetch: typeof fetch = async () =>
-        new Response('Not Found', { status: 404 });
+      const errorFetch: typeof fetch = async () => new Response('Not Found', { status: 404 });
 
       const result = await checkForUpdates({
         currentVersion: '0.1.0',

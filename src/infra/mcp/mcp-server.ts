@@ -37,7 +37,7 @@ export class McpServer {
 
   constructor(options: McpServerOptions) {
     this.serverName = options.serverName ?? 'vi-harness-mcp-server';
-    this.serverVersion = options.serverVersion ?? '0.4.0';
+    this.serverVersion = options.serverVersion ?? '0.1.0';
     this.toolRegistry = options.toolRegistry;
     this.toolExecutor = options.toolExecutor;
     this.contextStore = options.contextStore;
@@ -83,8 +83,14 @@ export class McpServer {
             description: t.definition.description,
             inputSchema: {
               type: 'object',
-              properties: ((t.definition.inputSchema as Record<string, unknown>)?.['properties'] as Record<string, unknown>) ?? {},
-              required: ((t.definition.inputSchema as Record<string, unknown>)?.['required'] as string[]) ?? [],
+              properties:
+                ((t.definition.inputSchema as Record<string, unknown>)?.['properties'] as Record<
+                  string,
+                  unknown
+                >) ?? {},
+              required:
+                ((t.definition.inputSchema as Record<string, unknown>)?.['required'] as string[]) ??
+                [],
             },
           }));
 
@@ -96,7 +102,8 @@ export class McpServer {
         }
 
         case 'tools/call': {
-          const params = request.params as { name?: string; arguments?: Record<string, unknown> } | undefined;
+          const params = request.params as
+            { name?: string; arguments?: Record<string, unknown> } | undefined;
           const toolName = params?.name;
           const toolInput = params?.arguments ?? {};
 
@@ -114,7 +121,9 @@ export class McpServer {
               jsonrpc: '2.0',
               id: request.id,
               result: {
-                content: [{ type: 'text', text: `Error: Tool [${toolName}] not found in registry.` }],
+                content: [
+                  { type: 'text', text: `Error: Tool [${toolName}] not found in registry.` },
+                ],
                 isError: true,
               } satisfies McpCallToolResult,
             };
@@ -137,7 +146,9 @@ export class McpServer {
               jsonrpc: '2.0',
               id: request.id,
               result: {
-                content: [{ type: 'text', text: `Tool execution failed: ${err?.message ?? String(err)}` }],
+                content: [
+                  { type: 'text', text: `Tool execution failed: ${err?.message ?? String(err)}` },
+                ],
                 isError: true,
               } satisfies McpCallToolResult,
             };
@@ -205,7 +216,10 @@ export class McpServer {
       return {
         jsonrpc: '2.0',
         id: request.id,
-        error: { code: -32603, message: `Internal server error: ${error?.message ?? String(error)}` },
+        error: {
+          code: -32603,
+          message: `Internal server error: ${error?.message ?? String(error)}`,
+        },
       };
     }
   }
@@ -215,7 +229,10 @@ export class McpServer {
   /**
    * Bind the MCP server to a transport and start receiving requests.
    */
-  async listen(transport: import('./transports/types.js').Transport, config?: Record<string, unknown>): Promise<void> {
+  async listen(
+    transport: import('./transports/types.js').Transport,
+    config?: Record<string, unknown>,
+  ): Promise<void> {
     transport.onMessage(async (req) => {
       return this.handleRequest(req);
     });

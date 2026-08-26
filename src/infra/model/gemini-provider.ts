@@ -41,28 +41,34 @@ export interface GeminiProviderOptions {
 const GeminiPartSchema = z.object({
   text: z.string().optional(),
   thought: z.string().optional(),
-  functionCall: z.object({
-    name: z.string(),
-    args: z.record(z.unknown()).optional(),
-  }).optional(),
+  functionCall: z
+    .object({
+      name: z.string(),
+      args: z.record(z.unknown()).optional(),
+    })
+    .optional(),
 });
 
 const GeminiCandidateSchema = z.object({
-  content: z.object({
-    role: z.string().optional(),
-    parts: z.array(GeminiPartSchema).optional(),
-  }).optional(),
+  content: z
+    .object({
+      role: z.string().optional(),
+      parts: z.array(GeminiPartSchema).optional(),
+    })
+    .optional(),
   finishReason: z.string().nullable().optional(),
 });
 
 const GeminiResponseSchema = z.object({
   candidates: z.array(GeminiCandidateSchema).optional(),
-  usageMetadata: z.object({
-    promptTokenCount: z.number().optional(),
-    candidatesTokenCount: z.number().optional(),
-    totalTokenCount: z.number().optional(),
-    cachedContentTokenCount: z.number().optional(),
-  }).optional(),
+  usageMetadata: z
+    .object({
+      promptTokenCount: z.number().optional(),
+      candidatesTokenCount: z.number().optional(),
+      totalTokenCount: z.number().optional(),
+      cachedContentTokenCount: z.number().optional(),
+    })
+    .optional(),
 });
 
 export class GeminiModelProvider implements ModelProvider {
@@ -75,7 +81,11 @@ export class GeminiModelProvider implements ModelProvider {
 
   constructor(options: GeminiProviderOptions = {}) {
     this.providerId = options.providerId ?? 'gemini-primary';
-    this.baseUrl = (options.baseUrl ?? process.env['GEMINI_BASE_URL'] ?? 'https://generativelanguage.googleapis.com/v1beta').replace(/\/+$/, '');
+    this.baseUrl = (
+      options.baseUrl ??
+      process.env['GEMINI_BASE_URL'] ??
+      'https://generativelanguage.googleapis.com/v1beta'
+    ).replace(/\/+$/, '');
     this.apiKey = options.apiKey ?? process.env['GEMINI_API_KEY'] ?? '';
     this.defaultModelId = options.defaultModelId ?? 'gemini-2.5-pro';
     this.fetchImpl = options.customFetch ?? globalThis.fetch;
@@ -107,7 +117,11 @@ export class GeminiModelProvider implements ModelProvider {
     const body = this.buildRequestBody(request);
     const startMs = Date.now();
 
-    const response = await this.executeRequest(`/models/${modelId}:generateContent`, body, request.signal);
+    const response = await this.executeRequest(
+      `/models/${modelId}:generateContent`,
+      body,
+      request.signal,
+    );
     const latencyMs = Date.now() - startMs;
 
     let parsedJson: unknown;
@@ -322,7 +336,11 @@ export class GeminiModelProvider implements ModelProvider {
     return payload;
   }
 
-  private async executeRequest(path: string, body: Record<string, unknown>, signal?: AbortSignal): Promise<Response> {
+  private async executeRequest(
+    path: string,
+    body: Record<string, unknown>,
+    signal?: AbortSignal,
+  ): Promise<Response> {
     const delimiter = path.includes('?') ? '&' : '?';
     const url = `${this.baseUrl}${path}${delimiter}key=${this.apiKey}`;
     const headers: Record<string, string> = {

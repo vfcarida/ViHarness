@@ -20,8 +20,12 @@ export class ProjDevReportGenerator {
     lines.push(`- **Date**: ${report.timestamp}`);
     lines.push(`- **Overall Score**: **${report.overallScore.toFixed(2)}%**`);
     lines.push(`- **Execution Score (80% weight)**: ${report.executionScoreAverage.toFixed(2)}%`);
-    lines.push(`- **Code Review Score (20% weight)**: ${report.codeReviewScoreAverage.toFixed(2)}%`);
-    lines.push(`- **Total Problems**: ${report.totalProblems} (${report.completedProblems} passed)`);
+    lines.push(
+      `- **Code Review Score (20% weight)**: ${report.codeReviewScoreAverage.toFixed(2)}%`,
+    );
+    lines.push(
+      `- **Total Problems**: ${report.totalProblems} (${report.completedProblems} passed)`,
+    );
     lines.push(`- **Total Tokens**: ${report.totalTokens.toLocaleString()}`);
     lines.push(`- **Total Cost**: $${report.totalCostDollars.toFixed(4)}`);
     lines.push(`- **Total Duration**: ${(report.totalDurationMs / 1000).toFixed(1)}s\n`);
@@ -35,7 +39,9 @@ export class ProjDevReportGenerator {
       const rank = idx + 1;
       const agentLabel = isViHarness ? `**${entry.agent}**` : entry.agent;
       const modelLabel = entry.referenceModel ?? 'N/A';
-      const scoreLabel = isViHarness ? `**${entry.score.toFixed(2)}%**` : `${entry.score.toFixed(2)}%`;
+      const scoreLabel = isViHarness
+        ? `**${entry.score.toFixed(2)}%**`
+        : `${entry.score.toFixed(2)}%`;
       const statusLabel = isViHarness ? '🎯 **Evaluated**' : 'Official Baseline';
       lines.push(`| ${rank} | ${agentLabel} | ${modelLabel} | ${scoreLabel} | ${statusLabel} |`);
     });
@@ -49,7 +55,9 @@ export class ProjDevReportGenerator {
     }
 
     lines.push('\n## 📋 Detailed Problem Results\n');
-    lines.push('| Problem ID | Category | Difficulty | Mode | Exec Score | Review Score | Final Score | Verdicts | Status |');
+    lines.push(
+      '| Problem ID | Category | Difficulty | Mode | Exec Score | Review Score | Final Score | Verdicts | Status |',
+    );
     lines.push('| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |');
 
     for (const ps of report.problemScores) {

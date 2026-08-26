@@ -7,11 +7,7 @@
  */
 import type { ExecutionId } from '../types/identifiers.js';
 import type { Goal } from '../model/goal.js';
-import type {
-  ExecutionOptions,
-  ExecutionResult,
-  AgentEvent,
-} from '../model/runtime-types.js';
+import type { ExecutionOptions, ExecutionResult, AgentEvent } from '../model/runtime-types.js';
 
 export interface AgentObserver {
   onEvent(event: AgentEvent): void;

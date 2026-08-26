@@ -167,7 +167,8 @@ export class ProfileLoader {
       bundles: Array.isArray(parsed.bundles) ? parsed.bundles.map(String) : ['base'],
       patches: Array.isArray(parsed.patches) ? parsed.patches : undefined,
       env: parsed.env && typeof parsed.env === 'object' ? parsed.env : undefined,
-      metadata: parsed.metadata && typeof parsed.metadata === 'object' ? parsed.metadata : undefined,
+      metadata:
+        parsed.metadata && typeof parsed.metadata === 'object' ? parsed.metadata : undefined,
     };
   }
 
@@ -259,10 +260,12 @@ export class ProfileLoader {
     return {
       name: typeof result.name === 'string' ? result.name : fallbackName,
       description: typeof result.description === 'string' ? result.description : undefined,
-      bundles: Array.isArray(result.bundles) && result.bundles.length > 0 ? result.bundles : ['base'],
+      bundles:
+        Array.isArray(result.bundles) && result.bundles.length > 0 ? result.bundles : ['base'],
       patches: Array.isArray(result.patches) ? result.patches : undefined,
       env: result.env && typeof result.env === 'object' ? result.env : undefined,
-      metadata: result.metadata && typeof result.metadata === 'object' ? result.metadata : undefined,
+      metadata:
+        result.metadata && typeof result.metadata === 'object' ? result.metadata : undefined,
     };
   }
 

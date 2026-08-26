@@ -15,11 +15,7 @@ import type {
   ToolCall,
   TokenUsage,
 } from '../../core/model/model-io.js';
-import {
-  FinishReason,
-  ModelCapability,
-  ProviderHealthStatus,
-} from '../../core/model/model-io.js';
+import { FinishReason, ModelCapability, ProviderHealthStatus } from '../../core/model/model-io.js';
 
 export interface MockModelProviderOptions {
   readonly providerId?: string;
@@ -132,7 +128,9 @@ export class MockModelProvider implements ModelProvider {
     const words = this.responseText.split(' ');
     for (const word of words) {
       if (this.latencyMs > 0) {
-        await new Promise((r) => setTimeout(r, Math.max(1, Math.floor(this.latencyMs / words.length))));
+        await new Promise((r) =>
+          setTimeout(r, Math.max(1, Math.floor(this.latencyMs / words.length))),
+        );
       }
       yield { deltaText: word + ' ' };
     }

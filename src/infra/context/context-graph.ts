@@ -81,10 +81,7 @@ export class ContextGraph {
   /**
    * Find ancestor nodes up the directed graph (e.g. DEPENDS_ON or DERIVED_FROM).
    */
-  getAncestors(
-    startId: ContextId,
-    relationType?: ContextRelationType,
-  ): Set<ContextId> {
+  getAncestors(startId: ContextId, relationType?: ContextRelationType): Set<ContextId> {
     const ancestors = new Set<ContextId>();
     const queue: ContextId[] = [startId];
     const visited = new Set<ContextId>([startId]);
@@ -107,10 +104,7 @@ export class ContextGraph {
   /**
    * Find descendant nodes down the directed graph.
    */
-  getDescendants(
-    startId: ContextId,
-    relationType?: ContextRelationType,
-  ): Set<ContextId> {
+  getDescendants(startId: ContextId, relationType?: ContextRelationType): Set<ContextId> {
     const descendants = new Set<ContextId>();
     const queue: ContextId[] = [startId];
     const visited = new Set<ContextId>([startId]);

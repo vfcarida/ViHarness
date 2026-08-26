@@ -14,11 +14,7 @@ import type {
   ToolCall,
   TokenUsage,
 } from '../../core/model/model-io.js';
-import {
-  FinishReason,
-  ModelCapability,
-  ProviderHealthStatus,
-} from '../../core/model/model-io.js';
+import { FinishReason, ModelCapability, ProviderHealthStatus } from '../../core/model/model-io.js';
 
 export interface ScriptedStep {
   readonly content?: string;
@@ -27,7 +23,8 @@ export interface ScriptedStep {
   readonly usage?: TokenUsage;
 }
 
-export type ScriptStepHandler = ScriptedStep | ((request: ModelRequest, index: number) => ScriptedStep);
+export type ScriptStepHandler =
+  ScriptedStep | ((request: ModelRequest, index: number) => ScriptedStep);
 
 export interface ScriptedModelProviderOptions {
   readonly providerId?: string;
@@ -73,7 +70,8 @@ export class ScriptedModelProvider implements ModelProvider {
     this.requestHistory.push(request);
 
     const stepHandler = this.steps[Math.min(stepIndex, this.steps.length - 1)];
-    const step = typeof stepHandler === 'function' ? stepHandler(request, stepIndex) : (stepHandler ?? {});
+    const step =
+      typeof stepHandler === 'function' ? stepHandler(request, stepIndex) : (stepHandler ?? {});
 
     const toolCalls: ToolCall[] = [];
     if (step.toolCalls && step.toolCalls.length > 0) {
@@ -87,8 +85,10 @@ export class ScriptedModelProvider implements ModelProvider {
       }
     }
 
-    const content = step.content ?? (toolCalls.length > 0 ? '' : 'Scripted trajectory completed successfully.');
-    const finishReason = step.finishReason ?? (toolCalls.length > 0 ? FinishReason.TOOL_CALL : FinishReason.STOP);
+    const content =
+      step.content ?? (toolCalls.length > 0 ? '' : 'Scripted trajectory completed successfully.');
+    const finishReason =
+      step.finishReason ?? (toolCalls.length > 0 ? FinishReason.TOOL_CALL : FinishReason.STOP);
 
     const inputTokens =
       step.usage?.inputTokens ??

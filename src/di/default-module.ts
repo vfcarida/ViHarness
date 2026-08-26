@@ -115,10 +115,7 @@ export class DefaultModule implements ContainerModule {
     container.register(TOKENS.GitManager, () => new TwoPhaseGitManager());
     container.register('gitManager', (c) => c.resolve(TOKENS.GitManager));
 
-    container.register(
-      TOKENS.GoalBudgets,
-      () => new GoalBudgetManager(),
-    );
+    container.register(TOKENS.GoalBudgets, () => new GoalBudgetManager());
     container.register('goalBudgets', (c) => c.resolve(TOKENS.GoalBudgets));
 
     container.register(TOKENS.MemoryManager, (c) => {

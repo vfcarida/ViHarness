@@ -84,14 +84,20 @@ Commands:
       case 'list': {
         const sessions = await sessionStore.listRecent(args.limit);
         console.log(`\nFound ${sessions.length} sessions (DB: ${store.resolvedDbPath}):\n`);
-        console.log('--------------------------------------------------------------------------------');
+        console.log(
+          '--------------------------------------------------------------------------------',
+        );
         console.log('ID                                    MESSAGES  UPDATED AT');
-        console.log('--------------------------------------------------------------------------------');
+        console.log(
+          '--------------------------------------------------------------------------------',
+        );
         for (const s of sessions) {
           const dateStr = new Date(s.updatedAt).toISOString().replace('T', ' ').slice(0, 19);
           console.log(`${s.id.padEnd(38)} ${String(s.messageCount).padEnd(9)} ${dateStr}`);
         }
-        console.log('--------------------------------------------------------------------------------\n');
+        console.log(
+          '--------------------------------------------------------------------------------\n',
+        );
         break;
       }
 
@@ -109,7 +115,9 @@ Commands:
         console.log(`\nSession: ${record.session.id}`);
         console.log(`Created: ${new Date(record.session.header.createdAt).toISOString()}`);
         if (record.session.header.parentId) {
-          console.log(`Parent:  ${record.session.header.parentId} (branch point: ${record.session.header.branchPoint})`);
+          console.log(
+            `Parent:  ${record.session.header.parentId} (branch point: ${record.session.header.branchPoint})`,
+          );
         }
         console.log(`Messages: ${record.session.log.length}\n`);
 

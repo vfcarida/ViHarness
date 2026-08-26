@@ -49,20 +49,30 @@ describe('Vi-Harness Full Pipeline Integration Suite — P016', () => {
     try {
       await sqlite.close();
       fs.rmSync(tempDir, { recursive: true, force: true });
-    } catch {}
+    } catch {
+      /* ignore cleanup error */
+    }
   });
 
   // Test 1: Simple task - Add a function
   it('1. Simple task: adds function, creates git checkpoint, and records metrics', async () => {
     const mathFile = path.join(tempDir, 'math.ts');
-    fs.writeFileSync(mathFile, 'export function add(a: number, b: number): number { return a + b; }\n', 'utf-8');
+    fs.writeFileSync(
+      mathFile,
+      'export function add(a: number, b: number): number { return a + b; }\n',
+      'utf-8',
+    );
 
     const toolRegistry = new DefaultToolRegistry();
     toolRegistry.register(new ReadFileTool(idFactory));
     toolRegistry.register(new WriteFileTool(idFactory));
 
     const policyEngine = new DefaultPolicyEngine();
-    const toolExecutor = new DefaultToolExecutor({ registry: toolRegistry, policyEngine, idFactory });
+    const toolExecutor = new DefaultToolExecutor({
+      registry: toolRegistry,
+      policyEngine,
+      idFactory,
+    });
     const compiler = new DefaultContextCompiler({ idFactory, clock });
     const gitManager = new DefaultGitManager();
     const metricsSink = new SqliteMetricsSink({ store: sqlite });
@@ -125,7 +135,10 @@ describe('Vi-Harness Full Pipeline Integration Suite — P016', () => {
     expect(status.headCommit).toBe(commitSha);
 
     // 4. Verify metrics recorded in storage
-    await metricsSink.recordMetric('test-session-1', 'task_success', { tokens: 75, durationMs: 120 });
+    await metricsSink.recordMetric('test-session-1', 'task_success', {
+      tokens: 75,
+      durationMs: 120,
+    });
     const metrics = await metricsSink.getSessionMetrics('test-session-1');
     expect(metrics.length).toBe(1);
     expect(metrics[0]?.payload.tokens).toBe(75);
@@ -266,7 +279,10 @@ describe('Vi-Harness Full Pipeline Integration Suite — P016', () => {
     });
 
     // Step 2: Query for similar problem
-    const matches = await experienceStore.findSimilar('Fix PostgreSQL connection pool leak in db/pool.ts', 0.5);
+    const matches = await experienceStore.findSimilar(
+      'Fix PostgreSQL connection pool leak in db/pool.ts',
+      0.5,
+    );
 
     expect(matches.length).toBeGreaterThan(0);
     expect(matches[0]?.id).toBe(expId);
@@ -278,7 +294,8 @@ describe('Vi-Harness Full Pipeline Integration Suite — P016', () => {
   it('5. Architect mode: generates natural language plan before execution model runs', async () => {
     const architectModel = new MockModelProvider({
       providerId: 'architect-mock',
-      defaultResponseText: 'PLAN:\n1. In `db/schema.ts`: Define modular entities\n2. In `db/index.ts`: Export interfaces',
+      defaultResponseText:
+        'PLAN:\n1. In `db/schema.ts`: Define modular entities\n2. In `db/index.ts`: Export interfaces',
     });
 
     const planResult = await ArchitectExecutor.plan({

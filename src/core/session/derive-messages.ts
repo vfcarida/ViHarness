@@ -8,11 +8,7 @@
  */
 import type { SessionEvent } from './session-event.js';
 import type { CompactionSummaryData } from './event-map.js';
-import {
-  type ModelMessage,
-  MessageRole,
-  type ToolCall,
-} from '../model/model-io.js';
+import { type ModelMessage, MessageRole, type ToolCall } from '../model/model-io.js';
 
 export interface DeriveMessagesOptions {
   /** If true, includes shadowed events instead of compaction replacements. */
@@ -116,7 +112,10 @@ export function deriveMessages(
         messages.push({
           role: MessageRole.ASSISTANT,
           content: data.message.content,
-          toolCalls: data.message.toolCalls && data.message.toolCalls.length > 0 ? data.message.toolCalls : undefined,
+          toolCalls:
+            data.message.toolCalls && data.message.toolCalls.length > 0
+              ? data.message.toolCalls
+              : undefined,
           metadata: data.message.metadata,
         });
         break;

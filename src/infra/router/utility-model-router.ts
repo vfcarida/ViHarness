@@ -24,10 +24,7 @@ import type {
   DualModelConfig,
   ModelRole,
 } from '../../core/model/router-types.js';
-import {
-  TaskCategory,
-  ModelPolicyRule,
-} from '../../core/model/router-types.js';
+import { TaskCategory, ModelPolicyRule } from '../../core/model/router-types.js';
 import { AgentPhase } from '../../core/model/state.js';
 import { ModelCapability } from '../../core/model/model-io.js';
 import { CapabilityMatcher } from './capability-matcher.js';
@@ -296,11 +293,14 @@ export class UtilityModelRouter implements ModelRouter {
       if (hasReasoning) {
         successProbability = 0.98;
         reasoningBonus = 20.0;
-        if (desc.capabilities.maxOutputTokens >= 16000 || desc.costPer1kOutputTokensDollars >= 0.03) {
+        if (
+          desc.capabilities.maxOutputTokens >= 16000 ||
+          desc.costPer1kOutputTokensDollars >= 0.03
+        ) {
           reasoningBonus += 10.0;
         }
       } else {
-        successProbability = 0.50;
+        successProbability = 0.5;
       }
     } else if (targetRole === 'EDITOR') {
       // Editor role values fast, high-quality code generation and tool usage
@@ -309,19 +309,24 @@ export class UtilityModelRouter implements ModelRouter {
       } else if (hasCoding) {
         successProbability = 0.65;
       } else {
-        successProbability = 0.40;
+        successProbability = 0.4;
       }
     } else if (isHighComplexity) {
       if (hasReasoning && hasCoding) {
         successProbability = 0.95;
-        const isFrontierTier = desc.capabilities.maxOutputTokens >= 16000 || desc.costPer1kOutputTokensDollars >= 0.03;
+        const isFrontierTier =
+          desc.capabilities.maxOutputTokens >= 16000 || desc.costPer1kOutputTokensDollars >= 0.03;
         reasoningBonus = request.complexity === 'VERY_HIGH' ? (isFrontierTier ? 25.0 : 10.0) : 8.0;
       } else if (!hasReasoning) {
         successProbability = 0.4;
       }
-    } else if (isMediumOrHigher && (request.taskCategory === TaskCategory.CODE_GEN || request.taskCategory === TaskCategory.BUG_FIX)) {
+    } else if (
+      isMediumOrHigher &&
+      (request.taskCategory === TaskCategory.CODE_GEN ||
+        request.taskCategory === TaskCategory.BUG_FIX)
+    ) {
       if (hasCoding && isFullTierModel) {
-        successProbability = 0.90;
+        successProbability = 0.9;
       } else {
         successProbability = 0.65;
       }
@@ -357,7 +362,8 @@ export class UtilityModelRouter implements ModelRouter {
 
     // 5. Estimated Latency
     const estimatedLatencyMs = desc.costPer1kOutputTokensDollars > 0.005 ? 1200 : 400;
-    const latencyWeight = request.latencyBudgetMs && estimatedLatencyMs > request.latencyBudgetMs ? 0.01 : 0.001;
+    const latencyWeight =
+      request.latencyBudgetMs && estimatedLatencyMs > request.latencyBudgetMs ? 0.01 : 0.001;
     const latencyPenalty = estimatedLatencyMs * latencyWeight;
 
     // 6. Risk Penalty

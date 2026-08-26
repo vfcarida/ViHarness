@@ -342,6 +342,6 @@ describe('Adversarial Context Compiler Suite', () => {
 
     expect(finalRaw).toBe(50000);
     expect(finalCompiled).toBeLessThanOrEqual(8000);
-    expect(finalCompiled / finalRaw).toBeLessThan(0.20); // Compressed by > 80%
+    expect(finalCompiled / finalRaw).toBeLessThan(0.2); // Compressed by > 80%
   });
 });

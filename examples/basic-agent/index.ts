@@ -7,6 +7,8 @@
  * 3. Defining a Goal and executing it through the 10-phase state machine
  * 4. Capturing empirical verification evidence and telemetry
  */
+import { fileURLToPath } from 'node:url';
+import * as path from 'node:path';
 import {
   createRuntime,
   DefaultToolRegistry,
@@ -111,7 +113,13 @@ export async function runBasicAgent(): Promise<void> {
 }
 
 // Execute if run directly
-if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith('basic-agent/index.ts')) {
+const isDirectExecution =
+  process.argv[1] &&
+  (path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) ||
+    /basic-agent[\\/]index\.(ts|js)$/.test(process.argv[1]) ||
+    process.argv[1].replace(/\\/g, '/').endsWith('basic-agent/index.ts'));
+
+if (isDirectExecution) {
   runBasicAgent().catch((err) => {
     console.error('Agent execution failed:', err);
     process.exit(1);

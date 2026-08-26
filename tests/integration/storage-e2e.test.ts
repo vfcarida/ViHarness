@@ -56,7 +56,10 @@ describe('SQLite Storage End-to-End Integration — P013', () => {
     });
 
     await curator1.set('project', 'git_branch', 'feat/sqlite-persistence');
-    await metrics1.recordMetric(sessionId, 'tokens_used', { totalTokens: 4200, costDollars: 0.015 });
+    await metrics1.recordMetric(sessionId, 'tokens_used', {
+      totalTokens: 4200,
+      costDollars: 0.015,
+    });
 
     await store1.close();
 

@@ -30,9 +30,12 @@ export enum ActionExecutionStatus {
 }
 
 // Backward compatibility runtime aliases (prevents ESLint enum duplicate errors)
-(ActionExecutionStatus as unknown as Record<string, string>).RUNNING = ActionExecutionStatus.STARTED;
-(ActionExecutionStatus as unknown as Record<string, string>).UNCERTAIN = ActionExecutionStatus.UNKNOWN;
-(ActionExecutionStatus as unknown as Record<string, string>).INTERRUPTED = ActionExecutionStatus.UNKNOWN;
+(ActionExecutionStatus as unknown as Record<string, string>).RUNNING =
+  ActionExecutionStatus.STARTED;
+(ActionExecutionStatus as unknown as Record<string, string>).UNCERTAIN =
+  ActionExecutionStatus.UNKNOWN;
+(ActionExecutionStatus as unknown as Record<string, string>).INTERRUPTED =
+  ActionExecutionStatus.UNKNOWN;
 
 export enum RecoveryPolicy {
   RETRY_SAFE = 'RETRY_SAFE',

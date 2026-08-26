@@ -6,10 +6,7 @@
  * across Naive Accumulation, Pi-style Compaction, and Vi-Harness Context Compiler.
  */
 
-export type ContextStrategyType =
-  | 'NAIVE_ACCUMULATION'
-  | 'PI_COMPACTION'
-  | 'VI_CONTEXT_COMPILER';
+export type ContextStrategyType = 'NAIVE_ACCUMULATION' | 'PI_COMPACTION' | 'VI_CONTEXT_COMPILER';
 
 export type InjectionCategory =
   | 'CRITICAL_MEMORY'

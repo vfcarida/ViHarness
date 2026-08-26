@@ -27,7 +27,9 @@ export class TransportRegistry {
   create(name: string, config?: Record<string, unknown>): Transport {
     const factory = this.factories.get(name.toLowerCase());
     if (!factory) {
-      throw new Error(`Transport [${name}] is not registered in TransportRegistry. Available: ${this.list().join(', ')}`);
+      throw new Error(
+        `Transport [${name}] is not registered in TransportRegistry. Available: ${this.list().join(', ')}`,
+      );
     }
     return factory(config);
   }

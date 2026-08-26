@@ -4,7 +4,11 @@
  * "Application-level validation: command sanitization, metacharacter blocking, and secret scrubbing."
  */
 import type { Tool } from '../../../core/interfaces/tool.js';
-import type { ToolInput, ToolResult, ToolExecutionContext } from '../../../core/model/tool-types.js';
+import type {
+  ToolInput,
+  ToolResult,
+  ToolExecutionContext,
+} from '../../../core/model/tool-types.js';
 import { ToolCategory, ToolRiskLevel } from '../../../core/model/tool-types.js';
 import type { IdFactory } from '../../../core/types/identifiers.js';
 import { CommandSanitizer } from '../command-sanitizer.js';

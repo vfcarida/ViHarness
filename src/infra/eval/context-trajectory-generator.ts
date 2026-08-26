@@ -23,7 +23,8 @@ export class ContextTrajectoryGenerator {
     {
       id: 'CM-001',
       factKey: 'DB_PORT_SCHEMA',
-      content: 'Architecture Invariant: PostgreSQL port 5432 with schema version v4.2 and strict foreign keys.',
+      content:
+        'Architecture Invariant: PostgreSQL port 5432 with schema version v4.2 and strict foreign keys.',
       description: 'Database connection configuration and schema version invariant',
       injectedIteration: 2,
       expectedPattern: 'PostgreSQL port 5432',
@@ -31,7 +32,8 @@ export class ContextTrajectoryGenerator {
     {
       id: 'CM-002',
       factKey: 'SECURITY_TOKEN_LOGGING',
-      content: 'Security Invariant: Never log Bearer auth tokens or HMAC secret keys in telemetry pipelines.',
+      content:
+        'Security Invariant: Never log Bearer auth tokens or HMAC secret keys in telemetry pipelines.',
       description: 'Security policy forbidding credential exposure in telemetry',
       injectedIteration: 5,
       expectedPattern: 'Never log Bearer auth tokens',
@@ -39,7 +41,8 @@ export class ContextTrajectoryGenerator {
     {
       id: 'CM-003',
       factKey: 'TAX_EXEMPTION_ORDER',
-      content: 'Business Rule: Tax calculation must apply exempt status before discount tier evaluation.',
+      content:
+        'Business Rule: Tax calculation must apply exempt status before discount tier evaluation.',
       description: 'Billing computation ordering invariant',
       injectedIteration: 15,
       expectedPattern: 'exempt status before discount tier',
@@ -47,7 +50,8 @@ export class ContextTrajectoryGenerator {
     {
       id: 'CM-004',
       factKey: 'API_IDEMPOTENCY_HEADER',
-      content: 'API Contract: PaymentWebhook v2 payload requires X-Idempotency-Key header on all retries.',
+      content:
+        'API Contract: PaymentWebhook v2 payload requires X-Idempotency-Key header on all retries.',
       description: 'Webhook idempotency requirement',
       injectedIteration: 30,
       expectedPattern: 'X-Idempotency-Key',
@@ -55,7 +59,8 @@ export class ContextTrajectoryGenerator {
     {
       id: 'CM-005',
       factKey: 'TENANT_ISOLATION_RULE',
-      content: 'Database Isolation: Multi-tenant tenant_id column required on all foreign key references and composite indexes.',
+      content:
+        'Database Isolation: Multi-tenant tenant_id column required on all foreign key references and composite indexes.',
       description: 'Multi-tenant database data isolation invariant',
       injectedIteration: 65,
       expectedPattern: 'tenant_id column required',
@@ -259,11 +264,17 @@ export class ContextTrajectoryGenerator {
     ];
 
     for (let i = 1; i <= 40; i++) {
-      logLines.push(`[TRACE 2026-08-13T16:00:00.${100 + i}Z] Executing test case ${i}: test_item_${i}_validation... PASS`);
-      logLines.push(`[DEBUG 2026-08-13T16:00:00.${100 + i}Z] Memory usage: ${24.5 + (i % 5) * 0.4}MB, Event loop lag: 0.12ms`);
+      logLines.push(
+        `[TRACE 2026-08-13T16:00:00.${100 + i}Z] Executing test case ${i}: test_item_${i}_validation... PASS`,
+      );
+      logLines.push(
+        `[DEBUG 2026-08-13T16:00:00.${100 + i}Z] Memory usage: ${24.5 + (i % 5) * 0.4}MB, Event loop lag: 0.12ms`,
+      );
     }
 
-    logLines.push(`[INFO 2026-08-13T16:00:01.000Z] Test suite completed: 40 passed, 0 failed, 0 skipped.`);
+    logLines.push(
+      `[INFO 2026-08-13T16:00:01.000Z] Test suite completed: 40 passed, 0 failed, 0 skipped.`,
+    );
     return logLines.join('\n');
   }
 }

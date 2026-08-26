@@ -103,7 +103,10 @@ describe('ViHarness Pi-Replacement Compatibility Adapter Contract', () => {
             {
               id: 'call_write',
               name: 'write_file',
-              input: { path: 'src/auth/login.ts', content: 'export function login() { return true; }' },
+              input: {
+                path: 'src/auth/login.ts',
+                content: 'export function login() { return true; }',
+              },
             },
           ],
         },
@@ -166,7 +169,7 @@ describe('ViHarness Pi-Replacement Compatibility Adapter Contract', () => {
       description: 'Ensure internal Vi state handles are hidden',
     };
 
-    const result = await harness.runTask(task) as Record<string, unknown>;
+    const result = (await harness.runTask(task)) as Record<string, unknown>;
 
     // Verify internal state machine / runtime / context graph handles are NOT exposed
     expect(result['stateMachine']).toBeUndefined();
@@ -276,7 +279,13 @@ describe('ViHarness Pi-Replacement Compatibility Adapter Contract', () => {
         },
         {
           content: 'Step 2: Apply code fix',
-          toolCalls: [{ id: 'c2', name: 'write_file', input: { path: 'src/app.ts', content: 'export const ok = true;' } }],
+          toolCalls: [
+            {
+              id: 'c2',
+              name: 'write_file',
+              input: { path: 'src/app.ts', content: 'export const ok = true;' },
+            },
+          ],
           tokenUsage: { inputTokens: 800, outputTokens: 150, totalTokens: 950 },
         },
       ],
@@ -297,7 +306,9 @@ describe('ViHarness Pi-Replacement Compatibility Adapter Contract', () => {
 
     expect(result.tokens.promptTokens).toBeGreaterThan(0);
     expect(result.tokens.completionTokens).toBeGreaterThan(0);
-    expect(result.tokens.totalTokens).toBe(result.tokens.promptTokens + result.tokens.completionTokens);
+    expect(result.tokens.totalTokens).toBe(
+      result.tokens.promptTokens + result.tokens.completionTokens,
+    );
     expect(result.modelCalls).toBeGreaterThan(0);
     expect(typeof result.estimatedCost).toBe('number');
   });

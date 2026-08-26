@@ -95,7 +95,7 @@ describe('Real Verification Pipeline Integration Suite (No Mocks)', () => {
         createdAt: new Date(),
         pass: false,
         checkId: 'check-unit-tests',
-        confidence: 0.20,
+        confidence: 0.2,
         affectedFiles: ['src/index.ts'],
       },
     ];
@@ -103,7 +103,9 @@ describe('Real Verification Pipeline Integration Suite (No Mocks)', () => {
     const regressions = engine.detectRegressions(baselineEvidence, candidateEvidence, taskId);
 
     expect(regressions).toHaveLength(1);
-    expect(regressions[0]?.description).toContain('Regression detected in check [check-unit-tests]');
+    expect(regressions[0]?.description).toContain(
+      'Regression detected in check [check-unit-tests]',
+    );
   });
 
   it('5. Acceptance Policy Evaluation: Gated DONE state requires zero regressions and required checks', () => {

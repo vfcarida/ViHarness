@@ -6,22 +6,26 @@
  */
 import * as path from 'path';
 import type { PolicyRule } from '../../../core/interfaces/policy-engine.js';
-import type { PolicyAction, PolicyDecision, PermissionContext } from '../../../core/model/policy.js';
+import type {
+  PolicyAction,
+  PolicyDecision,
+  PermissionContext,
+} from '../../../core/model/policy.js';
 import { PolicyDecisionType, DEFAULT_PERMISSION_CONTEXT } from '../../../core/model/policy.js';
 
 export class PathRestrictionRule implements PolicyRule {
   public readonly id = 'rule-path-restriction';
   public readonly name = 'Path Restriction';
-  public readonly description = 'Restricts filesystem operations to allowed project working paths using canonical resolution.';
+  public readonly description =
+    'Restricts filesystem operations to allowed project working paths using canonical resolution.';
 
   async evaluate(action: PolicyAction, context?: PermissionContext): Promise<PolicyDecision> {
     const permContext = context ?? DEFAULT_PERMISSION_CONTEXT;
     const now = new Date();
     const actionType = String(action.type ?? '').toLowerCase();
 
-    const isFileOp = actionType.includes('file') ||
-      actionType.includes('read') ||
-      actionType.includes('write');
+    const isFileOp =
+      actionType.includes('file') || actionType.includes('read') || actionType.includes('write');
 
     if (!isFileOp) {
       return {
@@ -33,7 +37,9 @@ export class PathRestrictionRule implements PolicyRule {
       };
     }
 
-    const rawPath = String(action.metadata?.['path'] ?? action.metadata?.['resource'] ?? action.resource ?? '');
+    const rawPath = String(
+      action.metadata?.['path'] ?? action.metadata?.['resource'] ?? action.resource ?? '',
+    );
 
     // 1. Check Path Traversal Tricks (e.g. '../', '%2e%2e', '..\\')
     let decodedPath = rawPath;
@@ -57,7 +63,11 @@ export class PathRestrictionRule implements PolicyRule {
     const normalizedPath = path.normalize(decodedPath).toLowerCase().replace(/\\/g, '/');
 
     for (const forbiddenPattern of permContext.forbiddenPaths) {
-      const cleanPattern = forbiddenPattern.replace(/\*\*/g, '').replace(/\*/g, '').toLowerCase().replace(/\\/g, '/');
+      const cleanPattern = forbiddenPattern
+        .replace(/\*\*/g, '')
+        .replace(/\*/g, '')
+        .toLowerCase()
+        .replace(/\\/g, '/');
       if (cleanPattern.length > 0 && normalizedPath.includes(cleanPattern)) {
         return {
           decision: PolicyDecisionType.DENY,

@@ -17,7 +17,9 @@ import type { Clock } from '../../../core/interfaces/clock.js';
 import type { ExecutionOptions } from '../../../core/model/runtime-types.js';
 
 export interface TerminalConnection {
-  readonly execute: (command: string) => Promise<{ stdout: string; stderr: string; exitCode: number }>;
+  readonly execute: (
+    command: string,
+  ) => Promise<{ stdout: string; stderr: string; exitCode: number }>;
 }
 
 export interface ViHarnessHarborAgentOptions {

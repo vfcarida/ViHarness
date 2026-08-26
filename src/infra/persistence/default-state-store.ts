@@ -53,11 +53,7 @@ export class DefaultStateStore implements StateStore {
     }
 
     const fromPhase = sm.state.phase;
-    const targetPhase = validateTransitionOrThrow(
-      fromPhase,
-      event,
-      options?.isLlmEmitted ?? false,
-    );
+    const targetPhase = validateTransitionOrThrow(fromPhase, event, options?.isLlmEmitted ?? false);
 
     // Durable Ordering: EventStore persistence MUST succeed before state machine state is mutated.
     if (this.eventStore) {

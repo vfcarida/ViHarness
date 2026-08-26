@@ -41,12 +41,20 @@ export class DefaultGitManager implements GitManager {
   }
 
   async isDirty(): Promise<boolean> {
-    return this.modifiedFilesSet.size > 0 || this.stagedFilesSet.size > 0 || this.untrackedFilesSet.size > 0;
+    return (
+      this.modifiedFilesSet.size > 0 ||
+      this.stagedFilesSet.size > 0 ||
+      this.untrackedFilesSet.size > 0
+    );
   }
 
   async captureBaseline(): Promise<WorkspaceState> {
     const status = await this.getStatus();
-    for (const file of [...this.modifiedFilesSet, ...this.stagedFilesSet, ...this.untrackedFilesSet]) {
+    for (const file of [
+      ...this.modifiedFilesSet,
+      ...this.stagedFilesSet,
+      ...this.untrackedFilesSet,
+    ]) {
       if (this.fileOwners.get(file) !== 'agent') {
         this.baselineUserFiles.add(file);
       }

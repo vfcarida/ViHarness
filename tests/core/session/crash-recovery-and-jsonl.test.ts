@@ -57,7 +57,9 @@ describe('Crash Recovery & JSONL Persistence (DSH & Pi) — P008', () => {
 
     // Verify intermediate events are preserved
     expect((result.recoveredLog[1]?.data as any).content).toBe('Please refactor db client');
-    expect((result.recoveredLog[2]?.data as any).message.content).toBe('Refactoring database client now.');
+    expect((result.recoveredLog[2]?.data as any).message.content).toBe(
+      'Refactoring database client now.',
+    );
   });
 
   it('2. should close unclosed step and unclosed turn in proper sequence', () => {

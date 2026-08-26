@@ -27,18 +27,26 @@ export class MarkdownReportGenerator {
 
     lines.push('# Vi-Harness Official Benchmark Evaluation Report');
     lines.push('');
-    lines.push('> **Experimental Design**: Isolates the agent harness as the primary independent variable');
-    lines.push('> holding model, task, tools, timeout, budget, and workspace environment constant.');
+    lines.push(
+      '> **Experimental Design**: Isolates the agent harness as the primary independent variable',
+    );
+    lines.push(
+      '> holding model, task, tools, timeout, budget, and workspace environment constant.',
+    );
     lines.push('');
     lines.push('---');
     lines.push('');
     lines.push('## 1. Experiment Control Parameters');
     lines.push('');
     lines.push(`- **Suite**: \`${result.suiteName}\` (\`${result.suiteId}\`)`);
-    lines.push(`- **Model**: \`${result.modelConfig.providerId}/${result.modelConfig.modelId}\` (Temperature: \`${result.modelConfig.temperature}\`)`);
+    lines.push(
+      `- **Model**: \`${result.modelConfig.providerId}/${result.modelConfig.modelId}\` (Temperature: \`${result.modelConfig.temperature}\`)`,
+    );
     lines.push(`- **Trials Per Task**: \`${result.runsPerTask}\` repeated runs per harness`);
     lines.push(`- **Reproducibility Seed**: \`${result.seed}\``);
-    lines.push(`- **Environment**: OS \`${result.environment.os}\` | Node \`${result.environment.nodeVersion}\` | Isolated Workspaces: \`${result.environment.isolatedWorkspace}\``);
+    lines.push(
+      `- **Environment**: OS \`${result.environment.os}\` | Node \`${result.environment.nodeVersion}\` | Isolated Workspaces: \`${result.environment.isolatedWorkspace}\``,
+    );
     lines.push(`- **Generated At**: \`${result.generatedAt.toISOString()}\``);
     lines.push('');
     lines.push('---');
@@ -46,8 +54,12 @@ export class MarkdownReportGenerator {
 
     lines.push('## 2. Executive Comparison: Pi vs Vi-Harness');
     lines.push('');
-    lines.push('| Harness | Version | Runs | Success Rate | Mean Cost | Median Cost | P95 Cost | Mean Iter | Median Iter | P95 Iter | Mean Latency | Median Latency | P95 Latency |');
-    lines.push('| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |');
+    lines.push(
+      '| Harness | Version | Runs | Success Rate | Mean Cost | Median Cost | P95 Cost | Mean Iter | Median Iter | P95 Iter | Mean Latency | Median Latency | P95 Latency |',
+    );
+    lines.push(
+      '| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |',
+    );
 
     for (const [harnessName, summary] of Object.entries(result.harnessSummaries)) {
       const sRate = `${(summary.overallSuccessRate * 100).toFixed(1)}%`;
@@ -73,7 +85,9 @@ export class MarkdownReportGenerator {
 
     lines.push('## 3. Token Consumption Distributions');
     lines.push('');
-    lines.push('| Harness | Prompt Tokens (Mean / Med / P95) | Completion Tokens (Mean / Med / P95) | Total Tokens (Mean / Med / P95) | StdDev Total Tokens |');
+    lines.push(
+      '| Harness | Prompt Tokens (Mean / Med / P95) | Completion Tokens (Mean / Med / P95) | Total Tokens (Mean / Med / P95) | StdDev Total Tokens |',
+    );
     lines.push('| :--- | :--- | :--- | :--- | :--- |');
 
     for (const [harnessName, summary] of Object.entries(result.harnessSummaries)) {
@@ -90,7 +104,9 @@ export class MarkdownReportGenerator {
 
     lines.push('## 4. Task-by-Task Comparison Breakdown');
     lines.push('');
-    lines.push('| Task ID | Name | Category | Harness | Success | Mean Cost | Median Cost | P95 Cost | Mean Iter | P95 Iter | Mean Latency |');
+    lines.push(
+      '| Task ID | Name | Category | Harness | Success | Mean Cost | Median Cost | P95 Cost | Mean Iter | P95 Iter | Mean Latency |',
+    );
     lines.push('| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |');
 
     for (const comp of result.taskComparisons) {
@@ -164,7 +180,9 @@ export class MarkdownReportGenerator {
     lines.push('');
     lines.push(`- **Report ID**: \`${report.reportId}\``);
     lines.push(`- **Suite ID**: \`${report.suiteId}\``);
-    lines.push(`- **Overall Success Rate**: ${(report.aggregatedMetrics.overallSuccessRate * 100).toFixed(1)}%`);
+    lines.push(
+      `- **Overall Success Rate**: ${(report.aggregatedMetrics.overallSuccessRate * 100).toFixed(1)}%`,
+    );
     lines.push(`- **Total Tokens**: ${report.aggregatedMetrics.totalTokens}`);
     lines.push(`- **Total Cost**: $${report.aggregatedMetrics.totalCostUSD.toFixed(4)}`);
     lines.push(`- **Average Iterations**: ${report.aggregatedMetrics.avgIterations.toFixed(1)}`);
@@ -174,7 +192,7 @@ export class MarkdownReportGenerator {
 
     for (const r of report.results) {
       const taskId = r.metadata?.taskId ?? r.taskId;
-      const success = r.correctness?.taskSuccess ?? (r.successRate >= 1.0);
+      const success = r.correctness?.taskSuccess ?? r.successRate >= 1.0;
       const totalTokens = r.efficiency?.totalTokens ?? r.tokenDistribution.totalTokens.mean;
       const totalCostUSD = r.efficiency?.totalCostUSD ?? r.costDistribution.mean;
       const iterations = r.efficiency?.iterations ?? r.iterationDistribution.mean;

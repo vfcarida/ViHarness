@@ -28,7 +28,9 @@ describe('Tool Output Spill System — P018', () => {
   afterEach(() => {
     try {
       fs.rmSync(tempDir, { recursive: true, force: true });
-    } catch {}
+    } catch {
+      /* ignore cleanup error */
+    }
   });
 
   it('1. Output under threshold remains inline without creating spill files', () => {
@@ -69,7 +71,9 @@ describe('Tool Output Spill System — P018', () => {
     });
 
     expect(result.success).toBe(true);
-    expect(result.output).toContain('Retrieved lines 10-12 of 50 from [spill-session-123-call-999]');
+    expect(result.output).toContain(
+      'Retrieved lines 10-12 of 50 from [spill-session-123-call-999]',
+    );
     expect(result.output).toContain('Line 10: Sample data payload');
     expect(result.output).toContain('Line 11: Sample data payload');
     expect(result.output).toContain('Line 12: Sample data payload');
@@ -138,13 +142,16 @@ describe('Tool Output Spill System — P018', () => {
       spillStore,
     });
 
-    const results = await executor.execute([
-      { id: 'auto-spill-call', name: 'large_output_tool', arguments: {} },
-    ], { sessionId: 'auto-session' });
+    const results = await executor.execute(
+      [{ id: 'auto-spill-call', name: 'large_output_tool', arguments: {} }],
+      { sessionId: 'auto-session' },
+    );
 
     expect(results.length).toBe(1);
     expect(results[0]?.success).toBe(true);
-    expect(results[0]?.output).toContain('[Full output saved to: spill-auto-session-auto-spill-call]');
+    expect(results[0]?.output).toContain(
+      '[Full output saved to: spill-auto-session-auto-spill-call]',
+    );
     expect(results[0]?.output).toContain('[Use retrieve_output tool to read specific line ranges]');
   });
 

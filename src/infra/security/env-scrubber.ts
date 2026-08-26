@@ -24,7 +24,9 @@ export const SENSITIVE_PATTERNS: ReadonlyArray<string> = [
 /**
  * Cleanse an environment object by dropping any environment variable names matching sensitive patterns.
  */
-export function scrubEnv(env: Record<string, string | undefined> = process.env): Record<string, string> {
+export function scrubEnv(
+  env: Record<string, string | undefined> = process.env,
+): Record<string, string> {
   const scrubbed: Record<string, string> = {};
   for (const [key, value] of Object.entries(env)) {
     if (value === undefined) continue;

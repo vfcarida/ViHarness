@@ -39,9 +39,13 @@ export class ActionPlanner {
       for (const tc of response.toolCalls) {
         const canonicalName = (tc.name ?? '').trim().toLowerCase();
         const tool = toolRegistry?.getTool(canonicalName) ?? toolRegistry?.getTool(tc.name);
-        const actionType = tool ? mapCategoryToActionType(tool.definition.category) : ActionType.TOOL_CALL;
+        const actionType = tool
+          ? mapCategoryToActionType(tool.definition.category)
+          : ActionType.TOOL_CALL;
         const irreversible = tool
-          ? tool.definition.mutating || tool.definition.riskLevel === 'HIGH' || tool.definition.riskLevel === 'CRITICAL'
+          ? tool.definition.mutating ||
+            tool.definition.riskLevel === 'HIGH' ||
+            tool.definition.riskLevel === 'CRITICAL'
           : false;
 
         // Strip any approval spoofing or permission override keys from model input

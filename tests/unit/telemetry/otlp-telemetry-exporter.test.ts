@@ -49,7 +49,9 @@ describe('OtlpTelemetryExporter', () => {
     await exporter.flush();
 
     expect(capturedTracesUrl).toBe('http://localhost:4318/v1/traces');
-    expect(capturedBody.resourceSpans[0].resource.attributes[0].value.stringValue).toBe('vi-harness-test');
+    expect(capturedBody.resourceSpans[0].resource.attributes[0].value.stringValue).toBe(
+      'vi-harness-test',
+    );
     expect(capturedBody.resourceSpans[0].scopeSpans[0].spans).toHaveLength(2);
     expect(capturedBody.resourceSpans[0].scopeSpans[0].spans[0].name).toBe('iteration_observe');
   });

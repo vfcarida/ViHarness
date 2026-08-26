@@ -65,13 +65,7 @@ import {
   DefaultRecoveryManager,
   DefaultResumeManager,
 } from '../../src/index.js';
-import type {
-  Goal,
-  Task,
-  ActionProposal,
-  SubagentSpec,
-  ModelDescriptor,
-} from '../../src/index.js';
+import type { Goal, Task, ActionProposal, SubagentSpec, ModelDescriptor } from '../../src/index.js';
 
 describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () => {
   let idFactory: UuidV7IdFactory;
@@ -113,7 +107,11 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
     providerId: 'openai',
     version: '1.0.0',
     capabilities: {
-      capabilities: new Set([ModelCapability.REASONING, ModelCapability.CODING, ModelCapability.TOOL_USE]),
+      capabilities: new Set([
+        ModelCapability.REASONING,
+        ModelCapability.CODING,
+        ModelCapability.TOOL_USE,
+      ]),
       maxContextTokens: 128000,
       maxOutputTokens: 4096,
       supportsSystemPrompt: true,
@@ -128,7 +126,11 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
     providerId: 'anthropic',
     version: '3.5',
     capabilities: {
-      capabilities: new Set([ModelCapability.REASONING, ModelCapability.CODING, ModelCapability.TOOL_USE]),
+      capabilities: new Set([
+        ModelCapability.REASONING,
+        ModelCapability.CODING,
+        ModelCapability.TOOL_USE,
+      ]),
       maxContextTokens: 200000,
       maxOutputTokens: 4096,
       supportsSystemPrompt: true,
@@ -142,8 +144,14 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
     clock = new TestClock(new Date('2024-01-01T00:00:00Z'));
 
     // 1. Providers & Router
-    primaryProvider = new MockModelProvider({ providerId: 'openai', descriptor: defaultDescriptor });
-    backupProvider = new MockModelProvider({ providerId: 'anthropic', descriptor: sonnetDescriptor });
+    primaryProvider = new MockModelProvider({
+      providerId: 'openai',
+      descriptor: defaultDescriptor,
+    });
+    backupProvider = new MockModelProvider({
+      providerId: 'anthropic',
+      descriptor: sonnetDescriptor,
+    });
 
     router = new UtilityModelRouter({ idFactory });
     router.registerProvider(primaryProvider);
@@ -193,7 +201,10 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
 
     // 5. Repository State & Reversibility
     checkpointStore = new DefaultCheckpointStore({ idFactory, clock });
-    gitManager = new DefaultGitManager({ initialBranch: 'main', initialCommit: 'c0000000000000000000' });
+    gitManager = new DefaultGitManager({
+      initialBranch: 'main',
+      initialCommit: 'c0000000000000000000',
+    });
     rollbackManager = new DefaultRollbackManager();
 
     // 6. Subagents & Escalation
@@ -304,7 +315,10 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
       iterationId: idFactory.create<'Iteration'>(),
       type: ActionType.FILE_WRITE,
       description: 'Write login validation code to src/auth/login.ts',
-      parameters: { path: 'src/auth/login.ts', content: 'export function validateLogin() { return true; }' },
+      parameters: {
+        path: 'src/auth/login.ts',
+        content: 'export function validateLogin() { return true; }',
+      },
       irreversible: false,
       proposedAt: clock.now(),
     };
@@ -313,20 +327,23 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
     const execId = await executionJournal.logProposal(actionProposal, false);
 
     // 6 & 7. Policy Engine evaluates action proposal (Deny-First Precedence)
-    const policyDecision = await policyEngine.evaluate({
-      id: actionProposal.id,
-      type: actionProposal.type,
-      resource: (actionProposal.parameters.path as string) ?? 'src/auth/login.ts',
-      parameters: actionProposal.parameters as Record<string, unknown>,
-      irreversible: actionProposal.irreversible,
-    }, {
-      allowedPaths: ['src/'],
-      forbiddenPaths: ['.env', 'secrets/'],
-      allowedCommands: ['npm test', 'tsc'],
-      forbiddenCommands: ['rm -rf /'],
-      allowNetwork: false,
-      requireApprovalForDestructive: true,
-    });
+    const policyDecision = await policyEngine.evaluate(
+      {
+        id: actionProposal.id,
+        type: actionProposal.type,
+        resource: (actionProposal.parameters.path as string) ?? 'src/auth/login.ts',
+        parameters: actionProposal.parameters as Record<string, unknown>,
+        irreversible: actionProposal.irreversible,
+      },
+      {
+        allowedPaths: ['src/'],
+        forbiddenPaths: ['.env', 'secrets/'],
+        allowedCommands: ['npm test', 'tsc'],
+        forbiddenCommands: ['rm -rf /'],
+        allowNetwork: false,
+        requireApprovalForDestructive: true,
+      },
+    );
     expect(policyDecision.decision).toBe(PolicyDecisionType.ALLOW);
 
     // 8. Tool Executes in Local Development Sandbox
@@ -339,7 +356,10 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
 
     const toolResult = await toolExecutor.execute({
       toolName: 'write_file',
-      input: { path: 'src/auth/login.ts', content: 'export function validateLogin() { return true; }' },
+      input: {
+        path: 'src/auth/login.ts',
+        content: 'export function validateLogin() { return true; }',
+      },
     });
     expect(toolResult.success).toBe(true);
     await executionJournal.logCompletion(execId, toolResult);
@@ -386,7 +406,9 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
     expect(acceptanceEvaluation.satisfied).toBe(true);
 
     // 14 & 15. Checkpoint is created
-    const commitRef = await gitManager.createCommit('Milestone: Login validation passed verification');
+    const commitRef = await gitManager.createCommit(
+      'Milestone: Login validation passed verification',
+    );
     const checkpoint = await checkpointStore.create({
       taskId,
       iteration: 2,
@@ -555,7 +577,11 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
       },
     ];
 
-    const regressions = evidenceAggregator.detectRegressions(taskId, currentEvidence, baselineEvidence);
+    const regressions = evidenceAggregator.detectRegressions(
+      taskId,
+      currentEvidence,
+      baselineEvidence,
+    );
     expect(regressions).toHaveLength(1);
     expect(regressions[0]!.outcome).toBe(EvidenceOutcome.REGRESSION);
 
@@ -613,7 +639,11 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
       userOwnedFiles: ['notes.txt'],
     });
 
-    const rollbackResult = await rollbackManager.rollbackToCheckpoint(cp.id, checkpointStore, gitManager);
+    const rollbackResult = await rollbackManager.rollbackToCheckpoint(
+      cp.id,
+      checkpointStore,
+      gitManager,
+    );
     expect(rollbackResult.success).toBe(true);
     expect(rollbackResult.revertedFiles).toContain('src/auth.ts');
     expect(rollbackResult.preservedUserChanges).toContain('notes.txt');
@@ -675,7 +705,12 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
     await executionJournal.logStart(execId);
 
     // Process crashes while destructive action is RUNNING
-    const crashAnalysis = await recoveryManager.analyzeCrash(taskId, executionJournal, eventStore, checkpointStore);
+    const crashAnalysis = await recoveryManager.analyzeCrash(
+      taskId,
+      executionJournal,
+      eventStore,
+      checkpointStore,
+    );
     expect(crashAnalysis.requiresHumanReview).toBe(true);
 
     const decision = recoveryManager.createRecoveryDecision(crashAnalysis);
@@ -718,7 +753,7 @@ describe('Enterprise Coding-Agent Harness — End-to-End Integration Suite', () 
 
   it('Budget Exhaustion: Financial cost exceeding budget limit triggers BUDGET_EXCEEDED state transition', async () => {
     const taskId = idFactory.create<'Task'>();
-    budgetTracker.setTaskBudget(taskId, 0.10); // $0.10 budget limit
+    budgetTracker.setTaskBudget(taskId, 0.1); // $0.10 budget limit
 
     // Incur usage of $0.15
     budgetTracker.recordUsage(taskId, 'gpt-4o', 0.15);

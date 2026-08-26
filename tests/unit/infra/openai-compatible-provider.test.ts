@@ -14,9 +14,7 @@ describe('OpenAICompatibleProvider Unit Suite', () => {
   const baseRequest: ModelRequest = {
     modelId: 'gpt-4o',
     systemPrompt: 'You are an expert coding assistant.',
-    messages: [
-      { role: MessageRole.USER, content: 'Refactor calculateInvoice function' },
-    ],
+    messages: [{ role: MessageRole.USER, content: 'Refactor calculateInvoice function' }],
     temperature: 0.1,
     topP: 0.9,
     maxTokens: 1000,
@@ -49,7 +47,8 @@ describe('OpenAICompatibleProvider Unit Suite', () => {
                     type: 'function',
                     function: {
                       name: 'write_file',
-                      arguments: '{"path":"src/invoice.ts","content":"export function calculateInvoice() {}"}',
+                      arguments:
+                        '{"path":"src/invoice.ts","content":"export function calculateInvoice() {}"}',
                     },
                   },
                 ],
@@ -88,8 +87,14 @@ describe('OpenAICompatibleProvider Unit Suite', () => {
 
     const body = JSON.parse(capturedInit?.body as string);
     expect(body.model).toBe('gpt-4o');
-    expect(body.messages[0]).toEqual({ role: 'system', content: 'You are an expert coding assistant.' });
-    expect(body.messages[1]).toEqual({ role: 'user', content: 'Refactor calculateInvoice function' });
+    expect(body.messages[0]).toEqual({
+      role: 'system',
+      content: 'You are an expert coding assistant.',
+    });
+    expect(body.messages[1]).toEqual({
+      role: 'user',
+      content: 'Refactor calculateInvoice function',
+    });
     expect(body.temperature).toBe(0.1);
     expect(body.top_p).toBe(0.9);
     expect(body.max_tokens).toBe(1000);
@@ -110,7 +115,10 @@ describe('OpenAICompatibleProvider Unit Suite', () => {
     expect(response.usage.outputTokens).toBe(45);
     expect(response.usage.totalTokens).toBe(165);
     expect(response.usage.reasoningTokens).toBe(10);
-    expect(response.estimatedCostDollars).toBeCloseTo((120 / 1000) * 0.005 + (45 / 1000) * 0.015, 6);
+    expect(response.estimatedCostDollars).toBeCloseTo(
+      (120 / 1000) * 0.005 + (45 / 1000) * 0.015,
+      6,
+    );
   });
 
   it('2. Streaming response: parses SSE lines, deltas, multiple chunks and handles data: [DONE]', async () => {
@@ -277,7 +285,9 @@ describe('OpenAICompatibleProvider Unit Suite', () => {
 
     // Degraded (!ok)
     const mockFetchDegraded = vi.fn().mockResolvedValue({ ok: false, status: 500 });
-    const providerDegraded = new OpenAICompatibleProvider({ customFetch: mockFetchDegraded as any });
+    const providerDegraded = new OpenAICompatibleProvider({
+      customFetch: mockFetchDegraded as any,
+    });
     const healthDegraded = await providerDegraded.getHealth();
     expect(healthDegraded.status).toBe(ProviderHealthStatus.DEGRADED);
     expect(healthDegraded.errorMessage).toBe('HTTP 500');

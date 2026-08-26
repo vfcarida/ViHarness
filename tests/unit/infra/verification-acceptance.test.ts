@@ -2,10 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { AcceptanceEvaluator } from '../../../src/infra/verification/acceptance-evaluator.js';
 import { ContradictoryEvidenceResolver } from '../../../src/infra/evidence/contradictory-evidence-resolver.js';
 import { EvidenceCache } from '../../../src/infra/optimization/evidence-cache.js';
-import {
-  EvidenceType,
-  EvidenceOutcome,
-} from '../../../src/core/model/evidence.js';
+import { EvidenceType, EvidenceOutcome } from '../../../src/core/model/evidence.js';
 import type { Evidence } from '../../../src/core/model/evidence.js';
 import type { AcceptancePolicy } from '../../../src/core/model/acceptance-policy.js';
 import { PolicyDecisionType } from '../../../src/core/model/policy.js';
@@ -53,20 +50,29 @@ describe('Verification & Acceptance Evaluation Unit Suite', () => {
     });
 
     it('2. Blocks completion if required checks are missing or failing', () => {
-      const failingEvidence = [createEvidence({ checkId: 'check-unit-tests', pass: false, outcome: EvidenceOutcome.FAIL })];
+      const failingEvidence = [
+        createEvidence({ checkId: 'check-unit-tests', pass: false, outcome: EvidenceOutcome.FAIL }),
+      ];
       const evaluation = AcceptanceEvaluator.evaluate({
         policy: basePolicy,
         evidence: failingEvidence,
       });
 
       expect(evaluation.satisfied).toBe(false);
-      expect(evaluation.missingRequirements.some((r) => r.includes('Required check [check-unit-tests]'))).toBe(true);
+      expect(
+        evaluation.missingRequirements.some((r) => r.includes('Required check [check-unit-tests]')),
+      ).toBe(true);
     });
 
     it('3. Blocks completion if regressions are detected', () => {
       const evidence = [
         createEvidence({ id: 'ev-pass' as EvidenceId, checkId: 'check-unit-tests', pass: true }),
-        createEvidence({ id: 'ev-reg' as EvidenceId, checkId: 'check-billing', pass: false, outcome: EvidenceOutcome.FAIL }),
+        createEvidence({
+          id: 'ev-reg' as EvidenceId,
+          checkId: 'check-billing',
+          pass: false,
+          outcome: EvidenceOutcome.FAIL,
+        }),
       ];
 
       const regressions: Regression[] = [
@@ -86,7 +92,9 @@ describe('Verification & Acceptance Evaluation Unit Suite', () => {
       });
 
       expect(evaluation.satisfied).toBe(false);
-      expect(evaluation.missingRequirements.some((r) => r.includes('Zero regressions required'))).toBe(true);
+      expect(
+        evaluation.missingRequirements.some((r) => r.includes('Zero regressions required')),
+      ).toBe(true);
       expect(evaluation.regressionsDetected).toHaveLength(1);
     });
 
@@ -107,7 +115,9 @@ describe('Verification & Acceptance Evaluation Unit Suite', () => {
       });
 
       expect(evaluation.satisfied).toBe(false);
-      expect(evaluation.missingRequirements.some((r) => r.includes('unresolved policy violation'))).toBe(true);
+      expect(
+        evaluation.missingRequirements.some((r) => r.includes('unresolved policy violation')),
+      ).toBe(true);
     });
 
     it('5. Blocks completion if confidence falls below minConfidence', () => {
@@ -121,15 +131,27 @@ describe('Verification & Acceptance Evaluation Unit Suite', () => {
       });
 
       expect(evaluation.satisfied).toBe(false);
-      expect(evaluation.missingRequirements.some((r) => r.includes('Evidence confidence'))).toBe(true);
+      expect(evaluation.missingRequirements.some((r) => r.includes('Evidence confidence'))).toBe(
+        true,
+      );
     });
   });
 
   describe('ContradictoryEvidenceResolver', () => {
     it('6. Detects contradiction when functional tests pass but linter or static verification fails', () => {
       const evidenceList: Evidence[] = [
-        createEvidence({ id: 'e1' as EvidenceId, type: EvidenceType.TEST_RESULT, outcome: EvidenceOutcome.PASS, pass: true }),
-        createEvidence({ id: 'e2' as EvidenceId, type: EvidenceType.LINT_RESULT, outcome: EvidenceOutcome.FAIL, pass: false }),
+        createEvidence({
+          id: 'e1' as EvidenceId,
+          type: EvidenceType.TEST_RESULT,
+          outcome: EvidenceOutcome.PASS,
+          pass: true,
+        }),
+        createEvidence({
+          id: 'e2' as EvidenceId,
+          type: EvidenceType.LINT_RESULT,
+          outcome: EvidenceOutcome.FAIL,
+          pass: false,
+        }),
       ];
 
       const resolution = ContradictoryEvidenceResolver.evaluate(evidenceList);
@@ -140,8 +162,18 @@ describe('Verification & Acceptance Evaluation Unit Suite', () => {
 
     it('7. Detects contradiction when same checkId reports both PASS and FAIL', () => {
       const evidenceList: Evidence[] = [
-        createEvidence({ id: 'e1' as EvidenceId, checkId: 'suite-core', outcome: EvidenceOutcome.PASS, pass: true }),
-        createEvidence({ id: 'e2' as EvidenceId, checkId: 'suite-core', outcome: EvidenceOutcome.FAIL, pass: false }),
+        createEvidence({
+          id: 'e1' as EvidenceId,
+          checkId: 'suite-core',
+          outcome: EvidenceOutcome.PASS,
+          pass: true,
+        }),
+        createEvidence({
+          id: 'e2' as EvidenceId,
+          checkId: 'suite-core',
+          outcome: EvidenceOutcome.FAIL,
+          pass: false,
+        }),
       ];
 
       const resolution = ContradictoryEvidenceResolver.evaluate(evidenceList);
@@ -152,8 +184,18 @@ describe('Verification & Acceptance Evaluation Unit Suite', () => {
 
     it('8. Returns no contradiction for consistent evidence', () => {
       const evidenceList: Evidence[] = [
-        createEvidence({ id: 'e1' as EvidenceId, checkId: 'suite-1', outcome: EvidenceOutcome.PASS, pass: true }),
-        createEvidence({ id: 'e2' as EvidenceId, checkId: 'suite-2', outcome: EvidenceOutcome.PASS, pass: true }),
+        createEvidence({
+          id: 'e1' as EvidenceId,
+          checkId: 'suite-1',
+          outcome: EvidenceOutcome.PASS,
+          pass: true,
+        }),
+        createEvidence({
+          id: 'e2' as EvidenceId,
+          checkId: 'suite-2',
+          outcome: EvidenceOutcome.PASS,
+          pass: true,
+        }),
       ];
 
       const resolution = ContradictoryEvidenceResolver.evaluate(evidenceList);

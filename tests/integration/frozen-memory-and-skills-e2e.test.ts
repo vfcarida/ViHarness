@@ -68,7 +68,7 @@ describe('Frozen Memory Snapshot, Skills Catalog & Self-Improvement E2E Suite â€
       content: 'Initial Policy: All API errors must return standard ProblemDetails JSON.',
       source: 'api_guidelines',
       confidence: 0.95,
-      importance: 0.90,
+      importance: 0.9,
       tags: ['api', 'standards'],
     });
 

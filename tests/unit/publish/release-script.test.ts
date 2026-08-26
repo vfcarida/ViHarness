@@ -36,7 +36,8 @@ describe('Semantic Release & Changelog Engine', () => {
     });
 
     it('detects breaking change in commit footer', () => {
-      const message = 'feat(router): overhaul utility score calculation\n\nBREAKING CHANGE: router options schema modified.';
+      const message =
+        'feat(router): overhaul utility score calculation\n\nBREAKING CHANGE: router options schema modified.';
       const parsed = SemanticReleaseEngine.parseCommit(message);
       expect(parsed.type).toBe('feat');
       expect(parsed.isBreaking).toBe(true);
@@ -52,9 +53,7 @@ describe('Semantic Release & Changelog Engine', () => {
 
   describe('determineBumpType & calculateNextVersion', () => {
     it('determines major bump on breaking commit', () => {
-      const commits: ParsedCommit[] = [
-        { type: 'feat', subject: 'new feature', isBreaking: true },
-      ];
+      const commits: ParsedCommit[] = [{ type: 'feat', subject: 'new feature', isBreaking: true }];
       const bump = SemanticReleaseEngine.determineBumpType(commits);
       expect(bump).toBe('major');
       expect(SemanticReleaseEngine.calculateNextVersion('0.1.0', bump)).toBe('1.0.0');
@@ -85,7 +84,12 @@ describe('Semantic Release & Changelog Engine', () => {
     it('formats a clean markdown changelog with emojis and categorization', () => {
       const commits: ParsedCommit[] = [
         { type: 'feat', scope: 'profile', subject: 'add custom profiles', isBreaking: false },
-        { type: 'fix', scope: 'sqlite', subject: 'correct migration column type', isBreaking: false },
+        {
+          type: 'fix',
+          scope: 'sqlite',
+          subject: 'correct migration column type',
+          isBreaking: false,
+        },
       ];
 
       const md = SemanticReleaseEngine.formatChangelogSection('0.2.0', commits, '2026-08-19');

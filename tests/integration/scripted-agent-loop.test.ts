@@ -31,7 +31,11 @@ import { FinishReason, MessageRole } from '../../src/core/model/model-io.js';
 import { AgentPhase } from '../../src/core/model/state.js';
 import { EvidenceOutcome } from '../../src/core/model/evidence.js';
 import { ActionResultStatus } from '../../src/core/model/action.js';
-import type { VerificationEngine, VerificationRequest, VerificationResult } from '../../src/core/interfaces/verification-engine.js';
+import type {
+  VerificationEngine,
+  VerificationRequest,
+  VerificationResult,
+} from '../../src/core/interfaces/verification-engine.js';
 import type { Goal } from '../../src/core/model/goal.js';
 import { GoalStatus } from '../../src/core/model/goal.js';
 
@@ -44,7 +48,11 @@ describe('Genuine Coding-Agent Iteration Loop Integration', { timeout: 30000 }, 
     const servicePath = path.join(tempDir, 'service.ts');
     const testPath = path.join(tempDir, 'service.test.ts');
 
-    fs.writeFileSync(servicePath, 'export function add(a: number, b: number): number { return 0; }', 'utf-8');
+    fs.writeFileSync(
+      servicePath,
+      'export function add(a: number, b: number): number { return 0; }',
+      'utf-8',
+    );
     fs.writeFileSync(testPath, 'import { add } from "./service"; // test suite', 'utf-8');
 
     let currentFileContent = fs.readFileSync(servicePath, 'utf-8');
@@ -56,7 +64,9 @@ describe('Genuine Coding-Agent Iteration Loop Integration', { timeout: 30000 }, 
         const isCorrect = fileContent.includes('a + b');
         return {
           status: isCorrect ? 'PASSED' : 'FAILED',
-          summary: isCorrect ? 'Test suite passed: add(2, 3) === 5' : 'Test suite failed: expected add(2, 3) === 5, got wrong result',
+          summary: isCorrect
+            ? 'Test suite passed: add(2, 3) === 5'
+            : 'Test suite failed: expected add(2, 3) === 5, got wrong result',
           durationMs: 10,
           confidence: 1.0,
           affectedFiles: [servicePath],
@@ -96,7 +106,8 @@ describe('Genuine Coding-Agent Iteration Loop Integration', { timeout: 30000 }, 
       },
       // 3. write_file (faulty code)
       {
-        content: 'I will write an initial implementation with a deliberate bug (subtraction instead of addition).',
+        content:
+          'I will write an initial implementation with a deliberate bug (subtraction instead of addition).',
         toolCalls: [
           {
             name: 'write_file',
@@ -123,7 +134,8 @@ describe('Genuine Coding-Agent Iteration Loop Integration', { timeout: 30000 }, 
       },
       // 5. inspect_failure (reads service.ts to inspect why it failed)
       {
-        content: 'The test failed! I see verification evidence failed. I will inspect the code again.',
+        content:
+          'The test failed! I see verification evidence failed. I will inspect the code again.',
         toolCalls: [{ name: 'read_file', input: { path: servicePath }, id: 'call_5' }],
         finishReason: FinishReason.TOOL_CALL,
       },
@@ -243,7 +255,10 @@ describe('Genuine Coding-Agent Iteration Loop Integration', { timeout: 30000 }, 
         // Inspect if structured error was delivered back in request messages
         const toolMsg = request.messages.find(
           (m: any) =>
-            (m.role === MessageRole.TOOL || m.role === MessageRole.TOOL_RESULT || m.role === 'TOOL' || m.role === 'TOOL_RESULT') &&
+            (m.role === MessageRole.TOOL ||
+              m.role === MessageRole.TOOL_RESULT ||
+              m.role === 'TOOL' ||
+              m.role === 'TOOL_RESULT') &&
             m.content.includes('UNKNOWN_TOOL'),
         );
         if (toolMsg) {
@@ -345,8 +360,12 @@ describe('Genuine Coding-Agent Iteration Loop Integration', { timeout: 30000 }, 
             m.role === 'TOOL' ||
             m.role === 'TOOL_RESULT',
         );
-        const hasA = toolMessages.some((m: any) => m.content.includes('Content of A') || m.content.includes('fileA.txt'));
-        const hasB = toolMessages.some((m: any) => m.content.includes('Content of B') || m.content.includes('fileB.txt'));
+        const hasA = toolMessages.some(
+          (m: any) => m.content.includes('Content of A') || m.content.includes('fileA.txt'),
+        );
+        const hasB = toolMessages.some(
+          (m: any) => m.content.includes('Content of B') || m.content.includes('fileB.txt'),
+        );
         if (hasA && hasB) {
           bothToolResultsDelivered = true;
         }

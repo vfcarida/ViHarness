@@ -78,12 +78,30 @@ export class ProjDevExecutionAdapter {
         try {
           const filePath = sanitizePath(String(input['path']));
           if (!fs.existsSync(filePath)) {
-            return { toolCallId: callId, name: 'read_file', success: false, output: `File not found: ${input['path']}`, durationMs: Date.now() - start };
+            return {
+              toolCallId: callId,
+              name: 'read_file',
+              success: false,
+              output: `File not found: ${input['path']}`,
+              durationMs: Date.now() - start,
+            };
           }
           const content = fs.readFileSync(filePath, 'utf-8');
-          return { toolCallId: callId, name: 'read_file', success: true, output: content, durationMs: Date.now() - start };
+          return {
+            toolCallId: callId,
+            name: 'read_file',
+            success: true,
+            output: content,
+            durationMs: Date.now() - start,
+          };
         } catch (err: any) {
-          return { toolCallId: callId, name: 'read_file', success: false, output: err.message, durationMs: Date.now() - start };
+          return {
+            toolCallId: callId,
+            name: 'read_file',
+            success: false,
+            output: err.message,
+            durationMs: Date.now() - start,
+          };
         }
       },
     };
@@ -118,9 +136,21 @@ export class ProjDevExecutionAdapter {
             fs.mkdirSync(parentDir, { recursive: true });
           }
           fs.writeFileSync(filePath, String(input['content'] ?? ''), 'utf-8');
-          return { toolCallId: callId, name: 'write_file', success: true, output: `Successfully wrote ${input['path']}`, durationMs: Date.now() - start };
+          return {
+            toolCallId: callId,
+            name: 'write_file',
+            success: true,
+            output: `Successfully wrote ${input['path']}`,
+            durationMs: Date.now() - start,
+          };
         } catch (err: any) {
-          return { toolCallId: callId, name: 'write_file', success: false, output: err.message, durationMs: Date.now() - start };
+          return {
+            toolCallId: callId,
+            name: 'write_file',
+            success: false,
+            output: err.message,
+            durationMs: Date.now() - start,
+          };
         }
       },
     };
@@ -147,13 +177,31 @@ export class ProjDevExecutionAdapter {
         try {
           const dirPath = input['path'] ? sanitizePath(String(input['path'])) : workspacePath;
           if (!fs.existsSync(dirPath)) {
-            return { toolCallId: callId, name: 'list_directory', success: false, output: `Directory not found: ${input['path']}`, durationMs: Date.now() - start };
+            return {
+              toolCallId: callId,
+              name: 'list_directory',
+              success: false,
+              output: `Directory not found: ${input['path']}`,
+              durationMs: Date.now() - start,
+            };
           }
           const entries = fs.readdirSync(dirPath, { withFileTypes: true });
           const listing = entries.map((e) => (e.isDirectory() ? `${e.name}/` : e.name)).join('\n');
-          return { toolCallId: callId, name: 'list_directory', success: true, output: listing || '(empty directory)', durationMs: Date.now() - start };
+          return {
+            toolCallId: callId,
+            name: 'list_directory',
+            success: true,
+            output: listing || '(empty directory)',
+            durationMs: Date.now() - start,
+          };
         } catch (err: any) {
-          return { toolCallId: callId, name: 'list_directory', success: false, output: err.message, durationMs: Date.now() - start };
+          return {
+            toolCallId: callId,
+            name: 'list_directory',
+            success: false,
+            output: err.message,
+            durationMs: Date.now() - start,
+          };
         }
       },
     };

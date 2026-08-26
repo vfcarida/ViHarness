@@ -104,7 +104,11 @@ describe('Enterprise Coding-Agent Harness — Real Task End-to-End Validation Pa
     providerId: 'openai',
     version: '1.0.0',
     capabilities: {
-      capabilities: new Set([ModelCapability.REASONING, ModelCapability.CODING, ModelCapability.TOOL_USE]),
+      capabilities: new Set([
+        ModelCapability.REASONING,
+        ModelCapability.CODING,
+        ModelCapability.TOOL_USE,
+      ]),
       maxContextTokens: 128000,
       maxOutputTokens: 4096,
       supportsSystemPrompt: true,
@@ -119,7 +123,11 @@ describe('Enterprise Coding-Agent Harness — Real Task End-to-End Validation Pa
     providerId: 'anthropic',
     version: '3.5',
     capabilities: {
-      capabilities: new Set([ModelCapability.REASONING, ModelCapability.CODING, ModelCapability.TOOL_USE]),
+      capabilities: new Set([
+        ModelCapability.REASONING,
+        ModelCapability.CODING,
+        ModelCapability.TOOL_USE,
+      ]),
       maxContextTokens: 200000,
       maxOutputTokens: 4096,
       supportsSystemPrompt: true,
@@ -133,7 +141,10 @@ describe('Enterprise Coding-Agent Harness — Real Task End-to-End Validation Pa
     clock = new TestClock(new Date('2024-01-01T00:00:00Z'));
 
     gpt4oProvider = new MockModelProvider({ providerId: 'openai', descriptor: gpt4oDescriptor });
-    sonnetProvider = new MockModelProvider({ providerId: 'anthropic', descriptor: sonnetDescriptor });
+    sonnetProvider = new MockModelProvider({
+      providerId: 'anthropic',
+      descriptor: sonnetDescriptor,
+    });
 
     router = new UtilityModelRouter({ idFactory });
     router.registerProvider(gpt4oProvider);
@@ -166,7 +177,10 @@ describe('Enterprise Coding-Agent Harness — Real Task End-to-End Validation Pa
     verificationEngine = new DefaultVerificationEngine({ evidenceStore, idFactory, clock });
 
     checkpointStore = new DefaultCheckpointStore({ idFactory, clock });
-    gitManager = new DefaultGitManager({ initialBranch: 'main', initialCommit: 'init0000000000000000' });
+    gitManager = new DefaultGitManager({
+      initialBranch: 'main',
+      initialCommit: 'init0000000000000000',
+    });
     rollbackManager = new DefaultRollbackManager();
 
     telemetryCollector = new DefaultTelemetryCollector({ idFactory, clock });
@@ -204,11 +218,22 @@ describe('Enterprise Coding-Agent Harness — Real Task End-to-End Validation Pa
     // -------------------------------------------------------------------------
     // ITERATION 1: EXPLORE & CONTEXT COMPILATION
     // -------------------------------------------------------------------------
-    await eventStore.append({ taskId, event: StateEvent.START, fromPhase: AgentPhase.INIT, toPhase: AgentPhase.EXPLORE, timestamp: clock.now() });
+    await eventStore.append({
+      taskId,
+      event: StateEvent.START,
+      fromPhase: AgentPhase.INIT,
+      toPhase: AgentPhase.EXPLORE,
+      timestamp: clock.now(),
+    });
     const t1 = stateMachine.apply(StateEvent.START); // INIT -> EXPLORE
     transitionHistory.push(t1);
 
-    const route1 = await router.route({ taskId, goal: goal.description, state: stateMachine.state, requiredCapabilities: [] });
+    const route1 = await router.route({
+      taskId,
+      goal: goal.description,
+      state: stateMachine.state,
+      requiredCapabilities: [],
+    });
     expect(route1.selectedModelId).toBe('gpt-4o');
 
     const compile1 = await contextCompiler.compile({
@@ -232,7 +257,10 @@ describe('Enterprise Coding-Agent Harness — Real Task End-to-End Validation Pa
 
     const execId1 = await executionJournal.logProposal(exploreProposal, false);
     await executionJournal.logStart(execId1);
-    const exploreResult = await toolExecutor.execute({ toolName: 'read_file', input: { path: 'tests/fixtures/sample-app/src/pricing.ts' } });
+    const exploreResult = await toolExecutor.execute({
+      toolName: 'read_file',
+      input: { path: 'tests/fixtures/sample-app/src/pricing.ts' },
+    });
     await executionJournal.logCompletion(execId1, exploreResult);
 
     const est1 = costTracker.calculateCost('openai', 'gpt-4o', 1200, 300);
@@ -328,7 +356,10 @@ export class PricingEngine {
     transitionHistory.push(t4);
 
     // Verification check fails because tax exemption test fails!
-    const verify1 = await verificationEngine.verify({ type: 'unit-test', path: 'tests/fixtures/sample-app/tests/pricing.test.ts', taskId }, VerificationProfile.STANDARD);
+    const verify1 = await verificationEngine.verify(
+      { type: 'unit-test', path: 'tests/fixtures/sample-app/tests/pricing.test.ts', taskId },
+      VerificationProfile.STANDARD,
+    );
 
     // Inject tax failure evidence
     await evidenceStore.record({
@@ -459,7 +490,9 @@ export class PricingEngine {
     // -------------------------------------------------------------------------
     // FINAL MILESTONE: CHECKPOINT & DONE
     // -------------------------------------------------------------------------
-    const commitRef = await gitManager.createCommit('Fix discount calculation and tax exemption handling in pricing.ts');
+    const commitRef = await gitManager.createCommit(
+      'Fix discount calculation and tax exemption handling in pricing.ts',
+    );
     const checkpoint = await checkpointStore.create({
       taskId,
       iteration: 3,
@@ -471,7 +504,9 @@ export class PricingEngine {
     expect(checkpoint.id).toBeDefined();
 
     const doneEvidenceId = idFactory.create<'Evidence'>();
-    const t7 = stateMachine.apply(StateEvent.VERIFICATION_PASSED, { evidenceIds: [doneEvidenceId] }); // VERIFY -> DONE
+    const t7 = stateMachine.apply(StateEvent.VERIFICATION_PASSED, {
+      evidenceIds: [doneEvidenceId],
+    }); // VERIFY -> DONE
     transitionHistory.push(t7);
     expect(stateMachine.phase).toBe(AgentPhase.DONE);
     expect(stateMachine.isTerminal).toBe(true);
@@ -499,7 +534,9 @@ export class PricingEngine {
     expect(compile3.metrics.tokensAfter).toBeLessThanOrEqual(compile3.metrics.tokensBefore);
 
     // 2. Important decisions survive compaction
-    expect(compile3.compiledContext.entries.some((e) => e.content.includes('Fix shopping cart pricing'))).toBe(true);
+    expect(
+      compile3.compiledContext.entries.some((e) => e.content.includes('Fix shopping cart pricing')),
+    ).toBe(true);
 
     // 3. Failed approaches can be recovered via evidence store
     expect(evidenceList2.some((e) => e.outcome === EvidenceOutcome.FAIL)).toBe(true);
@@ -513,14 +550,23 @@ export class PricingEngine {
     expect(route2.selectedProvider.providerId).toBe('anthropic');
 
     // 6. Rollback works
-    const rollbackResult = await rollbackManager.rollbackToCheckpoint(checkpoint.id, checkpointStore, gitManager);
+    const rollbackResult = await rollbackManager.rollbackToCheckpoint(
+      checkpoint.id,
+      checkpointStore,
+      gitManager,
+    );
     expect(rollbackResult.success).toBe(true);
 
     // 7. Verification blocks invalid completion
     expect(eval1.satisfied).toBe(false);
 
     // 8. Runtime can resume from crash
-    const crashAnalysis = await recoveryManager.analyzeCrash(taskId, executionJournal, eventStore, checkpointStore);
+    const crashAnalysis = await recoveryManager.analyzeCrash(
+      taskId,
+      executionJournal,
+      eventStore,
+      checkpointStore,
+    );
     const resumeDecision = recoveryManager.createRecoveryDecision(crashAnalysis);
     const resumeResult = await resumeManager.resumeTask(taskId, resumeDecision);
     expect(resumeResult.state).toBeDefined();

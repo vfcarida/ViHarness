@@ -37,6 +37,13 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['dist/', 'node_modules/', 'coverage/', '*.config.*'],
+    ignores: [
+      'dist/',
+      'node_modules/',
+      'coverage/',
+      '*.config.*',
+      'tests/fixtures/**',
+      'benchmark-results/**',
+    ],
   },
 );

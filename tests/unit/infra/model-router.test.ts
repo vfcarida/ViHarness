@@ -80,10 +80,7 @@ describe('Model Router & Hot-Swapping', () => {
         costPer1kInputTokensDollars: 0.0001,
         costPer1kOutputTokensDollars: 0.0002,
         capabilities: {
-          capabilities: new Set([
-            ModelCapability.CODING,
-            ModelCapability.TOOL_USE,
-          ]),
+          capabilities: new Set([ModelCapability.CODING, ModelCapability.TOOL_USE]),
           maxContextTokens: 32000,
           maxOutputTokens: 2048,
           supportsSystemPrompt: true,
@@ -212,7 +209,7 @@ describe('Model Router & Hot-Swapping', () => {
       complexity: 'MEDIUM',
       risk: 'LOW',
       contextTokenCount: 10000,
-      remainingBudgetDollars: 0.10, // Very low remaining budget
+      remainingBudgetDollars: 0.1, // Very low remaining budget
     };
 
     const decision = await router.route(reqBudgetCritical);

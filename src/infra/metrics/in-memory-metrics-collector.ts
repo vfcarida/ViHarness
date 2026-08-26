@@ -89,8 +89,7 @@ export class InMemoryMetricsCollector implements ModelMetricsCollector {
         totalOutputTokens: stat.totalOutputTokens,
         totalTokens: stat.totalTokens,
         totalCostDollars: stat.totalCostDollars,
-        averageLatencyMs:
-          stat.totalRequests > 0 ? stat.totalLatencyMs / stat.totalRequests : 0,
+        averageLatencyMs: stat.totalRequests > 0 ? stat.totalLatencyMs / stat.totalRequests : 0,
         totalRetries: stat.totalRetries,
       };
     }

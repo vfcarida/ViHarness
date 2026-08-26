@@ -25,7 +25,10 @@ export class ConfigLoader {
   /**
    * Resolve and validate complete configuration.
    */
-  static load(cliOverrides: CliConfigOverrides = {}, workingDir: string = process.cwd()): ViHarnessConfigType {
+  static load(
+    cliOverrides: CliConfigOverrides = {},
+    workingDir: string = process.cwd(),
+  ): ViHarnessConfigType {
     // 1. Find and load config file (if any)
     const fileConfig = this.loadFileConfig(cliOverrides.configPath, workingDir);
 
@@ -35,12 +38,21 @@ export class ConfigLoader {
     // 3. Construct raw merged object with proper fallback hierarchy
     const rawMerged = {
       model: {
-        primary: cliOverrides.model || envConfig.model?.primary || fileConfig.model?.primary || undefined,
-        architect: cliOverrides.architect || envConfig.model?.architect || fileConfig.model?.architect || undefined,
+        primary:
+          cliOverrides.model || envConfig.model?.primary || fileConfig.model?.primary || undefined,
+        architect:
+          cliOverrides.architect ||
+          envConfig.model?.architect ||
+          fileConfig.model?.architect ||
+          undefined,
         providers: fileConfig.model?.providers || [],
       },
       context: {
-        maxTokens: cliOverrides.maxTokens ?? envConfig.context?.maxTokens ?? fileConfig.context?.maxTokens ?? undefined,
+        maxTokens:
+          cliOverrides.maxTokens ??
+          envConfig.context?.maxTokens ??
+          fileConfig.context?.maxTokens ??
+          undefined,
         compactionThreshold:
           cliOverrides.compactionThreshold ??
           envConfig.context?.compactionThreshold ??
@@ -61,12 +73,20 @@ export class ConfigLoader {
         deniedCommands: fileConfig.security?.deniedCommands || [],
       },
       storage: {
-        path: cliOverrides.storagePath || envConfig.storage?.path || fileConfig.storage?.path || undefined,
+        path:
+          cliOverrides.storagePath ||
+          envConfig.storage?.path ||
+          fileConfig.storage?.path ||
+          undefined,
         maxSizeMb: fileConfig.storage?.maxSizeMb || undefined,
       },
       experience: fileConfig.experience || {},
       mcp: {
-        transport: cliOverrides.mcpTransport || envConfig.mcp?.transport || fileConfig.mcp?.transport || undefined,
+        transport:
+          cliOverrides.mcpTransport ||
+          envConfig.mcp?.transport ||
+          fileConfig.mcp?.transport ||
+          undefined,
         port: cliOverrides.mcpPort ?? envConfig.mcp?.port ?? fileConfig.mcp?.port ?? undefined,
       },
       benchmarks: fileConfig.benchmarks || undefined,
@@ -76,7 +96,10 @@ export class ConfigLoader {
     return ViHarnessConfig.parse(rawMerged);
   }
 
-  private static loadFileConfig(explicitPath?: string, workingDir: string = process.cwd()): Partial<ViHarnessConfigType> {
+  private static loadFileConfig(
+    explicitPath?: string,
+    workingDir: string = process.cwd(),
+  ): Partial<ViHarnessConfigType> {
     const candidates = explicitPath
       ? [path.resolve(workingDir, explicitPath)]
       : [
@@ -116,10 +139,12 @@ export class ConfigLoader {
       mcp: {},
     };
 
-    if (env.VI_MODEL_PRIMARY || env.VI_MODEL) result.model.primary = env.VI_MODEL_PRIMARY || env.VI_MODEL;
+    if (env.VI_MODEL_PRIMARY || env.VI_MODEL)
+      result.model.primary = env.VI_MODEL_PRIMARY || env.VI_MODEL;
     if (env.VI_MODEL_ARCHITECT) result.model.architect = env.VI_MODEL_ARCHITECT;
     if (env.VI_MAX_TOKENS) result.context.maxTokens = parseInt(env.VI_MAX_TOKENS, 10);
-    if (env.VI_COMPACTION_THRESHOLD) result.context.compactionThreshold = parseFloat(env.VI_COMPACTION_THRESHOLD);
+    if (env.VI_COMPACTION_THRESHOLD)
+      result.context.compactionThreshold = parseFloat(env.VI_COMPACTION_THRESHOLD);
     if (env.VI_SECURITY_MODE) result.security.permissionMode = env.VI_SECURITY_MODE;
     if (env.VI_STORAGE_PATH) result.storage.path = env.VI_STORAGE_PATH;
     if (env.VI_MCP_TRANSPORT) result.mcp.transport = env.VI_MCP_TRANSPORT;

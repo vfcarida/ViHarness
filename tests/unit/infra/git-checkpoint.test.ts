@@ -6,10 +6,7 @@ import {
   UuidV7IdFactory,
   TestClock,
 } from '../../../src/infra/index.js';
-import {
-  AgentPhase,
-  StateMachine,
-} from '../../../src/core/index.js';
+import { AgentPhase, StateMachine } from '../../../src/core/index.js';
 import type { TaskId } from '../../../src/core/index.js';
 
 describe('Repository State Management & Checkpoints', () => {
@@ -125,7 +122,11 @@ describe('Repository State Management & Checkpoints', () => {
 
   it('should handle failed rollback gracefully when checkpoint ID is invalid', async () => {
     const invalidId = idFactory.create<'Checkpoint'>();
-    const result = await rollbackManager.rollbackToCheckpoint(invalidId, checkpointStore, gitManager);
+    const result = await rollbackManager.rollbackToCheckpoint(
+      invalidId,
+      checkpointStore,
+      gitManager,
+    );
 
     expect(result.success).toBe(false);
     expect(result.error).toContain('Checkpoint not found');

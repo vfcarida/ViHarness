@@ -25,7 +25,13 @@ import {
   UuidV7IdFactory,
   SystemClock,
 } from '../../src/infra/index.js';
-import { ContextTier, ContextObjectType, ContextScope, AgentPhase, MessageRole } from '../../src/core/index.js';
+import {
+  ContextTier,
+  ContextObjectType,
+  ContextScope,
+  AgentPhase,
+  MessageRole,
+} from '../../src/core/index.js';
 
 describe('Enterprise Readiness Integration Suite', () => {
   it('executes full enterprise suite integrating cryptographic audit, causal diagnosis, budget balancing, and streaming parsing', () => {
@@ -108,7 +114,9 @@ describe('Enterprise Readiness Integration Suite', () => {
 
     // 4. Streaming Tool Parser
     const parser = new StreamingToolParser();
-    const states = parser.feed('{"name": "write_file", "input": {"path": "src/fix.ts", "content": "export const x = 1;"}}');
+    const states = parser.feed(
+      '{"name": "write_file", "input": {"path": "src/fix.ts", "content": "export const x = 1;"}}',
+    );
     expect(states[0]!.isComplete).toBe(true);
     expect(states[0]!.parsedInput).toEqual({ path: 'src/fix.ts', content: 'export const x = 1;' });
 
@@ -136,7 +144,9 @@ describe('Enterprise Readiness Integration Suite', () => {
       messages: [{ role: MessageRole.USER, content: 'Enterprise validation task' }],
       proposedToolCalls: [{ name: 'write_file', input: { path: 'src/fix.ts' }, id: 'c_ent_1' }],
       policyDecisions: [],
-      executedToolResults: [{ toolCallId: 'c_ent_1', success: true, output: 'written', durationMs: 45 }],
+      executedToolResults: [
+        { toolCallId: 'c_ent_1', success: true, output: 'written', durationMs: 45 },
+      ],
       evidenceCreated: [],
       durationMs: 300,
       timestamp: new Date(),

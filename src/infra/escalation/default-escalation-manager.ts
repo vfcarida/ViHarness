@@ -8,7 +8,10 @@
  * Supports escalation creation, approval/rejection/modification/cancellation resolution,
  * expiration handling, policy enforcement, and audit trail retrieval.
  */
-import type { EscalationManager, EscalationResolution } from '../../core/interfaces/escalation-manager.js';
+import type {
+  EscalationManager,
+  EscalationResolution,
+} from '../../core/interfaces/escalation-manager.js';
 import type { EvidenceStore } from '../../core/interfaces/evidence-store.js';
 import type { IdFactory, EscalationId, TaskId } from '../../core/types/identifiers.js';
 import type { Clock } from '../../core/interfaces/clock.js';
@@ -18,11 +21,7 @@ import type {
   HumanDecisionRecord,
   ApprovalPolicy,
 } from '../../core/model/escalation.js';
-import {
-  EscalationReason,
-  EscalationStatus,
-  HumanDecision,
-} from '../../core/model/escalation.js';
+import { EscalationReason, EscalationStatus, HumanDecision } from '../../core/model/escalation.js';
 import type { Evidence } from '../../core/model/evidence.js';
 import { EvidenceOutcome, EvidenceType } from '../../core/model/evidence.js';
 import { ActionRiskCategory } from '../../core/model/policy.js';
@@ -122,11 +121,12 @@ export class DefaultEscalationManager implements EscalationManager {
 
     // Persist as durable Evidence in EvidenceStore
     if (this.evidenceStore) {
-      const outcome = decisionInput.decision === HumanDecision.APPROVE
-        ? EvidenceOutcome.PASS
-        : decisionInput.decision === HumanDecision.REJECT
-        ? EvidenceOutcome.FAIL
-        : EvidenceOutcome.WARNING;
+      const outcome =
+        decisionInput.decision === HumanDecision.APPROVE
+          ? EvidenceOutcome.PASS
+          : decisionInput.decision === HumanDecision.REJECT
+            ? EvidenceOutcome.FAIL
+            : EvidenceOutcome.WARNING;
 
       const evidenceRecord: Evidence = {
         id: this.idFactory.create<'Evidence'>(),

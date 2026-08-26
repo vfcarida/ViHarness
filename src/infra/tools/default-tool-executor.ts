@@ -13,7 +13,11 @@ import type { ToolExecutor, ToolExecutionRequest } from '../../core/interfaces/t
 import type { ToolRegistry } from '../../core/interfaces/tool-registry.js';
 import type { PolicyEngine } from '../../core/interfaces/policy-engine.js';
 import type { Tool } from '../../core/interfaces/tool.js';
-import type { ToolCategory, ToolResult, ToolExecutionContext } from '../../core/model/tool-types.js';
+import type {
+  ToolCategory,
+  ToolResult,
+  ToolExecutionContext,
+} from '../../core/model/tool-types.js';
 import type { IdFactory } from '../../core/types/identifiers.js';
 import { DefaultToolRegistry } from './default-tool-registry.js';
 import { HarnessError } from '../../core/errors/base-error.js';
@@ -78,8 +82,7 @@ export class DefaultToolExecutor implements ToolExecutor {
     // 1. Prototype Pollution & Malicious Argument Defense
     const sanitizedInput = sanitizeToolInput(request.input);
 
-    const correlationId =
-      request.context?.correlationId ?? this.idFactory.create<'Trace'>();
+    const correlationId = request.context?.correlationId ?? this.idFactory.create<'Trace'>();
     const timeoutMs = request.context?.timeoutMs ?? tool.definition.defaultTimeoutMs ?? 30000;
 
     const fullContext: ToolExecutionContext = {
@@ -131,10 +134,10 @@ export class DefaultToolExecutor implements ToolExecutor {
     if (this.policyEngine) {
       const actionResource = String(
         sanitizedInput['path'] ??
-        sanitizedInput['cmd'] ??
-        sanitizedInput['command'] ??
-        sanitizedInput['url'] ??
-        tool.definition.name,
+          sanitizedInput['cmd'] ??
+          sanitizedInput['command'] ??
+          sanitizedInput['url'] ??
+          tool.definition.name,
       );
 
       const action = {
@@ -162,7 +165,12 @@ export class DefaultToolExecutor implements ToolExecutor {
           success: false,
           durationMs: Date.now() - startTime,
           error: `Policy DENIED tool execution: ${evaluation.reason}`,
-          metadata: { ...baseMetadata, ruleId: evaluation.ruleId, decision: evaluation.decision, errorCode: 'POLICY_DENIED' },
+          metadata: {
+            ...baseMetadata,
+            ruleId: evaluation.ruleId,
+            decision: evaluation.decision,
+            errorCode: 'POLICY_DENIED',
+          },
         };
       }
 
@@ -177,7 +185,12 @@ export class DefaultToolExecutor implements ToolExecutor {
           success: false,
           durationMs: Date.now() - startTime,
           error: `Policy REQUIRES_APPROVAL for tool execution: ${evaluation.reason}`,
-          metadata: { ...baseMetadata, ruleId: evaluation.ruleId, decision: evaluation.decision, errorCode: 'REQUIRES_APPROVAL' },
+          metadata: {
+            ...baseMetadata,
+            ruleId: evaluation.ruleId,
+            decision: evaluation.decision,
+            errorCode: 'REQUIRES_APPROVAL',
+          },
         };
       }
     }
@@ -234,7 +247,7 @@ export class DefaultToolExecutor implements ToolExecutor {
         ...res,
         output: scrubbedOutput,
         error: scrubbedError,
-        durationMs: res.durationMs || (Date.now() - startTime),
+        durationMs: res.durationMs || Date.now() - startTime,
         metadata: {
           ...baseMetadata,
           ...(res.metadata ?? {}),
@@ -288,7 +301,8 @@ function sanitizeToolInput(input: Record<string, unknown>): Record<string, unkno
     } else if (Array.isArray(value)) {
       clean[key] = value.map((item) => {
         if (typeof item === 'string') return item.replace(/\0/g, '');
-        if (typeof item === 'object' && item !== null) return sanitizeToolInput(item as Record<string, unknown>);
+        if (typeof item === 'object' && item !== null)
+          return sanitizeToolInput(item as Record<string, unknown>);
         return item;
       });
     } else if (typeof value === 'object' && value !== null) {

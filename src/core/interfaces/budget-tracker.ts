@@ -8,11 +8,7 @@ import type { BudgetCheckResult, BudgetConfig } from '../model/cost-types.js';
 
 export interface BudgetTracker {
   /** Check if incurring additional cost violates task or model budgets. */
-  checkBudget(
-    taskId: TaskId,
-    modelId: string,
-    additionalCostUSD: number,
-  ): BudgetCheckResult;
+  checkBudget(taskId: TaskId, modelId: string, additionalCostUSD: number): BudgetCheckResult;
 
   /** Record cost usage for a task and model. */
   recordUsage(taskId: TaskId, modelId: string, costUSD: number): void;

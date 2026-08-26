@@ -43,7 +43,8 @@ export interface CausalTraceAnalysis {
     phaseChange: string;
     description: string;
   }>;
-  readonly bottleneckIdentified?: 'CACHE_UNDERUTILIZATION' | 'TOOL_FAILURES' | 'POLICY_FRICTION' | 'CONTEXT_BLOAT' | 'NONE';
+  readonly bottleneckIdentified?:
+    'CACHE_UNDERUTILIZATION' | 'TOOL_FAILURES' | 'POLICY_FRICTION' | 'CONTEXT_BLOAT' | 'NONE';
 }
 
 export class TraceDistiller {
@@ -122,7 +123,9 @@ export class TraceDistiller {
         const decisionType = String(pol.decision);
         if (decisionType === 'DENY' || decisionType === 'REQUIRE_APPROVAL') {
           policyDenialCount++;
-          const toolName = String(pol.action?.metadata?.['toolName'] ?? pol.action?.resource ?? 'unknown_tool');
+          const toolName = String(
+            pol.action?.metadata?.['toolName'] ?? pol.action?.resource ?? 'unknown_tool',
+          );
           const stat = toolStatsMap.get(toolName) ?? {
             proposals: 0,
             executions: 0,
@@ -222,7 +225,9 @@ export class TraceDistiller {
     }
 
     // Determine primary bottleneck
-    let bottleneckIdentified: 'CACHE_UNDERUTILIZATION' | 'TOOL_FAILURES' | 'POLICY_FRICTION' | 'CONTEXT_BLOAT' | 'NONE' = 'NONE';
+    let bottleneckIdentified:
+      'CACHE_UNDERUTILIZATION' | 'TOOL_FAILURES' | 'POLICY_FRICTION' | 'CONTEXT_BLOAT' | 'NONE' =
+      'NONE';
     if (cacheHitRatio < 0.2 && totalPromptTokens > 10000) {
       bottleneckIdentified = 'CACHE_UNDERUTILIZATION';
     } else if (maxToolFailures >= 3) {

@@ -67,7 +67,12 @@ export class RiskClassifier {
 
     // 2. Destructive Actions Check
     for (const pattern of DESTRUCTIVE_PATTERNS) {
-      if (pattern.test(resource) || pattern.test(fullText) || type.includes('delete') || type.includes('drop')) {
+      if (
+        pattern.test(resource) ||
+        pattern.test(fullText) ||
+        type.includes('delete') ||
+        type.includes('drop')
+      ) {
         categories.add(ActionRiskCategory.DESTRUCTIVE);
         break;
       }
@@ -90,13 +95,28 @@ export class RiskClassifier {
     }
 
     // 5. Operation Types
-    if (type.includes('read') || type.includes('fetch') || type.includes('list') || type.includes('get')) {
+    if (
+      type.includes('read') ||
+      type.includes('fetch') ||
+      type.includes('list') ||
+      type.includes('get')
+    ) {
       categories.add(ActionRiskCategory.READ);
     }
-    if (type.includes('write') || type.includes('create') || type.includes('update') || type.includes('patch')) {
+    if (
+      type.includes('write') ||
+      type.includes('create') ||
+      type.includes('update') ||
+      type.includes('patch')
+    ) {
       categories.add(ActionRiskCategory.WRITE);
     }
-    if (type.includes('exec') || type.includes('cmd') || type.includes('shell') || type.includes('run')) {
+    if (
+      type.includes('exec') ||
+      type.includes('cmd') ||
+      type.includes('shell') ||
+      type.includes('run')
+    ) {
       categories.add(ActionRiskCategory.EXECUTE);
     }
     if (

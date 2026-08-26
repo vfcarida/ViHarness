@@ -15,11 +15,19 @@ describe('CircuitBreaker', () => {
     const breaker = new CircuitBreaker({ failureThreshold: 2, recoveryTimeoutMs: 1000 });
 
     // 1st failure
-    await expect(breaker.execute(async () => { throw new Error('API down 1'); })).rejects.toThrow('API down 1');
+    await expect(
+      breaker.execute(async () => {
+        throw new Error('API down 1');
+      }),
+    ).rejects.toThrow('API down 1');
     expect(breaker.currentState).toBe('CLOSED');
 
     // 2nd failure -> opens circuit
-    await expect(breaker.execute(async () => { throw new Error('API down 2'); })).rejects.toThrow('API down 2');
+    await expect(
+      breaker.execute(async () => {
+        throw new Error('API down 2');
+      }),
+    ).rejects.toThrow('API down 2');
     expect(breaker.currentState).toBe('OPEN');
     expect(breaker.isAvailable).toBe(false);
 
@@ -42,7 +50,11 @@ describe('CircuitBreaker', () => {
     });
 
     // Trigger failure
-    await expect(breaker.execute(async () => { throw new Error('failure'); })).rejects.toThrow();
+    await expect(
+      breaker.execute(async () => {
+        throw new Error('failure');
+      }),
+    ).rejects.toThrow();
     expect(breaker.currentState).toBe('OPEN');
 
     // Wait for recovery timeout

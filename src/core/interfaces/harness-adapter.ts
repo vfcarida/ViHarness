@@ -97,8 +97,5 @@ export interface HarnessAdapter {
   readonly version: string;
 
   /** Execute a benchmark task within the provided isolated execution context */
-  execute(
-    task: BenchmarkTask,
-    context: HarnessExecutionContext,
-  ): Promise<HarnessExecutionResult>;
+  execute(task: BenchmarkTask, context: HarnessExecutionContext): Promise<HarnessExecutionResult>;
 }

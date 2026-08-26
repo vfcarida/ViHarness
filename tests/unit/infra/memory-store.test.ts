@@ -5,12 +5,7 @@ import {
   UuidV7IdFactory,
   TestClock,
 } from '../../../src/infra/index.js';
-import {
-  MemoryTier,
-  MemoryType,
-  MemoryScope,
-  MemoryStatus,
-} from '../../../src/core/index.js';
+import { MemoryTier, MemoryType, MemoryScope, MemoryStatus } from '../../../src/core/index.js';
 
 describe('Memory Subsystem & Provider Abstraction', () => {
   let store: InMemoryMemoryStore;

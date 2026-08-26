@@ -231,9 +231,7 @@ describe('Parallel Tool Executor — P018', () => {
     const registry = createMockRegistry([slowTool]);
     const executor = new ParallelToolExecutor(registry);
 
-    const results = await executor.execute([
-      { id: 'slow-call', name: 'slow_tool', arguments: {} },
-    ]);
+    const results = await executor.execute([{ id: 'slow-call', name: 'slow_tool', arguments: {} }]);
 
     expect(results.length).toBe(1);
     expect(results[0]?.success).toBe(false);
@@ -294,9 +292,7 @@ describe('Parallel Tool Executor — P018', () => {
     const registry = createMockRegistry([buggyClassifierTool]);
     const executor = new ParallelToolExecutor(registry);
 
-    const groups = executor.classifyAndGroup([
-      { id: '1', name: 'buggy_tool', arguments: {} },
-    ]);
+    const groups = executor.classifyAndGroup([{ id: '1', name: 'buggy_tool', arguments: {} }]);
 
     expect(groups.length).toBe(1);
     expect(groups[0]?.mode).toBe('exclusive');

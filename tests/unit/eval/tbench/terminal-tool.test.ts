@@ -23,7 +23,14 @@ describe('Terminal Tool — P011', () => {
     const env = new MockDockerEnvironment();
     const tool = new TerminalTool({
       dockerEnv: env,
-      container: { id: 'c1', name: 'c1', task: sampleTask, status: 'running', createdAt: Date.now(), workdir: '' },
+      container: {
+        id: 'c1',
+        name: 'c1',
+        task: sampleTask,
+        status: 'running',
+        createdAt: Date.now(),
+        workdir: '',
+      },
       idFactory,
     });
 
@@ -39,7 +46,9 @@ describe('Terminal Tool — P011', () => {
     const container = await env.create(sampleTask);
     const tool = new TerminalTool({ dockerEnv: env, container, idFactory });
 
-    const result = await tool.execute({ command: 'node -e "console.log(\'TERMINAL_TOOL_ECHO\');"' });
+    const result = await tool.execute({
+      command: 'node -e "console.log(\'TERMINAL_TOOL_ECHO\');"',
+    });
 
     expect(result.success).toBe(true);
     expect(result.name).toBe('terminal');
@@ -54,7 +63,9 @@ describe('Terminal Tool — P011', () => {
     const container = await env.create(sampleTask);
     const tool = new TerminalTool({ dockerEnv: env, container, idFactory });
 
-    const result = await tool.execute({ command: 'node -e "console.error(\'FAIL_MSG\'); process.exit(1);"' });
+    const result = await tool.execute({
+      command: 'node -e "console.error(\'FAIL_MSG\'); process.exit(1);"',
+    });
 
     expect(result.success).toBe(false);
     expect(result.error).toBeDefined();
@@ -94,7 +105,7 @@ describe('Terminal Tool — P011', () => {
 
   it('6. should catch execution errors if docker environment throws', async () => {
     const errorEnv = {
-      create: async () => ({} as any),
+      create: async () => ({}) as any,
       exec: async () => {
         throw new Error('Connection refused to Docker daemon');
       },
@@ -104,7 +115,14 @@ describe('Terminal Tool — P011', () => {
 
     const tool = new TerminalTool({
       dockerEnv: errorEnv,
-      container: { id: 'c1', name: 'c1', task: sampleTask, status: 'running', createdAt: Date.now(), workdir: '' },
+      container: {
+        id: 'c1',
+        name: 'c1',
+        task: sampleTask,
+        status: 'running',
+        createdAt: Date.now(),
+        workdir: '',
+      },
       idFactory,
     });
 

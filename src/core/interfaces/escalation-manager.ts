@@ -41,8 +41,5 @@ export interface EscalationManager {
   getAuditTrail(taskId: TaskId): Promise<ReadonlyArray<HumanDecisionRecord>>;
 
   /** Evaluate whether an action/reason requires human approval per ApprovalPolicy. */
-  requiresApproval(
-    reason: string | any,
-    policy?: ApprovalPolicy,
-  ): boolean;
+  requiresApproval(reason: string | any, policy?: ApprovalPolicy): boolean;
 }

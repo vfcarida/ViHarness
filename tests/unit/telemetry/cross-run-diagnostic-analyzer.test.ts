@@ -9,10 +9,7 @@
  * 5. Prefix caching underutilization -> caching enablement recommendation.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  HarnessDiagnosticEngine,
-  type RunTraceData,
-} from '../../../src/infra/index.js';
+import { HarnessDiagnosticEngine, type RunTraceData } from '../../../src/infra/index.js';
 import { AgentPhase, ActionResultStatus } from '../../../src/core/index.js';
 
 describe('Cross-Run Diagnostic Analyzer (Meta-Harness Pattern) — P009', () => {
@@ -77,7 +74,7 @@ describe('Cross-Run Diagnostic Analyzer (Meta-Harness Pattern) — P009', () => 
     expect(toolRec).toBeDefined();
     expect(toolRec?.parameter).toBe('toolFeedbackEnhancement_run_linter');
     expect(toolRec?.suggestedValue).toBe(true);
-    expect(toolRec?.confidence).toBeGreaterThanOrEqual(0.80);
+    expect(toolRec?.confidence).toBeGreaterThanOrEqual(0.8);
     expect(toolRec?.evidence.length).toBeGreaterThanOrEqual(1);
     expect(toolRec?.evidence[0]).toContain('run_linter');
   });
@@ -257,7 +254,9 @@ describe('Cross-Run Diagnostic Analyzer (Meta-Harness Pattern) — P009', () => 
 
     const report = HarnessDiagnosticEngine.analyzeAcrossRuns(mockRuns);
 
-    const cacheRec = report.recommendations.find((r) => r.type === 'THRESHOLD_ADJUSTMENT' && r.parameter === 'enablePrefixCaching');
+    const cacheRec = report.recommendations.find(
+      (r) => r.type === 'THRESHOLD_ADJUSTMENT' && r.parameter === 'enablePrefixCaching',
+    );
     expect(cacheRec).toBeDefined();
     expect(cacheRec?.suggestedValue).toBe(true);
   });

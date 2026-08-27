@@ -83,7 +83,7 @@
   "dependencies": {
     "better-sqlite3": "^13.0.3",
     "uuid": "^11.1.0",
-    "zod": "^3.24.0"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

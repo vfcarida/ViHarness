@@ -46,6 +46,9 @@ export interface GoalConstraints {
 
   /** Whether to allow the agent to proceed to DONE without verification. */
   readonly requireVerification: boolean;
+
+  /** Whether to enforce autonomous Test-Driven Development (Red-Green reproducer verification). */
+  readonly requireTdd?: boolean;
 }
 
 // ---------------------------------------------------------------------------

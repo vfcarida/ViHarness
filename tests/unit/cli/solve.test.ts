@@ -292,4 +292,33 @@ describe('Vi-Harness Solve CLI Suite', () => {
     expect(parsed.providerId).toBe('bedrock');
     expect(parsed.modelId).toBe('anthropic.claude-3-5-sonnet-20241022-v2:0');
   });
+
+  it('15. parseSolveArgs: Parses --tdd and --no-tdd flags', () => {
+    const defaultParsed = parseSolveArgs(['-p', 'task']);
+    expect(defaultParsed.tdd).toBe(false);
+
+    const tddParsed = parseSolveArgs(['-p', 'task', '--tdd']);
+    expect(tddParsed.tdd).toBe(true);
+
+    const noTddParsed = parseSolveArgs(['-p', 'task', '--no-tdd']);
+    expect(noTddParsed.tdd).toBe(false);
+  });
+
+  it('16. Headless Execution with TDD mode enabled: Blocks premature conclusion when reproducer is missing', async () => {
+    const exitCode = await runSolveCli([
+      '-p',
+      'TDD verified problem',
+      '--cwd',
+      tempDir,
+      '--provider-id',
+      'mock',
+      '--tdd',
+      '--mode',
+      'jsonl',
+      '--max-iterations',
+      '2',
+    ]);
+
+    expect(exitCode).toBe(1);
+  });
 });

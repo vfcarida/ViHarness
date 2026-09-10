@@ -80,6 +80,10 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
       const { runChatCli } = await import('./commands/chat.js');
       return runChatCli(args.slice(1));
     }
+    if (args[0] === 'bench' || args[0] === 'benchmark') {
+      const { runBenchmarkCli } = await import('./commands/benchmark.js');
+      return runBenchmarkCli(args.slice(1));
+    }
     printHelp();
     return 0;
   }
@@ -152,8 +156,8 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
     }
     case 'bench':
     case 'benchmark': {
-      const { runCli: runBenchCli } = await import('./benchmark-cli.js');
-      return runBenchCli(subArgs);
+      const { runBenchmarkCli } = await import('./commands/benchmark.js');
+      return runBenchmarkCli(subArgs);
     }
     case 'bench:context': {
       const { runContextCli } = await import('./context-benchmark-cli.js');

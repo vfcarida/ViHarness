@@ -23,6 +23,17 @@ import type { IdFactory } from '../../core/types/identifiers.js';
 import { HarnessError } from '../../core/errors/base-error.js';
 import { ErrorCode, ErrorCategory } from '../../core/errors/error-codes.js';
 import { StrictCompilerGate } from '../verification/strict-compiler-gate.js';
+import { PersistentShellSession } from './persistent-shell-session.js';
+import {
+  DelegateSubtaskTool,
+  type SubtaskRunnerFn,
+} from './builtin/delegate-subtask-tool.js';
+
+export type {
+  SubtaskRunOptions,
+  SubtaskExecutionSummary,
+  SubtaskRunnerFn,
+} from './builtin/delegate-subtask-tool.js';
 
 export interface WorkspaceToolsOptions {
   readonly idFactory?: IdFactory;
@@ -35,6 +46,10 @@ export interface WorkspaceToolsOptions {
   readonly strictCompilerCheck?: boolean;
   readonly maxCpuTimeSec?: number;
   readonly maxMemoryMb?: number;
+  readonly persistentShell?: boolean;
+  readonly shellSession?: PersistentShellSession;
+  readonly enableDelegation?: boolean;
+  readonly subtaskRunner?: SubtaskRunnerFn;
 }
 
 function checkDockerCliAvailable(): boolean {
@@ -719,6 +734,9 @@ export class WorkspaceRunCommandTool implements Tool {
   private readonly strictCompilerCheck: boolean;
   private readonly maxCpuTimeSec?: number;
   private readonly maxMemoryMb?: number;
+  private readonly persistentShell: boolean;
+  private shellSession?: PersistentShellSession;
+  private readonly ownsShellSession: boolean;
 
   constructor(
     private readonly workspacePath: string,
@@ -733,6 +751,29 @@ export class WorkspaceRunCommandTool implements Tool {
     this.strictCompilerCheck = options?.strictCompilerCheck ?? false;
     this.maxCpuTimeSec = options?.maxCpuTimeSec;
     this.maxMemoryMb = options?.maxMemoryMb;
+    this.persistentShell = options?.persistentShell ?? false;
+
+    if (options?.shellSession) {
+      this.shellSession = options.shellSession;
+      this.ownsShellSession = false;
+    } else if (this.persistentShell) {
+      this.shellSession = new PersistentShellSession(this.workspacePath, {
+        defaultTimeoutMs: this.timeoutMs,
+      });
+      this.ownsShellSession = true;
+    } else {
+      this.ownsShellSession = false;
+    }
+  }
+
+  getShellSession(): PersistentShellSession | undefined {
+    return this.shellSession;
+  }
+
+  dispose(): void {
+    if (this.ownsShellSession && this.shellSession) {
+      this.shellSession.terminate();
+    }
   }
 
   async execute(input: ToolInput, context: ToolExecutionContext): Promise<ToolResult> {
@@ -854,7 +895,83 @@ export class WorkspaceRunCommandTool implements Tool {
       }
     }
 
-    // 2. Prepare command string (local vs Docker CLI)
+    // 2. Persistent shell execution (if active and sandbox is local)
+    if (this.sandbox === 'local' && this.shellSession) {
+      try {
+        const effectiveTimeout = this.maxCpuTimeSec
+          ? Math.min(this.timeoutMs, this.maxCpuTimeSec * 1000)
+          : this.timeoutMs;
+        const shellRes = await this.shellSession.execute(command, effectiveTimeout);
+        const durationMs = Date.now() - start;
+
+        let output = shellRes.stdout;
+        if (shellRes.stderr) {
+          if (output && !output.endsWith('\n')) output += '\n';
+          output += `Stderr:\n${shellRes.stderr}`;
+        }
+
+        const isTle = shellRes.exitCode === 124 || shellRes.stderr.includes('timed out after');
+
+        const hasWarnings =
+          shellRes.exitCode === 0 &&
+          /\b(?:warning\s*:|warning\s*\[|CMake Warning|warning CS|ts\(\d+\)|warning\s*\()/i.test(output);
+
+        const warningDiag =
+          this.strictCompilerCheck && shellRes.exitCode === 0 && !isTle
+            ? StrictCompilerGate.inspectOutput(command, output)
+            : null;
+
+        if (warningDiag) {
+          output += `\n\n${warningDiag.feedbackMessage}`;
+        } else if (hasWarnings) {
+          output +=
+            '\n\n[Vi-Harness Compiler Warning Notice]: The command succeeded with warnings. Be aware that strict evaluation environments (like ACMOJ / SWE-bench judges) compile with \'-Wall -Wextra -Werror\' and reject solutions with compiler warnings. Make sure to eliminate any warnings before finishing.';
+        }
+
+        const isStrictFail = Boolean(warningDiag);
+        const isSuccess = !isStrictFail && !isTle && shellRes.exitCode === 0;
+
+        return {
+          toolCallId: callId,
+          name: this.definition.name,
+          success: isSuccess,
+          output: output.trim() || `(Command completed with exit code ${shellRes.exitCode} and no output)`,
+          durationMs,
+          metadata: {
+            exitCode: shellRes.exitCode,
+            timedOut: isTle,
+            command,
+            hasWarnings,
+            strictCompilerCheck: this.strictCompilerCheck,
+            warningCount: warningDiag?.warningCount ?? (hasWarnings ? 1 : 0),
+            compilerWarnings: warningDiag?.warningLines ?? [],
+            maxCpuTimeSec: this.maxCpuTimeSec,
+            maxMemoryMb: this.maxMemoryMb,
+            sandbox: 'local',
+            persistentShell: true,
+          },
+          error: isTle
+            ? 'TIME_LIMIT_EXCEEDED'
+            : isStrictFail
+              ? 'COMPILER_WARNINGS_DETECTED'
+              : shellRes.exitCode !== 0
+                ? `Command exited with code ${shellRes.exitCode}`
+                : undefined,
+        };
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        return {
+          toolCallId: callId,
+          name: this.definition.name,
+          success: false,
+          output: `Persistent shell error: ${errMsg}`,
+          durationMs: Date.now() - start,
+          error: errMsg,
+        };
+      }
+    }
+
+    // 3. Prepare command string (local vs Docker CLI)
     let executionCommand = command;
     let isDockerActive = false;
     let sandboxNotice = '';
@@ -1001,7 +1118,7 @@ export function createWorkspaceTools(
   options?: WorkspaceToolsOptions,
 ): Tool[] {
   const resolvedPath = path.resolve(workspacePath);
-  return [
+  const tools: Tool[] = [
     new WorkspaceReadFileTool(resolvedPath, options?.idFactory),
     new WorkspaceWriteFileTool(resolvedPath, options?.idFactory),
     new WorkspaceEditFileTool(resolvedPath, options?.idFactory),
@@ -1009,4 +1126,16 @@ export function createWorkspaceTools(
     new WorkspaceListDirectoryTool(resolvedPath, options?.idFactory),
     new WorkspaceRunCommandTool(resolvedPath, options),
   ];
+
+  if (options?.enableDelegation || options?.subtaskRunner) {
+    tools.push(
+      new DelegateSubtaskTool({
+        workspacePath: resolvedPath,
+        runner: options.subtaskRunner,
+        idFactory: options.idFactory,
+      }),
+    );
+  }
+
+  return tools;
 }

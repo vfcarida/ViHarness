@@ -27,6 +27,7 @@ import { AgentEventType, type AgentEvent } from '../../core/model/runtime-types.
 import { RealGitManager } from '../../infra/git/real-git-manager.js';
 import { SourceCodeIndexer } from '../../infra/syntax/source-code-indexer.js';
 import { OjFeedbackIngester } from '../../infra/eval/oj-feedback-ingester.js';
+import { TddEnforcer } from '../../infra/verification/tdd-enforcer.js';
 
 const IGNORED_SCAN_DIRS = new Set([
   '.git',
@@ -146,6 +147,7 @@ export interface SolveCliArgs {
   maxCpuTimeSec?: number;
   maxMemoryMb?: number;
   ingestFeedback?: string;
+  tdd: boolean;
   help: boolean;
 }
 
@@ -174,6 +176,7 @@ OPTIONS:
   --auto-rollback / --no-auto-rollback  Automatically revert workspace on oscillation/stagnation anomalies (default: true)
   --prompt-caching / --no-prompt-caching  Enable static prefix prompt caching breakpoints (default: true)
   --strict-compiler / --no-strict-compiler  Treat compiler warnings as fatal errors (ACMOJ / SWE-bench strict gate, default: false)
+  --tdd / --no-tdd                Enforce autonomous Test-Driven Development (Red-Green reproducer verification, default: false)
   --max-cpu-time-sec <sec>        Limit execution time for local commands (detects TLE)
   --max-memory-mb <mb>            Limit virtual memory for local commands (detects MLE)
   --ingest-feedback <file|json>   Ingest external Online Judge (ACMOJ / SWE-bench) verdict/log for targeted repair
@@ -192,6 +195,7 @@ ENVIRONMENT VARIABLES:
   VI_HARNESS_REASONING_EFFORT               Default reasoning effort (low, medium, high)
   MODEL_ID, OPENAI_MODEL                    Default model ID
   VI_HARNESS_STRICT_COMPILER                Default strict compiler enforcement (true/false)
+  VI_HARNESS_TDD_MODE                       Default TDD mode enforcement (true/false)
   VI_HARNESS_MAX_CPU_TIME_SEC               Default CPU time limit in seconds
   VI_HARNESS_MAX_MEMORY_MB                  Default virtual memory limit in MB
 `);
@@ -216,6 +220,7 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
     dockerImage: 'ubuntu:22.04',
     promptCaching: true,
     strictCompiler: process.env['VI_HARNESS_STRICT_COMPILER'] === 'true' || false,
+    tdd: process.env['VI_HARNESS_TDD_MODE'] === 'true' || false,
     maxCpuTimeSec: process.env['VI_HARNESS_MAX_CPU_TIME_SEC']
       ? parseInt(process.env['VI_HARNESS_MAX_CPU_TIME_SEC'], 10)
       : undefined,
@@ -282,6 +287,10 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
       result.strictCompiler = true;
     } else if (arg === '--no-strict-compiler') {
       result.strictCompiler = false;
+    } else if (arg === '--tdd') {
+      result.tdd = true;
+    } else if (arg === '--no-tdd') {
+      result.tdd = false;
     } else if (arg === '--max-cpu-time-sec' && i + 1 < args.length) {
       result.maxCpuTimeSec = parseInt(args[++i]!, 10);
     } else if (arg === '--max-memory-mb' && i + 1 < args.length) {
@@ -343,6 +352,9 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
   logInfo(`Initializing solve agent on workspace: ${workspacePath}`);
   logInfo(`Model: ${parsed.modelId} (provider: ${parsed.providerId})`);
   logInfo(`Prompt Caching: ${parsed.promptCaching ? 'enabled (ephemeral static prefix)' : 'disabled'}`);
+  if (parsed.tdd) {
+    logInfo('TDD Mode: enabled (Red-Green reproducer verification enforced)');
+  }
 
   // 1. Initialize Core Identifiers and Clocks
   const idFactory = new UuidV7IdFactory();
@@ -492,10 +504,12 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
     }
   }
 
+  const tddSection = parsed.tdd ? `\n\n${TddEnforcer.getGuidanceContract()}` : '';
+
   // 7. Build Task Prompt with Contract Guidelines
   const fullPrompt = `Task Instructions:
 ${parsed.prompt}
-${repoMapSection}${feedbackSection}
+${repoMapSection}${feedbackSection}${tddSection}
 
 Guidelines for this workspace:
 1. First, inspect the workspace using 'list_directory' and 'read_file' to understand existing files, declarations, and structure.
@@ -516,6 +530,7 @@ Guidelines for this workspace:
       maxRepairAttempts: 5,
       maxNoProgressIterations: 5,
       requireVerification: false,
+      requireTdd: parsed.tdd,
     },
     status: GoalStatus.ACTIVE,
     createdAt: clock.now(),
@@ -523,6 +538,7 @@ Guidelines for this workspace:
     metadata: {
       workspacePath,
       cliInvocation: true,
+      requireTdd: parsed.tdd,
     },
   };
 
@@ -537,8 +553,9 @@ Guidelines for this workspace:
       autoRollback: parsed.autoRollback,
       rollbackOnAnomaly: parsed.autoRollback,
       promptCaching: parsed.promptCaching,
+      requireTdd: parsed.tdd,
       toolExecutor,
-    });
+    } as any);
 
     // 8. Optional Output Patch Export (SWE-bench / ProjDevBench format)
     if (parsed.outputPatch) {

@@ -69,6 +69,8 @@ import {
 import { PreStepPipeline } from './pre-step-pipeline.js';
 import { ArchitectExecutor, type ArchitectExecutionResult } from './architect-executor.js';
 import { LoopFingerprinter, type LoopStateSnapshot } from './loop-fingerprinter.js';
+import { TddEnforcer } from '../infra/verification/tdd-enforcer.js';
+import { SwePruner } from '../infra/compiler/swe-pruner.js';
 
 export interface IterationExecutorParams {
   readonly executionId: ExecutionId;
@@ -288,10 +290,17 @@ export class IterationExecutor {
         const toolName = String(res.metadata['toolName'] ?? 'tool');
         const isError =
           res.status === ActionResultStatus.FAILURE || res.status === ActionResultStatus.DENIED;
+
+        const effectiveOutput = SwePruner.processPriorToolResult({
+          iterationSeq: priorIter.sequenceNumber,
+          currentSeq: sequenceNumber,
+          actionResult: res,
+        }).output;
+
         const resMsg = ProviderMessageAdapter.createToolResultMessage({
           toolCallId,
           name: toolName,
-          output: res.output || (res.error ? res.error : 'Execution finished'),
+          output: effectiveOutput,
           isError,
         });
         messages.push({
@@ -807,30 +816,122 @@ export class IterationExecutor {
         data: { evidence: ev },
       });
     } else if (isStoppingWithoutTools && !hasFailingTool) {
-      const ev: Evidence = {
-        id: idFactory.create<'Evidence'>(),
-        taskId: task.id,
-        type: EvidenceType.RUNTIME_OUTPUT,
-        outcome: EvidenceOutcome.PASS,
-        summary: 'TASK_COMPLETION: Task execution completed without verification requirement',
-        data: { status: 'COMPLETED' },
-        createdAt: now,
-        pass: true,
-        confidence: 0.95,
-        affectedFiles: [],
-      };
-      evidenceCreated.push(ev);
-      if (params.evidenceStore) {
-        await params.evidenceStore.record(ev);
-      }
+      const isTddActive = Boolean(
+        goal.constraints.requireTdd ||
+        goal.metadata?.['requireTdd'] ||
+        goal.metadata?.['tddMode'] ||
+        (options as any)?.requireTdd ||
+        (options as any)?.tddMode,
+      );
 
-      observerHub.emit({
-        type: AgentEventType.EvidenceCreated,
-        executionId,
-        taskId: task.id,
-        timestamp: now,
-        data: { evidence: ev },
-      });
+      if (isTddActive) {
+        const tddEnforcer = new TddEnforcer();
+        for (const it of iterationsSoFar) {
+          for (const r of it.toolResults) {
+            tddEnforcer.recordAction({
+              toolName: String(r.metadata?.['toolName'] ?? ''),
+              command: r.metadata?.['command'] as string | undefined,
+              filePath: (r.metadata?.['path'] ?? r.metadata?.['filePath'] ?? r.metadata?.['targetFile']) as string | undefined,
+              exitCode: r.metadata?.['exitCode'] as number | undefined,
+              output: r.output,
+            });
+          }
+        }
+        for (const r of toolResults) {
+          tddEnforcer.recordAction({
+            toolName: String(r.metadata?.['toolName'] ?? ''),
+            command: r.metadata?.['command'] as string | undefined,
+            filePath: (r.metadata?.['path'] ?? r.metadata?.['filePath'] ?? r.metadata?.['targetFile']) as string | undefined,
+            exitCode: r.metadata?.['exitCode'] as number | undefined,
+            output: r.output,
+          });
+        }
+
+        const tddEval = tddEnforcer.evaluateCompletion();
+        if (!tddEval.allowedToComplete) {
+          const ev: Evidence = {
+            id: idFactory.create<'Evidence'>(),
+            taskId: task.id,
+            type: EvidenceType.TEST_RESULT,
+            outcome: EvidenceOutcome.FAIL,
+            summary: tddEval.feedbackMessage ?? 'TDD_REPRODUCTION_REQUIRED: Task requires reproduction verification',
+            data: {
+              tddPhase: tddEval.phase,
+              reproCommand: tddEval.reproCommand,
+            },
+            createdAt: now,
+            pass: false,
+            confidence: 1.0,
+            affectedFiles: [],
+          };
+          evidenceCreated.push(ev);
+          if (params.evidenceStore) {
+            await params.evidenceStore.record(ev);
+          }
+
+          observerHub.emit({
+            type: AgentEventType.EvidenceCreated,
+            executionId,
+            taskId: task.id,
+            timestamp: now,
+            data: { evidence: ev },
+          });
+        } else {
+          const ev: Evidence = {
+            id: idFactory.create<'Evidence'>(),
+            taskId: task.id,
+            type: EvidenceType.TEST_RESULT,
+            outcome: EvidenceOutcome.PASS,
+            summary: `TDD_VERIFIED: Autonomous Red-Green reproduction confirmed with test: ${tddEval.reproCommand ?? 'reproducer'}`,
+            data: {
+              status: 'COMPLETED',
+              tddPhase: tddEval.phase,
+              reproCommand: tddEval.reproCommand,
+            },
+            createdAt: now,
+            pass: true,
+            confidence: 1.0,
+            affectedFiles: [],
+          };
+          evidenceCreated.push(ev);
+          if (params.evidenceStore) {
+            await params.evidenceStore.record(ev);
+          }
+
+          observerHub.emit({
+            type: AgentEventType.EvidenceCreated,
+            executionId,
+            taskId: task.id,
+            timestamp: now,
+            data: { evidence: ev },
+          });
+        }
+      } else {
+        const ev: Evidence = {
+          id: idFactory.create<'Evidence'>(),
+          taskId: task.id,
+          type: EvidenceType.RUNTIME_OUTPUT,
+          outcome: EvidenceOutcome.PASS,
+          summary: 'TASK_COMPLETION: Task execution completed without verification requirement',
+          data: { status: 'COMPLETED' },
+          createdAt: now,
+          pass: true,
+          confidence: 0.95,
+          affectedFiles: [],
+        };
+        evidenceCreated.push(ev);
+        if (params.evidenceStore) {
+          await params.evidenceStore.record(ev);
+        }
+
+        observerHub.emit({
+          type: AgentEventType.EvidenceCreated,
+          executionId,
+          taskId: task.id,
+          timestamp: now,
+          data: { evidence: ev },
+        });
+      }
     }
 
     // -----------------------------------------------------------------------

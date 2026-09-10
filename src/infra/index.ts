@@ -111,6 +111,8 @@ export type {
 } from './compiler/context-collapse.js';
 export { DefaultToolResultPruner } from './compiler/tool-result-pruner.js';
 export type { PruneOptions } from './compiler/tool-result-pruner.js';
+export { SwePruner } from './compiler/swe-pruner.js';
+export type { SwePrunerOptions } from './compiler/swe-pruner.js';
 export { InMemoryCompactionLock } from './compiler/compaction-lock.js';
 export type { LockState, InMemoryCompactionLockOptions } from './compiler/compaction-lock.js';
 export { ContextValidator } from './compiler/context-validator.js';
@@ -134,6 +136,18 @@ export { ReadFileTool } from './tools/builtin/read-file-tool.js';
 export { WriteFileTool } from './tools/builtin/write-file-tool.js';
 export { ListDirectoryTool } from './tools/builtin/list-directory-tool.js';
 export { RunCommandTool } from './tools/builtin/run-command-tool.js';
+export { PersistentShellSession } from './tools/persistent-shell-session.js';
+export type {
+  ShellExecutionResult,
+  PersistentShellSessionOptions,
+} from './tools/persistent-shell-session.js';
+export { DelegateSubtaskTool } from './tools/builtin/delegate-subtask-tool.js';
+export type {
+  SubtaskRunOptions,
+  SubtaskExecutionSummary,
+  SubtaskRunnerFn,
+  DelegateSubtaskToolOptions,
+} from './tools/builtin/delegate-subtask-tool.js';
 export { DefaultToolExecutor } from './tools/default-tool-executor.js';
 export type { DefaultToolExecutorOptions } from './tools/default-tool-executor.js';
 
@@ -386,6 +400,8 @@ export { TerminalTool } from './tools/terminal-tool.js';
 export type { TerminalToolOptions } from './tools/terminal-tool.js';
 export { OjFeedbackIngester } from './eval/oj-feedback-ingester.js';
 export type { OjFeedbackPayload } from './eval/oj-feedback-ingester.js';
+export { TddEnforcer, TddPhase } from './verification/tdd-enforcer.js';
+export type { TddEvaluationResult } from './verification/tdd-enforcer.js';
 
 // MCP Transports & Transport Registry
 export { StdioTransport, HttpTransport } from './mcp/transports/index.js';

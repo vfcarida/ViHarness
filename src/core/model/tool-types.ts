@@ -107,6 +107,7 @@ export interface ToolExecutionContext {
   readonly timeoutMs?: number;
   readonly workingDirectory?: string;
   readonly environment?: Readonly<Record<string, string>>;
+  readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
 // ---------------------------------------------------------------------------

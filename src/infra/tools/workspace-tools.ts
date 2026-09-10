@@ -22,6 +22,7 @@ import { ToolCategory, ToolRiskLevel } from '../../core/model/tool-types.js';
 import type { IdFactory } from '../../core/types/identifiers.js';
 import { HarnessError } from '../../core/errors/base-error.js';
 import { ErrorCode, ErrorCategory } from '../../core/errors/error-codes.js';
+import { StrictCompilerGate } from '../verification/strict-compiler-gate.js';
 
 export interface WorkspaceToolsOptions {
   readonly idFactory?: IdFactory;
@@ -31,6 +32,9 @@ export interface WorkspaceToolsOptions {
   readonly dockerImage?: string;
   readonly dockerWorkdir?: string;
   readonly dockerRunner?: (cmd: string) => Promise<{ stdout: string; stderr: string; exitCode: number }>;
+  readonly strictCompilerCheck?: boolean;
+  readonly maxCpuTimeSec?: number;
+  readonly maxMemoryMb?: number;
 }
 
 function checkDockerCliAvailable(): boolean {
@@ -712,6 +716,9 @@ export class WorkspaceRunCommandTool implements Tool {
   private readonly dockerImage: string;
   private readonly dockerWorkdir: string;
   private readonly dockerRunner?: (cmd: string) => Promise<{ stdout: string; stderr: string; exitCode: number }>;
+  private readonly strictCompilerCheck: boolean;
+  private readonly maxCpuTimeSec?: number;
+  private readonly maxMemoryMb?: number;
 
   constructor(
     private readonly workspacePath: string,
@@ -723,6 +730,9 @@ export class WorkspaceRunCommandTool implements Tool {
     this.dockerImage = options?.dockerImage ?? 'ubuntu:22.04';
     this.dockerWorkdir = options?.dockerWorkdir ?? '/workspace';
     this.dockerRunner = options?.dockerRunner;
+    this.strictCompilerCheck = options?.strictCompilerCheck ?? false;
+    this.maxCpuTimeSec = options?.maxCpuTimeSec;
+    this.maxMemoryMb = options?.maxMemoryMb;
   }
 
   async execute(input: ToolInput, context: ToolExecutionContext): Promise<ToolResult> {
@@ -769,25 +779,68 @@ export class WorkspaceRunCommandTool implements Tool {
           runnerRes.exitCode === 0 &&
           /\b(?:warning\s*:|warning\s*\[|CMake Warning|warning CS|ts\(\d+\)|warning\s*\()/i.test(output);
 
-        if (hasWarnings) {
+        const warningDiag =
+          this.strictCompilerCheck && runnerRes.exitCode === 0
+            ? StrictCompilerGate.inspectOutput(command, output)
+            : null;
+
+        if (warningDiag) {
+          output += `\n\n${warningDiag.feedbackMessage}`;
+        } else if (hasWarnings) {
           output +=
             '\n\n[Vi-Harness Compiler Warning Notice]: The command succeeded with warnings. Be aware that strict evaluation environments (like ACMOJ / SWE-bench judges) compile with \'-Wall -Wextra -Werror\' and reject solutions with compiler warnings. Make sure to eliminate any warnings before finishing.';
         }
 
+        const isMle =
+          Boolean(this.maxMemoryMb) &&
+          (output.includes('Out of memory') ||
+            output.includes('std::bad_alloc') ||
+            output.includes('fatal error: out of memory') ||
+            output.includes('JavaScript heap out of memory') ||
+            runnerRes.exitCode === 137);
+
+        const isTle =
+          runnerRes.exitCode === 124 ||
+          output.includes('timed out after') ||
+          output.includes('timeout: sending signal KILL');
+
+        if (isMle) {
+          output += `\n\n[Vi-Harness Resource Limit Notice]: Command exceeded virtual memory limit (${this.maxMemoryMb} MB). The process was terminated with Memory Limit Exceeded (MLE). Optimize memory allocations, avoid unbounded buffers, and release unused memory.`;
+        } else if (isTle && this.maxCpuTimeSec) {
+          output += `\n\n[Vi-Harness Resource Limit Notice]: Command exceeded CPU time limit (${this.maxCpuTimeSec} seconds). The process was terminated with Time Limit Exceeded (TLE). Optimize computational complexity (e.g. reduce time complexity from O(N^2) to O(N log N)) or fix infinite loops.`;
+        }
+
+        const isStrictFail = Boolean(warningDiag);
+        const isResourceFail = isMle || (isTle && Boolean(this.maxCpuTimeSec));
+        const isSuccess = !isStrictFail && !isResourceFail && runnerRes.exitCode === 0;
+
         return {
           toolCallId: callId,
           name: this.definition.name,
-          success: runnerRes.exitCode === 0,
+          success: isSuccess,
           output: output.trim() || `(Command completed with exit code ${runnerRes.exitCode} and no output)`,
           durationMs,
           metadata: {
             exitCode: runnerRes.exitCode,
             command,
             hasWarnings,
+            strictCompilerCheck: this.strictCompilerCheck,
+            warningCount: warningDiag?.warningCount ?? (hasWarnings ? 1 : 0),
+            compilerWarnings: warningDiag?.warningLines ?? [],
+            maxCpuTimeSec: this.maxCpuTimeSec,
+            maxMemoryMb: this.maxMemoryMb,
             sandbox: 'docker',
             dockerImage: this.dockerImage,
           },
-          error: runnerRes.exitCode !== 0 ? `Command exited with code ${runnerRes.exitCode}` : undefined,
+          error: isMle
+            ? 'MEMORY_LIMIT_EXCEEDED'
+            : isTle && this.maxCpuTimeSec
+              ? 'TIME_LIMIT_EXCEEDED'
+              : isStrictFail
+                ? 'COMPILER_WARNINGS_DETECTED'
+                : runnerRes.exitCode !== 0
+                  ? `Command exited with code ${runnerRes.exitCode}`
+                  : undefined,
         };
       } catch (err: any) {
         return {
@@ -810,19 +863,39 @@ export class WorkspaceRunCommandTool implements Tool {
       if (checkDockerCliAvailable()) {
         isDockerActive = true;
         const hostMount = path.resolve(this.workspacePath).replace(/\\/g, '/');
-        const escapedCmd = command.replace(/'/g, "'\\''");
+        let innerCmd = command;
+        if (this.maxMemoryMb) {
+          innerCmd = `ulimit -v ${this.maxMemoryMb * 1024} 2>/dev/null || true; ${innerCmd}`;
+        }
+        if (this.maxCpuTimeSec) {
+          innerCmd = `timeout --signal=KILL ${this.maxCpuTimeSec}s /bin/bash -c '${innerCmd.replace(/'/g, "'\\''")}'`;
+        }
+        const escapedCmd = innerCmd.replace(/'/g, "'\\''");
         executionCommand = `docker run --rm -v "${hostMount}:${this.dockerWorkdir}" -w "${this.dockerWorkdir}" ${this.dockerImage} /bin/bash -c '${escapedCmd}'`;
       } else {
         sandboxNotice = '[Vi-Harness Sandbox Notice]: Docker is unavailable on host system, executed locally.\n';
       }
+    } else if (process.platform !== 'win32') {
+      let localInner = command;
+      if (this.maxMemoryMb) {
+        localInner = `ulimit -v ${this.maxMemoryMb * 1024} 2>/dev/null || true; ${localInner}`;
+      }
+      if (this.maxCpuTimeSec) {
+        localInner = `timeout --signal=KILL ${this.maxCpuTimeSec}s /bin/bash -c '${localInner.replace(/'/g, "'\\''")}'`;
+      }
+      executionCommand = localInner;
     }
+
+    const effectiveTimeout = this.maxCpuTimeSec
+      ? Math.min(this.timeoutMs, this.maxCpuTimeSec * 1000)
+      : this.timeoutMs;
 
     return new Promise((resolve) => {
       child_process.exec(
         executionCommand,
         {
           cwd: this.workspacePath,
-          timeout: this.timeoutMs,
+          timeout: effectiveTimeout,
           maxBuffer: this.maxBufferBytes,
         },
         (error, stdout, stderr) => {
@@ -838,7 +911,7 @@ export class WorkspaceRunCommandTool implements Tool {
           }
 
           if (isKilled) {
-            output += `\n[Command timed out after ${this.timeoutMs}ms]`;
+            output += `\n[Command timed out after ${effectiveTimeout}ms]`;
           }
 
           if (!output.trim()) {
@@ -849,26 +922,70 @@ export class WorkspaceRunCommandTool implements Tool {
             exitCode === 0 &&
             /\b(?:warning\s*:|warning\s*\[|CMake Warning|warning CS|ts\(\d+\)|warning\s*\()/i.test(output);
 
-          if (hasWarnings) {
+          const warningDiag =
+            this.strictCompilerCheck && exitCode === 0 && !isKilled
+              ? StrictCompilerGate.inspectOutput(command, output)
+              : null;
+
+          if (warningDiag) {
+            output += `\n\n${warningDiag.feedbackMessage}`;
+          } else if (hasWarnings) {
             output +=
               '\n\n[Vi-Harness Compiler Warning Notice]: The command succeeded with warnings. Be aware that strict evaluation environments (like ACMOJ / SWE-bench judges) compile with \'-Wall -Wextra -Werror\' and reject solutions with compiler warnings. Make sure to eliminate any warnings before finishing.';
           }
 
+          const isMle =
+            Boolean(this.maxMemoryMb) &&
+            (output.includes('Out of memory') ||
+              output.includes('std::bad_alloc') ||
+              output.includes('fatal error: out of memory') ||
+              output.includes('JavaScript heap out of memory') ||
+              (exitCode === 137 && !isKilled));
+
+          const isTle =
+            isKilled ||
+            exitCode === 124 ||
+            output.includes('timed out after') ||
+            output.includes('timeout: sending signal KILL');
+
+          if (isMle) {
+            output += `\n\n[Vi-Harness Resource Limit Notice]: Command exceeded virtual memory limit (${this.maxMemoryMb} MB). The process was terminated with Memory Limit Exceeded (MLE). Optimize memory allocations, avoid unbounded buffers, and release unused memory.`;
+          } else if (isTle && this.maxCpuTimeSec) {
+            output += `\n\n[Vi-Harness Resource Limit Notice]: Command exceeded CPU time limit (${this.maxCpuTimeSec} seconds). The process was terminated with Time Limit Exceeded (TLE). Optimize computational complexity (e.g. reduce time complexity from O(N^2) to O(N log N)) or fix infinite loops.`;
+          }
+
+          const isStrictFail = Boolean(warningDiag);
+          const isResourceFail = isMle || (isTle && Boolean(this.maxCpuTimeSec));
+          const isSuccess = !isStrictFail && !isResourceFail && exitCode === 0 && !isKilled;
+
           resolve({
             toolCallId: callId,
             name: this.definition.name,
-            success: exitCode === 0 && !isKilled,
+            success: isSuccess,
             output: output.trim(),
             durationMs,
             metadata: {
               exitCode,
-              timedOut: isKilled,
+              timedOut: isKilled || isTle,
               command,
               hasWarnings,
+              strictCompilerCheck: this.strictCompilerCheck,
+              warningCount: warningDiag?.warningCount ?? (hasWarnings ? 1 : 0),
+              compilerWarnings: warningDiag?.warningLines ?? [],
+              maxCpuTimeSec: this.maxCpuTimeSec,
+              maxMemoryMb: this.maxMemoryMb,
               sandbox: isDockerActive ? 'docker' : 'local',
               ...(isDockerActive ? { dockerImage: this.dockerImage } : {}),
             },
-            error: exitCode !== 0 ? `Command exited with code ${exitCode}` : undefined,
+            error: isMle
+              ? 'MEMORY_LIMIT_EXCEEDED'
+              : isTle && this.maxCpuTimeSec
+                ? 'TIME_LIMIT_EXCEEDED'
+                : isStrictFail
+                  ? 'COMPILER_WARNINGS_DETECTED'
+                  : exitCode !== 0
+                    ? `Command exited with code ${exitCode}`
+                    : undefined,
           });
         },
       );

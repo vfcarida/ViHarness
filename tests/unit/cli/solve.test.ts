@@ -219,4 +219,77 @@ describe('Vi-Harness Solve CLI Suite', () => {
 
     expect(exitCode).toBe(0);
   });
+
+  it('11. Strict Compiler CLI Flags: Parses --strict-compiler and --no-strict-compiler correctly', () => {
+    const strictParsed = parseSolveArgs(['-p', 'task', '--strict-compiler']);
+    expect(strictParsed.strictCompiler).toBe(true);
+
+    const lenientParsed = parseSolveArgs(['-p', 'task', '--no-strict-compiler']);
+    expect(lenientParsed.strictCompiler).toBe(false);
+  });
+
+  it('12. parseSolveArgs: Parses resource limits and feedback ingestion options', () => {
+    const parsed = parseSolveArgs([
+      '-p',
+      'task',
+      '--max-cpu-time-sec',
+      '5',
+      '--max-memory-mb',
+      '256',
+      '--ingest-feedback',
+      'feedback.json',
+    ]);
+
+    expect(parsed.maxCpuTimeSec).toBe(5);
+    expect(parsed.maxMemoryMb).toBe(256);
+    expect(parsed.ingestFeedback).toBe('feedback.json');
+  });
+
+  it('13. Headless Execution with Ingested OJ Feedback: Ingests feedback and executes mock run', async () => {
+    const feedbackFile = path.join(tempDir, 'oj_verdict.json');
+    fs.writeFileSync(
+      feedbackFile,
+      JSON.stringify({
+        verdict: 'WA',
+        failedTestCase: 'case01.txt',
+        expected: '100',
+        actual: '0',
+      }),
+    );
+
+    const exitCode = await runSolveCli([
+      '-p',
+      'Fix calculation bug based on judge feedback',
+      '--cwd',
+      tempDir,
+      '--provider-id',
+      'mock',
+      '--ingest-feedback',
+      feedbackFile,
+      '--max-cpu-time-sec',
+      '30',
+      '--max-memory-mb',
+      '512',
+      '--mode',
+      'jsonl',
+      '--max-iterations',
+      '2',
+    ]);
+
+    expect(exitCode).toBe(0);
+  });
+
+  it('14. parseSolveArgs: Parses --provider-id bedrock', () => {
+    const parsed = parseSolveArgs([
+      '-p',
+      'task',
+      '--provider-id',
+      'bedrock',
+      '-m',
+      'anthropic.claude-3-5-sonnet-20241022-v2:0',
+    ]);
+
+    expect(parsed.providerId).toBe('bedrock');
+    expect(parsed.modelId).toBe('anthropic.claude-3-5-sonnet-20241022-v2:0');
+  });
 });

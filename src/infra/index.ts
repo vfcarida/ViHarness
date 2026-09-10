@@ -34,8 +34,12 @@ export type { AnthropicProviderOptions } from './model/anthropic-provider.js';
 export { GeminiModelProvider } from './model/gemini-provider.js';
 export type { GeminiProviderOptions } from './model/gemini-provider.js';
 
+export { BedrockConverseProvider, signBedrockRequest } from './model/bedrock-provider.js';
+export type { BedrockProviderOptions } from './model/bedrock-provider.js';
+
 export {
   executeResiliently,
+  executeWithHeartbeatStream,
   mapProviderError,
   DEFAULT_RESILIENCE_OPTIONS,
 } from './model/provider-resilience.js';
@@ -155,6 +159,8 @@ export { DefaultEvidenceAggregator } from './evidence/default-evidence-aggregato
 export { ContradictoryEvidenceResolver } from './evidence/contradictory-evidence-resolver.js';
 export { DefaultVerificationEngine } from './verification/default-verification-engine.js';
 export type { DefaultVerificationEngineOptions } from './verification/default-verification-engine.js';
+export { StrictCompilerGate } from './verification/strict-compiler-gate.js';
+export type { CompilerWarningDiagnostic } from './verification/strict-compiler-gate.js';
 
 // Repository State Management & Checkpoints
 export { DefaultCheckpointStore } from './checkpoint/default-checkpoint-store.js';
@@ -378,6 +384,8 @@ export type {
 } from './eval/tbench/index.js';
 export { TerminalTool } from './tools/terminal-tool.js';
 export type { TerminalToolOptions } from './tools/terminal-tool.js';
+export { OjFeedbackIngester } from './eval/oj-feedback-ingester.js';
+export type { OjFeedbackPayload } from './eval/oj-feedback-ingester.js';
 
 // MCP Transports & Transport Registry
 export { StdioTransport, HttpTransport } from './mcp/transports/index.js';

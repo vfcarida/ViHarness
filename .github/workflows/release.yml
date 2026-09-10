@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Perform dry-run verification without publishing to NPM or creating a release'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   id-token: write
@@ -21,6 +28,8 @@ jobs:
           node-version: 20
           cache: 'npm'
       - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
       - run: npm test
       - run: npm run build
       - run: npm run prepublish-check
@@ -28,6 +37,7 @@ jobs:
   publish:
     name: Publish to NPM with Provenance
     needs: verify
+    if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +47,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run build
+      - run: npm run prepublish-check
       - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -44,6 +55,7 @@ jobs:
   github-release:
     name: Create GitHub Release
     needs: publish
+    if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,6 +69,7 @@ jobs:
   docker:
     name: Build & Push Docker Image
     needs: publish
+    if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

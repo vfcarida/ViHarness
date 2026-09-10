@@ -151,12 +151,7 @@ export class OpenAICompatibleProvider implements ModelProvider {
     const payload = this.buildPayload(request, false);
 
     const url = `${this.baseUrl.replace(/\/$/, '')}/chat/completions`;
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    if (this.apiKey) {
-      headers['Authorization'] = `Bearer ${this.apiKey}`;
-    }
+    const headers = this.buildHeaders();
 
     let response: Response;
     try {
@@ -175,18 +170,28 @@ export class OpenAICompatibleProvider implements ModelProvider {
       throw mapHttpStatusToError(response.status, errorText, this.providerId);
     }
 
-    const data = await response.json();
+    const data = await response.json().catch((err) => {
+      throw new HarnessError({
+        code: ErrorCode.MODEL_MALFORMED_OUTPUT,
+        category: ErrorCategory.MODEL,
+        message: `[${this.providerId}] Failed to parse JSON response: ${err.message}`,
+      });
+    });
+
     const latencyMs = Date.now() - startTime;
 
-    const genIdHeader = response.headers?.get?.('x-openrouter-generation-id') ?? undefined;
-    const costHeader = response.headers?.get?.('x-openrouter-cost');
-    const parsedCostHeader = costHeader ? parseFloat(costHeader) : undefined;
-    const extraMeta = {
-      ...(genIdHeader ? { generationId: genIdHeader } : {}),
-      ...(parsedCostHeader !== undefined && !Number.isNaN(parsedCostHeader)
-        ? { providerReportedCost: parsedCostHeader }
-        : {}),
-    };
+    // Check OpenRouter / proxy generation ID and reported cost
+    let extraMeta: { generationId?: string; providerReportedCost?: number } | undefined;
+    const generationId = response.headers?.get?.('x-openrouter-generation-id') ?? undefined;
+    const reportedCostHeader = response.headers?.get?.('x-openrouter-cost') ?? undefined;
+    const providerReportedCost = reportedCostHeader ? parseFloat(reportedCostHeader) : undefined;
+
+    if (generationId || providerReportedCost !== undefined) {
+      extraMeta = {
+        ...(generationId ? { generationId } : {}),
+        ...(providerReportedCost !== undefined ? { providerReportedCost } : {}),
+      };
+    }
 
     return this.parseResponse(data, request, latencyMs, extraMeta);
   }
@@ -195,12 +200,7 @@ export class OpenAICompatibleProvider implements ModelProvider {
     const payload = this.buildPayload(request, true);
 
     const url = `${this.baseUrl.replace(/\/$/, '')}/chat/completions`;
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    if (this.apiKey) {
-      headers['Authorization'] = `Bearer ${this.apiKey}`;
-    }
+    const headers = this.buildHeaders();
 
     let response: Response;
     try {
@@ -286,6 +286,21 @@ export class OpenAICompatibleProvider implements ModelProvider {
         errorMessage: err instanceof Error ? err.message : String(err),
       };
     }
+  }
+
+  private buildHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (this.apiKey) {
+      headers['Authorization'] = `Bearer ${this.apiKey}`;
+    }
+    if (this.baseUrl.includes('openrouter.ai')) {
+      headers['HTTP-Referer'] =
+        process.env['OPENROUTER_HTTP_REFERER'] ?? 'https://github.com/vfcarida/ViHarness';
+      headers['X-Title'] = process.env['OPENROUTER_TITLE'] ?? 'Vi-Harness';
+    }
+    return headers;
   }
 
   private buildPayload(request: ModelRequest, stream: boolean): Record<string, unknown> {

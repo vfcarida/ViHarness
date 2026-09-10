@@ -248,7 +248,68 @@ export class RealGitManager implements GitManager {
     await this.execGit(['checkout', '-b', branchName]);
   }
 
+  public static readonly DEFAULT_IGNORED_BUILD_PATTERNS: ReadonlyArray<string> = [
+    'CMakeFiles/',
+    'CMakeCache.txt',
+    'cmake_install.cmake',
+    'Makefile.cmake',
+    '/code',
+    '*.o',
+    '*.obj',
+    '*.a',
+    '*.so',
+    '*.dylib',
+    '*.dll',
+    '*.exe',
+    'build/',
+    'dist/',
+    '.cache/',
+  ];
+
+  /**
+   * Ensures essential build outputs and temporary cache files are present in .gitignore
+   * so they are never staged or leaked into evaluation patches.
+   */
+  async ensureSanitizedGitignore(customPatterns?: ReadonlyArray<string>): Promise<string[]> {
+    const gitignorePath = path.join(this.workingDir, '.gitignore');
+    const patternsToAdd = customPatterns ?? RealGitManager.DEFAULT_IGNORED_BUILD_PATTERNS;
+    let existingContent = '';
+    if (fs.existsSync(gitignorePath)) {
+      try {
+        existingContent = await fs.promises.readFile(gitignorePath, 'utf-8');
+      } catch {
+        existingContent = '';
+      }
+    }
+    const existingLines = new Set(
+      existingContent
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean),
+    );
+    const added: string[] = [];
+    for (const pattern of patternsToAdd) {
+      if (!existingLines.has(pattern)) {
+        added.push(pattern);
+      }
+    }
+    if (added.length > 0) {
+      const appendContent =
+        (existingContent && !existingContent.endsWith('\n') ? '\n' : '') +
+        '# Vi-Harness Auto-Sanitized Build Artifacts\n' +
+        added.join('\n') +
+        '\n';
+      await fs.promises.appendFile(gitignorePath, appendContent, 'utf-8');
+    }
+    return added;
+  }
+
   async getDiff(targetRef?: string): Promise<string> {
+    try {
+      await this.ensureSanitizedGitignore();
+    } catch {
+      // Non-fatal if gitignore cannot be updated
+    }
     try {
       await this.execGit(['add', '-N', '.']);
     } catch {

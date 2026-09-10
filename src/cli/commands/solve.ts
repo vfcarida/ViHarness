@@ -17,6 +17,7 @@ import { DefaultToolRegistry } from '../../infra/tools/default-tool-registry.js'
 import { DefaultToolExecutor } from '../../infra/tools/default-tool-executor.js';
 import { createWorkspaceTools } from '../../infra/tools/workspace-tools.js';
 import { OpenAICompatibleProvider } from '../../infra/model/openai-compatible-provider.js';
+import { BedrockConverseProvider } from '../../infra/model/bedrock-provider.js';
 import { MockModelProvider } from '../../infra/model/mock-model-provider.js';
 import { UuidV7IdFactory } from '../../infra/id/uuid-id-factory.js';
 import { SystemClock } from '../../infra/time/system-clock.js';
@@ -25,6 +26,7 @@ import { GoalStatus, type Goal } from '../../core/model/goal.js';
 import { AgentEventType, type AgentEvent } from '../../core/model/runtime-types.js';
 import { RealGitManager } from '../../infra/git/real-git-manager.js';
 import { SourceCodeIndexer } from '../../infra/syntax/source-code-indexer.js';
+import { OjFeedbackIngester } from '../../infra/eval/oj-feedback-ingester.js';
 
 const IGNORED_SCAN_DIRS = new Set([
   '.git',
@@ -140,6 +142,10 @@ export interface SolveCliArgs {
   sandbox: 'local' | 'docker';
   dockerImage: string;
   promptCaching: boolean;
+  strictCompiler: boolean;
+  maxCpuTimeSec?: number;
+  maxMemoryMb?: number;
+  ingestFeedback?: string;
   help: boolean;
 }
 
@@ -167,6 +173,10 @@ OPTIONS:
   --auto-lint                     Enable automatic lint verification after file writes (default: false)
   --auto-rollback / --no-auto-rollback  Automatically revert workspace on oscillation/stagnation anomalies (default: true)
   --prompt-caching / --no-prompt-caching  Enable static prefix prompt caching breakpoints (default: true)
+  --strict-compiler / --no-strict-compiler  Treat compiler warnings as fatal errors (ACMOJ / SWE-bench strict gate, default: false)
+  --max-cpu-time-sec <sec>        Limit execution time for local commands (detects TLE)
+  --max-memory-mb <mb>            Limit virtual memory for local commands (detects MLE)
+  --ingest-feedback <file|json>   Ingest external Online Judge (ACMOJ / SWE-bench) verdict/log for targeted repair
   --output-patch <file>           Export git diff patch of agent modifications (SWE-bench / ProjDevBench format)
   --sandbox <local|docker>        Command execution environment: local or docker container (default: local)
   --docker-image <image>          Docker image used when --sandbox is docker (default: ubuntu:22.04)
@@ -181,6 +191,9 @@ ENVIRONMENT VARIABLES:
   VI_HARNESS_MAX_RETRIES                    Default request retries
   VI_HARNESS_REASONING_EFFORT               Default reasoning effort (low, medium, high)
   MODEL_ID, OPENAI_MODEL                    Default model ID
+  VI_HARNESS_STRICT_COMPILER                Default strict compiler enforcement (true/false)
+  VI_HARNESS_MAX_CPU_TIME_SEC               Default CPU time limit in seconds
+  VI_HARNESS_MAX_MEMORY_MB                  Default virtual memory limit in MB
 `);
 }
 
@@ -202,6 +215,13 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
     sandbox: 'local',
     dockerImage: 'ubuntu:22.04',
     promptCaching: true,
+    strictCompiler: process.env['VI_HARNESS_STRICT_COMPILER'] === 'true' || false,
+    maxCpuTimeSec: process.env['VI_HARNESS_MAX_CPU_TIME_SEC']
+      ? parseInt(process.env['VI_HARNESS_MAX_CPU_TIME_SEC'], 10)
+      : undefined,
+    maxMemoryMb: process.env['VI_HARNESS_MAX_MEMORY_MB']
+      ? parseInt(process.env['VI_HARNESS_MAX_MEMORY_MB'], 10)
+      : undefined,
     help: false,
   };
 
@@ -258,6 +278,16 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
       result.promptCaching = true;
     } else if (arg === '--no-prompt-caching') {
       result.promptCaching = false;
+    } else if (arg === '--strict-compiler') {
+      result.strictCompiler = true;
+    } else if (arg === '--no-strict-compiler') {
+      result.strictCompiler = false;
+    } else if (arg === '--max-cpu-time-sec' && i + 1 < args.length) {
+      result.maxCpuTimeSec = parseInt(args[++i]!, 10);
+    } else if (arg === '--max-memory-mb' && i + 1 < args.length) {
+      result.maxMemoryMb = parseInt(args[++i]!, 10);
+    } else if (arg === '--ingest-feedback' && i + 1 < args.length) {
+      result.ingestFeedback = args[++i]!;
     } else if (arg === '--output-patch' && i + 1 < args.length) {
       result.outputPatch = args[++i]!;
     } else if (arg === '--sandbox' && i + 1 < args.length) {
@@ -326,6 +356,13 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
       providerId: 'mock',
       defaultResponseText: 'I will complete the requested task.',
     });
+  } else if (parsed.providerId === 'bedrock') {
+    provider = new BedrockConverseProvider({
+      providerId: 'bedrock',
+      defaultModelId: parsed.modelId,
+      baseUrl: parsed.baseUrl,
+      apiKey: parsed.apiKey,
+    });
   } else {
     provider = new OpenAICompatibleProvider({
       providerId: parsed.providerId,
@@ -350,6 +387,9 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
     commandTimeoutMs: 120000,
     sandbox: parsed.sandbox,
     dockerImage: parsed.dockerImage,
+    strictCompilerCheck: parsed.strictCompiler,
+    maxCpuTimeSec: parsed.maxCpuTimeSec,
+    maxMemoryMb: parsed.maxMemoryMb,
   });
 
   const toolRegistry = new DefaultToolRegistry();
@@ -439,10 +479,23 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
     // Non-fatal if indexer fails to scan or parse repository files
   }
 
+  let feedbackSection = '';
+  if (parsed.ingestFeedback) {
+    const feedback = OjFeedbackIngester.parseFeedback(parsed.ingestFeedback, workspacePath);
+    if (feedback) {
+      feedbackSection = `\n\n${OjFeedbackIngester.formatFeedbackPrompt(feedback)}`;
+      logInfo(
+        `Ingested external Online Judge feedback: verdict=${feedback.verdict} (source: ${feedback.source})`,
+      );
+    } else {
+      logInfo(`Warning: Unable to parse feedback from ${parsed.ingestFeedback}`);
+    }
+  }
+
   // 7. Build Task Prompt with Contract Guidelines
   const fullPrompt = `Task Instructions:
 ${parsed.prompt}
-${repoMapSection}
+${repoMapSection}${feedbackSection}
 
 Guidelines for this workspace:
 1. First, inspect the workspace using 'list_directory' and 'read_file' to understand existing files, declarations, and structure.

@@ -149,7 +149,7 @@ export async function checkForUpdates(
 /**
  * Non-blocking fire-and-forget update check trigger for CLI startup.
  */
-export function triggerBackgroundUpdateCheck(currentVersion = '0.1.0'): void {
+export function triggerBackgroundUpdateCheck(currentVersion = '0.2.0'): void {
   // Fire and forget
   checkForUpdates({ currentVersion })
     .then((res) => {

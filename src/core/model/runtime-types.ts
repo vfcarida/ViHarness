@@ -180,9 +180,15 @@ export interface ExecutionOptions {
   readonly autoLintAfterWrite?: boolean;
   readonly autoTestAfterWrite?: boolean;
   readonly maxAutoCorrectionsPerFile?: number; // Default 2
+  readonly autoRollback?: boolean;
+  readonly rollbackOnAnomaly?: boolean;
   readonly experienceStore?: import('../../infra/telemetry/experience-store.js').ExperienceStore;
   readonly autoTune?: boolean;
   readonly toolExecutor?: import('../interfaces/tool-executor.js').ToolExecutor;
+  readonly requestTimeoutMs?: number;
+  readonly maxRetries?: number;
+  readonly reasoningEffort?: 'low' | 'medium' | 'high';
+  readonly promptCaching?: boolean; // Default true (Prefix caching with ephemeral breakpoints)
 }
 
 export interface ExecutionResult {

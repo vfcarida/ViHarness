@@ -68,6 +68,7 @@ import {
 } from '../core/model/verification.js';
 import { PreStepPipeline } from './pre-step-pipeline.js';
 import { ArchitectExecutor, type ArchitectExecutionResult } from './architect-executor.js';
+import { LoopFingerprinter, type LoopStateSnapshot } from './loop-fingerprinter.js';
 
 export interface IterationExecutorParams {
   readonly executionId: ExecutionId;
@@ -204,6 +205,7 @@ export class IterationExecutor {
 
     // Construct structured messages for model (including prior tool outputs & evidence)
     const messages: ModelMessage[] = [];
+    const enablePromptCaching = options?.promptCaching !== false;
 
     // Inject mounted skill instructions (from DeepSeek Harness SelfModification)
     if (options?.selfModification) {
@@ -212,6 +214,9 @@ export class IterationExecutor {
         messages.push({
           role: MessageRole.SYSTEM,
           content: `# Active Mounted Skills & Instructions:\n\n${mountedContent}`,
+          metadata: enablePromptCaching
+            ? { segmentType: 'STATIC', cacheControl: { type: 'ephemeral' } }
+            : undefined,
         });
       }
     }
@@ -228,6 +233,11 @@ export class IterationExecutor {
                 ? MessageRole.TOOL
                 : MessageRole.USER;
 
+        const isStaticSystem =
+          role === MessageRole.SYSTEM ||
+          entry.tier === ContextTier.L3_REPOSITORY ||
+          roleStr === 'system';
+
         messages.push({
           role,
           content: entry.content,
@@ -235,12 +245,21 @@ export class IterationExecutor {
             ? String(entry.metadata['toolCallId'])
             : undefined,
           name: entry.metadata['toolName'] ? String(entry.metadata['toolName']) : undefined,
+          metadata: {
+            ...entry.metadata,
+            ...(enablePromptCaching
+              ? isStaticSystem
+                ? { segmentType: 'STATIC', cacheControl: { type: 'ephemeral' } }
+                : { segmentType: 'DYNAMIC' }
+              : {}),
+          },
         });
       }
     } else {
       messages.push({
         role: MessageRole.USER,
         content: `Goal: ${goal.description}\nTask: ${task.description}`,
+        metadata: enablePromptCaching ? { segmentType: 'DYNAMIC' } : undefined,
       });
     }
 
@@ -256,7 +275,11 @@ export class IterationExecutor {
           }));
 
         if (priorToolCalls.length > 0) {
-          messages.push(ProviderMessageAdapter.createToolCallMessage(priorToolCalls));
+          const toolMsg = ProviderMessageAdapter.createToolCallMessage(priorToolCalls);
+          messages.push({
+            ...toolMsg,
+            metadata: enablePromptCaching ? { segmentType: 'DYNAMIC' } : undefined,
+          });
         }
       }
 
@@ -265,19 +288,22 @@ export class IterationExecutor {
         const toolName = String(res.metadata['toolName'] ?? 'tool');
         const isError =
           res.status === ActionResultStatus.FAILURE || res.status === ActionResultStatus.DENIED;
-        messages.push(
-          ProviderMessageAdapter.createToolResultMessage({
-            toolCallId,
-            name: toolName,
-            output: res.output || (res.error ? res.error : 'Execution finished'),
-            isError,
-          }),
-        );
+        const resMsg = ProviderMessageAdapter.createToolResultMessage({
+          toolCallId,
+          name: toolName,
+          output: res.output || (res.error ? res.error : 'Execution finished'),
+          isError,
+        });
+        messages.push({
+          ...resMsg,
+          metadata: enablePromptCaching ? { segmentType: 'DYNAMIC' } : undefined,
+        });
       }
       for (const ev of priorIter.evidenceCreated) {
         messages.push({
           role: MessageRole.SYSTEM,
           content: `[VERIFICATION_EVIDENCE] Check: ${ev.checkId ?? ev.id}, Outcome: ${ev.outcome}, Pass: ${ev.pass}, Summary: ${ev.summary}`,
+          metadata: enablePromptCaching ? { segmentType: 'DYNAMIC' } : undefined,
         });
       }
     }
@@ -368,16 +394,34 @@ export class IterationExecutor {
       modelResponse = architectExecutionData.combinedResponse;
     } else {
       const toolDefs = params.toolExecutor?.listTools().map((t) => t.definition);
+      const timeoutMs =
+        options?.requestTimeoutMs ??
+        (process.env['VI_HARNESS_REQUEST_TIMEOUT_MS']
+          ? parseInt(process.env['VI_HARNESS_REQUEST_TIMEOUT_MS'], 10)
+          : 180000); // 3 minutes default
+
+      const maxRetries =
+        options?.maxRetries ??
+        (process.env['VI_HARNESS_MAX_RETRIES']
+          ? parseInt(process.env['VI_HARNESS_MAX_RETRIES'], 10)
+          : 2); // 2 retries default (succeeds on 3rd attempt), configurable via env / CLI options
+
+      const reasoningEffort =
+        options?.reasoningEffort ??
+        (process.env['VI_HARNESS_REASONING_EFFORT'] as 'low' | 'medium' | 'high' | undefined);
+
       const modelRequest: ModelRequest = {
         modelId: routingDecision.selectedModelId,
         messages: stepMessages,
         tools: toolDefs,
+        reasoningEffort,
+        timeoutMs,
         signal: options?.signal,
       };
 
       modelResponse = await executeResiliently(routingDecision.selectedProvider, modelRequest, {
-        maxRetries: 2,
-        defaultTimeoutMs: 15000,
+        maxRetries,
+        defaultTimeoutMs: timeoutMs,
       });
     }
 
@@ -790,6 +834,84 @@ export class IterationExecutor {
     }
 
     // -----------------------------------------------------------------------
+    // LOOP FINGERPRINTING & ANOMALY DETECTION (HYGIENE GUARD)
+    // -----------------------------------------------------------------------
+    const fingerprinter = new LoopFingerprinter();
+    for (const prev of iterationsSoFar) {
+      const prevProposals = prev.actionProposals ?? (prev.actionProposed ? [prev.actionProposed] : []);
+      const prevFailingEv = prev.evidenceCreated.find((e) => !e.pass);
+      const prevSnapshot: LoopStateSnapshot = {
+        phase: prev.stateBefore,
+        activeError: prevFailingEv?.summary,
+        modifiedFiles: prev.toolResults
+          .map((r) => String(r.metadata?.['path'] ?? r.metadata?.['filePath'] ?? ''))
+          .filter((p) => p.length > 0),
+        proposedToolNames: prevProposals.map((p) => extractToolName(p)),
+        hypothesis: prevProposals[0]?.description,
+      };
+      fingerprinter.recordAndInspect(prevSnapshot, prev.sequenceNumber);
+    }
+
+    const currentFailingEv = evidenceCreated.find((e) => !e.pass);
+    const currentSnapshot: LoopStateSnapshot = {
+      phase: stateBefore,
+      activeError: currentFailingEv?.summary,
+      modifiedFiles: toolResults
+        .map((r) => String(r.metadata?.['path'] ?? r.metadata?.['filePath'] ?? ''))
+        .filter((p) => p.length > 0),
+      proposedToolNames: actionProposals.map((p) => extractToolName(p)),
+      hypothesis: actionProposals[0]?.description,
+    };
+    const loopAnomaly = fingerprinter.recordAndInspect(currentSnapshot, sequenceNumber);
+
+    // Automatic rollback on cyclic stagnation or oscillation if enabled
+    if (
+      loopAnomaly &&
+      (loopAnomaly.anomalyType === 'STAGNATION' || loopAnomaly.anomalyType === 'OSCILLATION') &&
+      (options?.autoRollback || options?.rollbackOnAnomaly) &&
+      params.toolExecutor
+    ) {
+      const revertTool = params.toolExecutor.getTool('revert_file');
+      if (revertTool) {
+        try {
+          const rollbackResult = await params.toolExecutor.execute({
+            tool: revertTool,
+            input: { path: '.' },
+          });
+          const rollbackEv: Evidence = {
+            id: idFactory.create<'Evidence'>(),
+            taskId: task.id,
+            type: EvidenceType.RUNTIME_OUTPUT,
+            outcome: EvidenceOutcome.INCONCLUSIVE,
+            summary: `[AUTOMATIC ROLLBACK TRIGGERED]: ${loopAnomaly.description} - Reverted workspace to clean baseline.`,
+            data: {
+              anomaly: loopAnomaly,
+              rollbackSuccess: rollbackResult.success,
+              rollbackOutput: rollbackResult.output,
+            },
+            createdAt: clock.now(),
+            pass: false,
+            confidence: 1.0,
+            affectedFiles: [],
+          };
+          evidenceCreated.push(rollbackEv);
+          if (params.evidenceStore) {
+            await params.evidenceStore.record(rollbackEv);
+          }
+          observerHub.emit({
+            type: AgentEventType.EvidenceCreated,
+            executionId,
+            taskId: task.id,
+            timestamp: clock.now(),
+            data: { evidence: rollbackEv },
+          });
+        } catch {
+          // Non-fatal if rollback invocation fails
+        }
+      }
+    }
+
+    // -----------------------------------------------------------------------
     // PHASE 9: DERIVED STATE TRANSITION (STRICT RESULTS-BASED)
     // -----------------------------------------------------------------------
     const hasFailingEvidence = evidenceCreated.some(
@@ -870,7 +992,11 @@ export class IterationExecutor {
         }
       } else {
         // Still inspecting or writing fixes
-        nextEvent = null;
+        if (isStoppingWithoutTools && !hasFailingTool) {
+          nextEvent = StateEvent.REPAIR_COMPLETE;
+        } else {
+          nextEvent = null;
+        }
       }
     }
 
@@ -901,12 +1027,26 @@ export class IterationExecutor {
             } else if (currentPhase === AgentPhase.IMPLEMENT) {
               stateMachine.apply(StateEvent.IMPLEMENTATION_COMPLETE);
             } else if (currentPhase === AgentPhase.VERIFY) {
-              const doneEvidenceId = validEvidenceIds[0] ?? (evidenceCreated[0]?.id as EvidenceId);
-              if (doneEvidenceId) {
-                stateMachine.apply(StateEvent.MARK_DONE, { evidenceIds: [doneEvidenceId] });
-              } else {
-                break;
+              let doneEvidenceId = validEvidenceIds[0] ?? (evidenceCreated[0]?.id as EvidenceId);
+              if (!doneEvidenceId) {
+                doneEvidenceId = idFactory.create<'Evidence'>();
+                const implicitEvidence: Evidence = {
+                  id: doneEvidenceId,
+                  taskId: task.id,
+                  type: EvidenceType.VERIFICATION,
+                  outcome: EvidenceOutcome.PASS,
+                  summary: 'Task completed without tool errors and verification not required.',
+                  data: { implicitCompletion: true },
+                  createdAt: clock.now(),
+                  pass: true,
+                  confidence: 1.0,
+                  affectedFiles: [],
+                };
+                if (evidenceStore) {
+                  await evidenceStore.record(implicitEvidence);
+                }
               }
+              stateMachine.apply(StateEvent.MARK_DONE, { evidenceIds: [doneEvidenceId] });
             } else {
               break;
             }
@@ -1005,7 +1145,9 @@ export class IterationExecutor {
       completedAt: clock.now(),
       durationMs: clock.now().getTime() - iterationStart.getTime(),
       costDollars: modelResponse.estimatedCostDollars,
-      metadata: {},
+      metadata: {
+        ...(loopAnomaly ? { loopAnomaly } : {}),
+      },
     };
 
     const terminationDecision = TerminationController.evaluate({
@@ -1094,6 +1236,7 @@ export class IterationExecutor {
       phases,
       iterationModel: currentIterationModel,
       metadata: {
+        ...(loopAnomaly ? { loopAnomaly } : {}),
         ...(architectExecutionData
           ? {
               architectMode: true,

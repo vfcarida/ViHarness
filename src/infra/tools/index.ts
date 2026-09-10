@@ -10,3 +10,4 @@ export * from './builtin/list-directory-tool.js';
 export * from './builtin/read-file-tool.js';
 export * from './builtin/run-command-tool.js';
 export * from './builtin/write-file-tool.js';
+export * from './workspace-tools.js';

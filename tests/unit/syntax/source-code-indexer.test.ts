@@ -143,6 +143,208 @@ func MainHandler(w int) {
         fileMap.symbols.find((s) => s.name === 'MainHandler' && s.kind === SymbolKind.FUNCTION),
       ).toBeDefined();
     });
+
+    it('should extract C and C++ functions, structs, and includes', () => {
+      const cCode = `
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct BuddyBlock {
+    size_t size;
+    int is_free;
+} BuddyBlock;
+
+void *buddy_alloc(size_t size) {
+    return NULL;
+}
+
+void buddy_free(void *ptr) {
+}
+`;
+      const fileMap = SourceCodeIndexer.parseFile('buddy.c', cCode);
+      expect(fileMap.language).toBe('c_cpp');
+      expect(fileMap.imports).toHaveLength(2);
+      expect(fileMap.symbols.find((s) => s.name === 'BuddyBlock')).toBeDefined();
+      expect(fileMap.symbols.find((s) => s.name === 'buddy_alloc')).toBeDefined();
+      expect(fileMap.symbols.find((s) => s.name === 'buddy_free')).toBeDefined();
+    });
+
+    it('should extract symbols and imports from Rust code', () => {
+      const rsCode = `
+use std::collections::HashMap;
+use std::sync::Arc;
+
+pub trait Repository {
+    fn find_by_id(&self, id: u64) -> Option<String>;
+}
+
+pub struct UserStore {
+    users: HashMap<u64, String>,
+}
+
+impl UserStore {
+    pub fn new() -> Self {
+        Self { users: HashMap::new() }
+    }
+}
+
+pub async fn start_server(port: u16) {
+}
+`;
+      const fileMap = SourceCodeIndexer.parseFile('src/lib.rs', rsCode);
+      expect(fileMap.language).toBe('rust');
+      expect(fileMap.imports).toHaveLength(2);
+      expect(fileMap.exports).toContain('Repository');
+      expect(fileMap.exports).toContain('UserStore');
+      expect(fileMap.symbols.find((s) => s.name === 'Repository' && s.kind === SymbolKind.INTERFACE)).toBeDefined();
+      expect(fileMap.symbols.find((s) => s.name === 'UserStore' && s.kind === SymbolKind.CLASS)).toBeDefined();
+      expect(fileMap.symbols.find((s) => s.name === 'new' && s.kind === SymbolKind.METHOD)).toBeDefined();
+      expect(fileMap.symbols.find((s) => s.name === 'start_server' && s.kind === SymbolKind.FUNCTION)).toBeDefined();
+    });
+
+    it('should extract symbols and imports from Java code', () => {
+      const javaCode = `
+package com.example.service;
+
+import java.util.List;
+import java.util.Optional;
+
+public class OrderService {
+    public Optional<String> getOrder(String id) {
+        return Optional.empty();
+    }
+}
+
+public interface OrderRepository {
+    List<String> findAll();
+}
+`;
+      const fileMap = SourceCodeIndexer.parseFile('OrderService.java', javaCode);
+      expect(fileMap.language).toBe('java');
+      expect(fileMap.imports).toHaveLength(2);
+      expect(fileMap.exports).toContain('OrderService');
+      expect(fileMap.exports).toContain('OrderRepository');
+      expect(fileMap.symbols.find((s) => s.name === 'OrderService' && s.kind === SymbolKind.CLASS)).toBeDefined();
+      expect(fileMap.symbols.find((s) => s.name === 'getOrder' && s.kind === SymbolKind.METHOD)).toBeDefined();
+      expect(fileMap.symbols.find((s) => s.name === 'OrderRepository' && s.kind === SymbolKind.INTERFACE)).toBeDefined();
+    });
+
+    it('should extract symbols and usings from C# code', () => {
+      const csCode = `
+using System;
+using System.Threading.Tasks;
+
+public class PaymentProcessor {
+    public async Task<bool> ProcessPayment(decimal amount) {
+        return true;
+    }
+}
+
+public interface IPaymentGateway {
+}
+`;
+      const fileMap = SourceCodeIndexer.parseFile('PaymentProcessor.cs', csCode);
+      expect(fileMap.language).toBe('csharp');
+      expect(fileMap.imports).toHaveLength(2);
+      expect(fileMap.exports).toContain('PaymentProcessor');
+      expect(fileMap.exports).toContain('IPaymentGateway');
+      expect(fileMap.symbols.find((s) => s.name === 'PaymentProcessor')).toBeDefined();
+      expect(fileMap.symbols.find((s) => s.name === 'ProcessPayment')).toBeDefined();
+    });
+
+    it('should extract symbols across Ruby, Swift, Kotlin, Shell, and SQL', () => {
+      // Ruby
+      const rbMap = SourceCodeIndexer.parseFile('app.rb', `
+require 'json'
+
+class UserController
+  def show
+  end
+end
+`);
+      expect(rbMap.language).toBe('ruby');
+      expect(rbMap.imports).toHaveLength(1);
+      expect(rbMap.symbols.find((s) => s.name === 'UserController')).toBeDefined();
+      expect(rbMap.symbols.find((s) => s.name === 'show')).toBeDefined();
+
+      // Swift
+      const swiftMap = SourceCodeIndexer.parseFile('App.swift', `
+import Foundation
+
+public class NetworkManager {
+  public func fetch() {}
+}
+`);
+      expect(swiftMap.language).toBe('swift');
+      expect(swiftMap.imports).toHaveLength(1);
+      expect(swiftMap.symbols.find((s) => s.name === 'NetworkManager')).toBeDefined();
+      expect(swiftMap.symbols.find((s) => s.name === 'fetch')).toBeDefined();
+
+      // Kotlin
+      const ktMap = SourceCodeIndexer.parseFile('Handler.kt', `
+import kotlinx.coroutines.*
+
+class EventHandler {
+  fun handleEvent() {}
+}
+`);
+      expect(ktMap.language).toBe('kotlin');
+      expect(ktMap.imports).toHaveLength(1);
+      expect(ktMap.symbols.find((s) => s.name === 'EventHandler')).toBeDefined();
+      expect(ktMap.symbols.find((s) => s.name === 'handleEvent')).toBeDefined();
+
+      // Shell
+      const shMap = SourceCodeIndexer.parseFile('deploy.sh', `
+function deploy_app() {
+  echo "Deploying"
+}
+`);
+      expect(shMap.language).toBe('shell');
+      expect(shMap.symbols.find((s) => s.name === 'deploy_app')).toBeDefined();
+
+      // SQL
+      const sqlMap = SourceCodeIndexer.parseFile('schema.sql', `
+CREATE TABLE users (id INT PRIMARY KEY, name TEXT);
+CREATE VIEW active_users AS SELECT * FROM users;
+`);
+      expect(sqlMap.language).toBe('sql');
+      expect(sqlMap.symbols.find((s) => s.name === 'users')).toBeDefined();
+      expect(sqlMap.symbols.find((s) => s.name === 'active_users')).toBeDefined();
+    });
+
+    it('should support Tree-Sitter Wasm AST parser registration and execution', async () => {
+      expect(SourceCodeIndexer.hasWasmParser('rust')).toBe(false);
+
+      // Register custom Wasm AST parser mock
+      SourceCodeIndexer.registerWasmParser('rust', (filePath, _content) => ({
+        symbols: [
+          {
+            name: 'WasmParsedRustStruct',
+            kind: SymbolKind.CLASS,
+            signature: 'pub struct WasmParsedRustStruct',
+            filePath,
+            startLine: 1,
+            endLine: 5,
+            isExported: true,
+          },
+        ],
+        imports: ['use wasm_bindgen::prelude::*;'],
+        exports: ['WasmParsedRustStruct'],
+      }));
+
+      expect(SourceCodeIndexer.hasWasmParser('rust')).toBe(true);
+
+      const parsedSync = SourceCodeIndexer.parseFile('test.rs', '/* empty */');
+      expect(parsedSync.symbols.find((s) => s.name === 'WasmParsedRustStruct')).toBeDefined();
+      expect(parsedSync.imports).toContain('use wasm_bindgen::prelude::*;');
+
+      const parsedAsync = await SourceCodeIndexer.parseFileAsync('test.rs', '/* empty */');
+      expect(parsedAsync.symbols.find((s) => s.name === 'WasmParsedRustStruct')).toBeDefined();
+
+      // Cleanup
+      SourceCodeIndexer.unregisterWasmParser('rust');
+      expect(SourceCodeIndexer.hasWasmParser('rust')).toBe(false);
+    });
   });
 
   describe('3. Repository-Wide Symbol Map & Compact Rendering', () => {

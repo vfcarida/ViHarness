@@ -90,6 +90,7 @@ export type { DynamicContextState } from './context/dynamic-context-manager.js';
 
 // Syntax & Source Code Indexer (Aider-Style Repo-Map)
 export { SourceCodeIndexer } from './syntax/source-code-indexer.js';
+export type { WasmAstParseResult, WasmAstParserFn } from './syntax/source-code-indexer.js';
 
 // Context Compiler
 export { ContextDeduplicator } from './compiler/context-deduplicator.js';

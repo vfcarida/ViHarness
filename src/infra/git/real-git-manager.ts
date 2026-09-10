@@ -249,8 +249,17 @@ export class RealGitManager implements GitManager {
   }
 
   async getDiff(targetRef?: string): Promise<string> {
+    try {
+      await this.execGit(['add', '-N', '.']);
+    } catch {
+      // Non-fatal if git add -N fails or no untracked files
+    }
     const ref = targetRef ?? 'HEAD';
-    return (await this.execGit(['diff', ref])).trim();
+    try {
+      return (await this.execGit(['diff', ref])).trim();
+    } catch {
+      return (await this.execGit(['diff'])).trim();
+    }
   }
 
   async checkout(ref: string): Promise<void> {

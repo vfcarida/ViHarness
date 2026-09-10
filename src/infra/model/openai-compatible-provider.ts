@@ -104,9 +104,21 @@ export class OpenAICompatibleProvider implements ModelProvider {
 
   constructor(options: OpenAICompatibleProviderOptions = {}) {
     this.providerId = options.providerId ?? 'openai-compatible';
-    this.baseUrl = options.baseUrl ?? 'https://api.openai.com/v1';
-    this.apiKey = options.apiKey ?? 'dummy-key';
-    this.defaultModelId = options.defaultModelId ?? 'gpt-4o';
+    this.baseUrl =
+      options.baseUrl ??
+      process.env['OPENROUTER_BASE_URL'] ??
+      process.env['OPENAI_BASE_URL'] ??
+      'https://api.openai.com/v1';
+    this.apiKey =
+      options.apiKey ??
+      process.env['OPENROUTER_API_KEY'] ??
+      process.env['OPENAI_API_KEY'] ??
+      'dummy-key';
+    this.defaultModelId =
+      options.defaultModelId ??
+      process.env['OPENAI_MODEL'] ??
+      process.env['MODEL_ID'] ??
+      'gpt-4o';
     this.fetchImpl = options.customFetch ?? globalThis.fetch;
 
     this.descriptor = {
@@ -166,7 +178,17 @@ export class OpenAICompatibleProvider implements ModelProvider {
     const data = await response.json();
     const latencyMs = Date.now() - startTime;
 
-    return this.parseResponse(data, request, latencyMs);
+    const genIdHeader = response.headers?.get?.('x-openrouter-generation-id') ?? undefined;
+    const costHeader = response.headers?.get?.('x-openrouter-cost');
+    const parsedCostHeader = costHeader ? parseFloat(costHeader) : undefined;
+    const extraMeta = {
+      ...(genIdHeader ? { generationId: genIdHeader } : {}),
+      ...(parsedCostHeader !== undefined && !Number.isNaN(parsedCostHeader)
+        ? { providerReportedCost: parsedCostHeader }
+        : {}),
+    };
+
+    return this.parseResponse(data, request, latencyMs, extraMeta);
   }
 
   async *stream(request: ModelRequest): AsyncIterable<ModelStreamChunk> {
@@ -304,10 +326,20 @@ export class OpenAICompatibleProvider implements ModelProvider {
       };
     }
 
+    if (request.reasoningEffort) {
+      payload['reasoning_effort'] = request.reasoningEffort;
+      payload['reasoning'] = { effort: request.reasoningEffort };
+    }
+
     return payload;
   }
 
-  private parseResponse(data: unknown, request: ModelRequest, latencyMs: number): ModelResponse {
+  private parseResponse(
+    data: unknown,
+    request: ModelRequest,
+    latencyMs: number,
+    extraMeta?: { generationId?: string; providerReportedCost?: number },
+  ): ModelResponse {
     const validation = OpenAIResponseSchema.safeParse(data);
     if (!validation.success) {
       throw new HarnessError({
@@ -403,14 +435,30 @@ export class OpenAICompatibleProvider implements ModelProvider {
         typeof cacheCreationInputTokens === 'number' ? cacheCreationInputTokens : undefined,
     };
 
+    const rawData = (typeof data === 'object' && data !== null ? data : {}) as Record<string, any>;
+    const bodyCost =
+      typeof rawData['cost'] === 'number'
+        ? rawData['cost']
+        : typeof usageObj['cost'] === 'number'
+          ? usageObj['cost']
+          : typeof usageObj['total_cost'] === 'number'
+            ? usageObj['total_cost']
+            : undefined;
+
+    const finalReportedCost = extraMeta?.providerReportedCost ?? bodyCost;
+
     const cost =
-      (usage.inputTokens / 1000) * this.descriptor.costPer1kInputTokensDollars +
-      (usage.outputTokens / 1000) * this.descriptor.costPer1kOutputTokensDollars;
+      finalReportedCost !== undefined
+        ? finalReportedCost
+        : (usage.inputTokens / 1000) * this.descriptor.costPer1kInputTokensDollars +
+          (usage.outputTokens / 1000) * this.descriptor.costPer1kOutputTokensDollars;
+
+    const generationId = responseData.id ?? extraMeta?.generationId;
 
     const finishReason = mapFinishReason(choice.finish_reason ?? undefined);
 
     return {
-      requestId: responseData.id ?? `req_${Date.now()}`,
+      requestId: generationId ?? `req_${Date.now()}`,
       modelId: responseData.model ?? request.modelId ?? this.defaultModelId,
       providerId: this.providerId,
       content,
@@ -421,6 +469,13 @@ export class OpenAICompatibleProvider implements ModelProvider {
       latencyMs,
       estimatedCostDollars: cost,
       cacheMetrics,
+      metadata: {
+        ...(generationId ? { generationId } : {}),
+        ...(finalReportedCost !== undefined ? { providerReportedCost: finalReportedCost } : {}),
+        ...((responseData as any).system_fingerprint
+          ? { systemFingerprint: (responseData as any).system_fingerprint }
+          : {}),
+      },
     };
   }
 }

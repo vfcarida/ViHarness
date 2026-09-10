@@ -1,3 +1,1 @@
-export function validateLogin() {
-  return true;
-}
+export function validateLogin() { return true; }

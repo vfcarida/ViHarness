@@ -33,13 +33,17 @@ jobs:
       - run: npm run typecheck
 
   test:
-    name: Test Suite & Coverage
+    name: Test Suite (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm ci
       - run: npm run test:coverage
@@ -57,6 +61,19 @@ jobs:
       - run: npm run build
       - run: npm run prepublish-check
       - run: npm pack --dry-run
+
+  solve-smoke:
+    name: Headless Solve Smoke Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - run: node bin/vi-harness.js solve -p "Verify solve agent CLI smoke check" --provider-id mock --mode jsonl
 
   benchmark:
     name: Benchmark Smoke Check

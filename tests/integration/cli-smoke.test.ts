@@ -11,7 +11,7 @@ describe('CLI Integration & Package Smoke Test', () => {
     try {
       const exitCode = await runCli(['--version']);
       expect(exitCode).toBe(0);
-      expect(logs.some((l) => l.includes('vi-harness v0.1.0'))).toBe(true);
+      expect(logs.some((l) => l.includes('vi-harness v0.2.0'))).toBe(true);
     } finally {
       console.log = originalLog;
     }

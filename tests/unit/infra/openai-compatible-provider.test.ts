@@ -299,4 +299,46 @@ describe('OpenAICompatibleProvider Unit Suite', () => {
     expect(healthFail.status).toBe(ProviderHealthStatus.UNHEALTHY);
     expect(healthFail.errorMessage).toContain('DNS lookup failed');
   });
+
+  it('8. OpenRouter Observability: extracts generationId and provider-reported cost from headers and body', async () => {
+    const mockHeaders = new Headers({
+      'x-openrouter-generation-id': 'gen-abc-12345',
+      'x-openrouter-cost': '0.00342',
+    });
+
+    const mockFetchOpenRouter = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: mockHeaders,
+      json: async () => ({
+        id: 'gen-abc-12345',
+        choices: [
+          {
+            message: {
+              role: 'assistant',
+              content: 'OpenRouter solution',
+            },
+            finish_reason: 'stop',
+          },
+        ],
+        usage: {
+          prompt_tokens: 50,
+          completion_tokens: 20,
+          total_tokens: 70,
+        },
+      }),
+    });
+
+    const provider = new OpenAICompatibleProvider({
+      providerId: 'openrouter',
+      baseUrl: 'https://openrouter.ai/api/v1',
+      customFetch: mockFetchOpenRouter as any,
+    });
+
+    const res = await provider.complete(baseRequest);
+    expect(res.requestId).toBe('gen-abc-12345');
+    expect(res.metadata?.generationId).toBe('gen-abc-12345');
+    expect(res.metadata?.providerReportedCost).toBeCloseTo(0.00342, 5);
+    expect(res.estimatedCostDollars).toBeCloseTo(0.00342, 5);
+  });
 });

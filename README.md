@@ -13,7 +13,7 @@
 
 **The open-source coding agent harness — built by studying, synthesizing, and improving upon the best patterns in the field.**
 
-[![CI / Tests](https://img.shields.io/badge/Tests-1042%20Passing%20(159%20Files)-brightgreen.svg?style=for-the-badge&logo=vitest)](https://github.com/vfcarida/Vi-Harness/actions)
+[![CI / Tests](https://img.shields.io/badge/Tests-1076%20Passing%20(165%20Files)-brightgreen.svg?style=for-the-badge&logo=vitest)](https://github.com/vfcarida/Vi-Harness/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict%205.8-blue.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-green.svg?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-Compliant%20v2024--11-purple.svg?style=for-the-badge)](https://modelcontextprotocol.io/)
@@ -356,15 +356,87 @@ npm install
 ### Build & Validate
 ```bash
 npm run build              # Compiles strict TypeScript to dist/
-npm test                   # Runs full test suite (1,022 tests, 150 files)
+npm test                   # Runs full test suite (1,072 tests, 163 files)
 npm run smoke              # Fast production smoke test (< 0.1s)
 npm run prepublish-check   # Pre-publish tarball & packaging validation
 ```
 
-### Run Benchmarks
+### Interactive Terminal / REPL Mode (`chat` / `repl`)
+
+Launch a stateful, interactive terminal session modeled on Claude Code and Aider with live streaming, slash commands, and human-in-the-loop permission gates:
+
+```bash
+# Launch interactive REPL in current workspace
+vi-harness chat
+
+# Or with custom model and auto-approval
+vi-harness chat -m claude-3-7-sonnet -y
+```
+
+**Slash Commands:**
+- `/diff` — Inspect uncommitted git modifications in the workspace.
+- `/undo` — Revert modifications to the previous clean git state.
+- `/model <model-id>` — Switch active model dynamically on the fly.
+- `/cost` — View total prompt/completion tokens, cached tokens, and financial expenditure ($ USD).
+- `/dashboard` — Display real-time ASCII/ANSI agent health & budget dashboard.
+- `/compact` — Clear prior conversation history to free context tokens.
+- `/help` — List all available slash commands.
+- `/exit`, `/quit`, `/q` — Exit the interactive session.
+
+**Permission Gate:**
+Mutating tools (`write_file`, `edit_file`, `run_command`) trigger an interactive prompt before execution (`y/n/always`). Non-mutating tools (`read_file`, `list_directory`) execute seamlessly.
+
+---
+
+### Standalone Headless Agent (`solve`)
+
+Execute autonomous end-to-end coding tasks directly on any repository without external wrappers or out-of-tree patches:
+
+```bash
+# Solve a task in the current workspace
+vi-harness solve -p "Fix the pointer type mismatch in buddy.c and verify with make test"
+
+# Or shortcut with -p
+vi-harness -p "Implement calculateSum in src/calc.ts"
+
+# Export git diff patch for SWE-bench / ProjDevBench evaluation
+vi-harness solve -p "Fix issue #42" --output-patch ./predictions/task42.patch
+
+# Execute inside isolated Docker container sandbox
+vi-harness solve -p "Build CMake project" --sandbox docker --docker-image ubuntu:22.04
+
+# Run with OpenRouter or LiteLLM endpoints with custom model, timeout, and auto-rollback
+vi-harness solve \
+  -p "Add unit tests for AuthService" \
+  --cwd /path/to/project \
+  --model openrouter/anthropic/claude-3.5-sonnet \
+  --base-url https://openrouter.ai/api/v1 \
+  --api-key $OPENROUTER_API_KEY \
+  --request-timeout-ms 240000 \
+  --auto-lint \
+  --auto-rollback \
+  --prompt-caching \
+  --mode text
+
+# Stream machine-readable JSONL events for CI/CD or benchmark runners
+vi-harness solve -p "Refactor API router" --mode jsonl
+```
+
+---
+
+### Universal Multi-Language AST Repo-Map (20+ Languages)
+
+Vi-Harness indexes large codebases using AST symbol extraction and PageRank graph analysis:
+- **Languages supported out-of-the-box**: TypeScript, JavaScript, Python, Go, Rust, Java, C#, C, C++, Ruby, PHP, Swift, Kotlin, Scala, Shell, SQL, Dart, Lua, Zig.
+- **Tree-Sitter Wasm Engine**: Extensible `SourceCodeIndexer.registerWasmParser()` hook for native AST node parsing across arbitrary custom grammars without native C++ compilation dependencies.
+
+---
+
+### Run Benchmarks & SWE-bench / ProjDevBench Evaluation
 ```bash
 npm run benchmark          # 7-Task Canonical SWE Benchmark (Pi vs Vi-Harness)
 npm run benchmark:context  # Context-Efficiency Scaling Benchmark (10-100 horizons)
+python scripts/eval/run_projdevbench_harness.py --dataset-file instances.jsonl --output-dir eval_results/
 ```
 
 ---

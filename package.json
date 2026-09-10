@@ -1,6 +1,6 @@
 {
   "name": "vi-harness",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The world's best coding agent harness - synthesizing patterns from Claude Code, Aider, Prime Agent, Hermes, Pi, and Meta-Harness",
   "type": "module",
   "main": "./dist/index.js",
@@ -33,6 +33,7 @@
   },
   "files": [
     "dist/",
+    "bin/",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"

@@ -20,13 +20,78 @@ import type {
 } from '../../core/model/symbol-types.js';
 import { SymbolKind } from '../../core/model/symbol-types.js';
 
+export interface WasmAstParseResult {
+  readonly symbols: CodeSymbol[];
+  readonly imports?: string[];
+  readonly exports?: string[];
+}
+
+export type WasmAstParserFn = (
+  filePath: string,
+  content: string,
+  language: string,
+) => WasmAstParseResult | Promise<WasmAstParseResult>;
+
 export class SourceCodeIndexer {
+  private static wasmParsers = new Map<string, WasmAstParserFn>();
+
+  /**
+   * Register an external Tree-Sitter Wasm or custom AST parser for a given language.
+   */
+  static registerWasmParser(language: string, parser: WasmAstParserFn): void {
+    this.wasmParsers.set(language.toLowerCase(), parser);
+  }
+
+  /**
+   * Unregister an AST parser for a given language.
+   */
+  static unregisterWasmParser(language: string): void {
+    this.wasmParsers.delete(language.toLowerCase());
+  }
+
+  /**
+   * Clear all registered AST parsers.
+   */
+  static clearWasmParsers(): void {
+    this.wasmParsers.clear();
+  }
+
+  /**
+   * Check if an AST parser is registered for a given language.
+   */
+  static hasWasmParser(language: string): boolean {
+    return this.wasmParsers.has(language.toLowerCase());
+  }
+
   /**
    * Parse a source code string and extract its symbol map and structural outline.
    */
   static parseFile(filePath: string, content: string): FileSymbolMap {
     const ext = path.extname(filePath).toLowerCase();
     const language = this.detectLanguage(ext);
+
+    // Check if a registered Tree-Sitter Wasm parser is available synchronously
+    if (this.wasmParsers.has(language)) {
+      try {
+        const wasmRes = this.wasmParsers.get(language)!(filePath, content, language);
+        if (wasmRes && !(wasmRes instanceof Promise)) {
+          const lines = content.split(/\r?\n/);
+          const outline = this.generateOutline(filePath, wasmRes.symbols, wasmRes.imports ?? []);
+          return {
+            filePath,
+            language,
+            symbols: wasmRes.symbols,
+            imports: wasmRes.imports ?? [],
+            exports: wasmRes.exports ?? [],
+            totalLines: lines.length,
+            outline,
+          };
+        }
+      } catch {
+        // Fall back to built-in parser on wasm failure
+      }
+    }
+
     const lines = content.split(/\r?\n/);
     const symbols: CodeSymbol[] = [];
     const imports: string[] = [];
@@ -42,6 +107,48 @@ export class SourceCodeIndexer {
         break;
       case 'go':
         this.parseGo(filePath, lines, symbols, imports, exports);
+        break;
+      case 'rust':
+        this.parseRust(filePath, lines, symbols, imports, exports);
+        break;
+      case 'java':
+        this.parseJava(filePath, lines, symbols, imports, exports);
+        break;
+      case 'csharp':
+        this.parseCSharp(filePath, lines, symbols, imports, exports);
+        break;
+      case 'c_cpp':
+        this.parseCAndCpp(filePath, lines, symbols, imports, exports);
+        break;
+      case 'ruby':
+        this.parseRuby(filePath, lines, symbols, imports, exports);
+        break;
+      case 'php':
+        this.parsePhp(filePath, lines, symbols, imports, exports);
+        break;
+      case 'swift':
+        this.parseSwift(filePath, lines, symbols, imports, exports);
+        break;
+      case 'kotlin':
+        this.parseKotlin(filePath, lines, symbols, imports, exports);
+        break;
+      case 'scala':
+        this.parseScala(filePath, lines, symbols, imports, exports);
+        break;
+      case 'shell':
+        this.parseShell(filePath, lines, symbols, imports, exports);
+        break;
+      case 'sql':
+        this.parseSql(filePath, lines, symbols, imports, exports);
+        break;
+      case 'dart':
+        this.parseDart(filePath, lines, symbols, imports, exports);
+        break;
+      case 'lua':
+        this.parseLua(filePath, lines, symbols, imports, exports);
+        break;
+      case 'zig':
+        this.parseZig(filePath, lines, symbols, imports, exports);
         break;
       default:
         this.parseGeneric(filePath, lines, symbols, imports, exports);
@@ -59,6 +166,39 @@ export class SourceCodeIndexer {
       totalLines: lines.length,
       outline,
     };
+  }
+
+  /**
+   * Asynchronously parse a source code string, supporting async Tree-Sitter Wasm parsers.
+   */
+  static async parseFileAsync(filePath: string, content: string): Promise<FileSymbolMap> {
+    const ext = path.extname(filePath).toLowerCase();
+    const language = this.detectLanguage(ext);
+
+    if (this.wasmParsers.has(language)) {
+      try {
+        const wasmRes = await Promise.resolve(
+          this.wasmParsers.get(language)!(filePath, content, language),
+        );
+        if (wasmRes) {
+          const lines = content.split(/\r?\n/);
+          const outline = this.generateOutline(filePath, wasmRes.symbols, wasmRes.imports ?? []);
+          return {
+            filePath,
+            language,
+            symbols: wasmRes.symbols,
+            imports: wasmRes.imports ?? [],
+            exports: wasmRes.exports ?? [],
+            totalLines: lines.length,
+            outline,
+          };
+        }
+      } catch {
+        // Fall back to built-in parser on wasm failure
+      }
+    }
+
+    return this.parseFile(filePath, content);
   }
 
   /**
@@ -637,6 +777,794 @@ export class SourceCodeIndexer {
     }
   }
 
+  private static parseCAndCpp(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    _exports: string[],
+  ): void {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      // Includes
+      if (line.startsWith('#include')) {
+        imports.push(line);
+        continue;
+      }
+
+      // Struct / enum / union declarations
+      const structMatch = line.match(/^(?:typedef\s+)?(struct|enum|union)\s+([A-Za-z0-9_]+)/);
+      if (structMatch && structMatch[2]) {
+        symbols.push({
+          name: structMatch[2],
+          kind: structMatch[1] === 'enum' ? SymbolKind.ENUM : SymbolKind.CLASS,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+        });
+        continue;
+      }
+
+      // Function definition or declaration
+      const funcMatch = line.match(
+        /^([A-Za-z0-9_* \t]+?)\s*\*?\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(([^)]*)\)\s*[{;]?$/,
+      );
+      if (funcMatch && funcMatch[2]) {
+        const funcName = funcMatch[2];
+        const disallowed = new Set([
+          'if',
+          'while',
+          'for',
+          'switch',
+          'return',
+          'sizeof',
+          'typedef',
+          'else',
+        ]);
+        if (!disallowed.has(funcName) && !line.startsWith('typedef')) {
+          symbols.push({
+            name: funcName,
+            kind: SymbolKind.FUNCTION,
+            signature: line.replace(/\{.*$/, '').trim(),
+            filePath,
+            startLine: lineNum,
+            endLine: lineNum,
+            isExported: true,
+          });
+        }
+      }
+    }
+  }
+
+  private static parseRust(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    let currentTraitOrImpl: string | undefined = undefined;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.startsWith('use ')) {
+        imports.push(line);
+        continue;
+      }
+
+      // Trait definition
+      const traitMatch = line.match(/^(?:pub(?:\([^)]+\))?\s+)?trait\s+([A-Za-z0-9_]+)/);
+      if (traitMatch && traitMatch[1]) {
+        const name = traitMatch[1];
+        const isExported = line.startsWith('pub');
+        if (isExported) exports.push(name);
+        currentTraitOrImpl = name;
+        symbols.push({
+          name,
+          kind: SymbolKind.INTERFACE,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+        });
+        continue;
+      }
+
+      // Impl block
+      const implMatch = line.match(
+        /^impl(?:<[^>]+>)?\s+(?:([A-Za-z0-9_]+)\s+for\s+)?([A-Za-z0-9_]+)/,
+      );
+      if (implMatch) {
+        currentTraitOrImpl = implMatch[2] || implMatch[1];
+        continue;
+      }
+
+      // Struct or Enum
+      const structMatch = line.match(
+        /^(?:pub(?:\([^)]+\))?\s+)?(struct|enum|union)\s+([A-Za-z0-9_]+)/,
+      );
+      if (structMatch && structMatch[2]) {
+        const kindStr = structMatch[1];
+        const name = structMatch[2];
+        const isExported = line.startsWith('pub');
+        if (isExported) exports.push(name);
+        currentTraitOrImpl = name;
+        symbols.push({
+          name,
+          kind: kindStr === 'enum' ? SymbolKind.ENUM : SymbolKind.CLASS,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+        });
+        continue;
+      }
+
+      // Function or Method
+      const fnMatch = line.match(
+        /^(?:pub(?:\([^)]+\))?\s+)?(?:async\s+)?(?:const\s+)?fn\s+([A-Za-z0-9_]+)\s*(?:<[^>]+>)?\s*\(([^)]*)\)/,
+      );
+      if (fnMatch && fnMatch[1]) {
+        const name = fnMatch[1];
+        const isExported = line.startsWith('pub');
+        if (isExported && !currentTraitOrImpl) exports.push(name);
+        symbols.push({
+          name,
+          kind: currentTraitOrImpl ? SymbolKind.METHOD : SymbolKind.FUNCTION,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+          parentSymbolName: currentTraitOrImpl,
+        });
+        continue;
+      }
+
+      if (line === '}' || line.startsWith('}')) {
+        currentTraitOrImpl = undefined;
+      }
+    }
+  }
+
+  private static parseJava(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    let currentClass: string | undefined = undefined;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.startsWith('import ')) {
+        imports.push(line);
+        continue;
+      }
+
+      // Class / Interface / Enum / Record
+      const classMatch = line.match(
+        /^(?:public\s+|protected\s+|private\s+)?(?:abstract\s+|final\s+|static\s+)*(class|interface|enum|record)\s+([A-Za-z0-9_]+)/,
+      );
+      if (classMatch && classMatch[2]) {
+        const kindStr = classMatch[1];
+        const name = classMatch[2];
+        const isExported = line.startsWith('public');
+        if (isExported) exports.push(name);
+        currentClass = name;
+        symbols.push({
+          name,
+          kind:
+            kindStr === 'interface'
+              ? SymbolKind.INTERFACE
+              : kindStr === 'enum'
+                ? SymbolKind.ENUM
+                : SymbolKind.CLASS,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+        });
+        continue;
+      }
+
+      // Method
+      const methodMatch = line.match(
+        /^(?:public|protected|private)\s+(?:static\s+|final\s+|synchronized\s+|abstract\s+)*([A-Za-z0-9_<>[\]?]+)\s+([A-Za-z0-9_]+)\s*\(([^)]*)\)/,
+      );
+      if (methodMatch && methodMatch[2]) {
+        const name = methodMatch[2];
+        const isExported = line.startsWith('public');
+        symbols.push({
+          name,
+          kind: currentClass ? SymbolKind.METHOD : SymbolKind.FUNCTION,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+          parentSymbolName: currentClass,
+        });
+        continue;
+      }
+
+      if (line === '}') {
+        currentClass = undefined;
+      }
+    }
+  }
+
+  private static parseCSharp(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    let currentClass: string | undefined = undefined;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.startsWith('using ')) {
+        imports.push(line);
+        continue;
+      }
+
+      const typeMatch = line.match(
+        /^(?:public|internal|protected|private)?\s*(?:abstract|sealed|static|partial)*\s*(class|interface|struct|record|enum)\s+([A-Za-z0-9_]+)/,
+      );
+      if (typeMatch && typeMatch[2]) {
+        const kindStr = typeMatch[1];
+        const name = typeMatch[2];
+        const isExported = line.startsWith('public');
+        if (isExported) exports.push(name);
+        currentClass = name;
+        symbols.push({
+          name,
+          kind:
+            kindStr === 'interface'
+              ? SymbolKind.INTERFACE
+              : kindStr === 'enum'
+                ? SymbolKind.ENUM
+                : SymbolKind.CLASS,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+        });
+        continue;
+      }
+
+      const methodMatch = line.match(
+        /^(?:public|internal|protected|private)\s+(?:static\s+|virtual\s+|override\s+|async\s+)*([A-Za-z0-9_<>[\]?]+)\s+([A-Za-z0-9_]+)\s*\(([^)]*)\)/,
+      );
+      if (methodMatch && methodMatch[2]) {
+        const name = methodMatch[2];
+        const isExported = line.startsWith('public');
+        symbols.push({
+          name,
+          kind: currentClass ? SymbolKind.METHOD : SymbolKind.FUNCTION,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+          parentSymbolName: currentClass,
+        });
+      }
+    }
+  }
+
+  private static parseRuby(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    let currentModuleOrClass: string | undefined = undefined;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.startsWith('require ') || line.startsWith('require_relative ')) {
+        imports.push(line);
+        continue;
+      }
+
+      const classMatch = line.match(/^(?:class|module)\s+([A-Za-z0-9_:]+)/);
+      if (classMatch && classMatch[1]) {
+        const name = classMatch[1];
+        exports.push(name);
+        currentModuleOrClass = name;
+        symbols.push({
+          name,
+          kind: SymbolKind.CLASS,
+          signature: line,
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+        });
+        continue;
+      }
+
+      const methodMatch = line.match(/^def\s+([A-Za-z0-9_!?=.]+)/);
+      if (methodMatch && methodMatch[1]) {
+        const name = methodMatch[1];
+        symbols.push({
+          name,
+          kind: currentModuleOrClass ? SymbolKind.METHOD : SymbolKind.FUNCTION,
+          signature: line,
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+          parentSymbolName: currentModuleOrClass,
+        });
+        continue;
+      }
+
+      if (line === 'end') {
+        currentModuleOrClass = undefined;
+      }
+    }
+  }
+
+  private static parsePhp(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    let currentClass: string | undefined = undefined;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.startsWith('use ') || line.startsWith('require') || line.startsWith('include')) {
+        imports.push(line);
+        continue;
+      }
+
+      const classMatch = line.match(
+        /^(?:abstract\s+|final\s+)?(class|interface|trait|enum)\s+([A-Za-z0-9_]+)/,
+      );
+      if (classMatch && classMatch[2]) {
+        const kindStr = classMatch[1];
+        const name = classMatch[2];
+        exports.push(name);
+        currentClass = name;
+        symbols.push({
+          name,
+          kind: kindStr === 'interface' ? SymbolKind.INTERFACE : SymbolKind.CLASS,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+        });
+        continue;
+      }
+
+      const funcMatch = line.match(
+        /^(?:public\s+|protected\s+|private\s+)?(?:static\s+)?function\s+([A-Za-z0-9_]+)\s*\(/,
+      );
+      if (funcMatch && funcMatch[1]) {
+        const name = funcMatch[1];
+        symbols.push({
+          name,
+          kind: currentClass ? SymbolKind.METHOD : SymbolKind.FUNCTION,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: !line.includes('private'),
+          parentSymbolName: currentClass,
+        });
+      }
+    }
+  }
+
+  private static parseSwift(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    let currentType: string | undefined = undefined;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.startsWith('import ')) {
+        imports.push(line);
+        continue;
+      }
+
+      const typeMatch = line.match(
+        /^(?:public\s+|open\s+|private\s+|internal\s+)?(?:final\s+)?(class|struct|enum|protocol|actor|extension)\s+([A-Za-z0-9_]+)/,
+      );
+      if (typeMatch && typeMatch[2]) {
+        const kindStr = typeMatch[1];
+        const name = typeMatch[2];
+        const isExported = line.startsWith('public') || line.startsWith('open');
+        if (isExported) exports.push(name);
+        currentType = name;
+        symbols.push({
+          name,
+          kind: kindStr === 'protocol' ? SymbolKind.INTERFACE : SymbolKind.CLASS,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+        });
+        continue;
+      }
+
+      const funcMatch = line.match(
+        /^(?:public\s+|open\s+|private\s+|internal\s+)?(?:static\s+|class\s+)?func\s+([A-Za-z0-9_]+)\s*(?:<[^>]+>)?\s*\(/,
+      );
+      if (funcMatch && funcMatch[1]) {
+        const name = funcMatch[1];
+        const isExported = line.startsWith('public') || line.startsWith('open');
+        symbols.push({
+          name,
+          kind: currentType ? SymbolKind.METHOD : SymbolKind.FUNCTION,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+          parentSymbolName: currentType,
+        });
+      }
+    }
+  }
+
+  private static parseKotlin(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    let currentClass: string | undefined = undefined;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.startsWith('import ')) {
+        imports.push(line);
+        continue;
+      }
+
+      const classMatch = line.match(
+        /^(?:open\s+|data\s+|sealed\s+|abstract\s+)?(class|interface|object|enum\s+class)\s+([A-Za-z0-9_]+)/,
+      );
+      if (classMatch && classMatch[2]) {
+        const name = classMatch[2];
+        exports.push(name);
+        currentClass = name;
+        symbols.push({
+          name,
+          kind: line.includes('interface') ? SymbolKind.INTERFACE : SymbolKind.CLASS,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+        });
+        continue;
+      }
+
+      const funcMatch = line.match(/^(?:fun|suspend\s+fun)\s+([A-Za-z0-9_]+)\s*(?:<[^>]+>)?\s*\(/);
+      if (funcMatch && funcMatch[1]) {
+        const name = funcMatch[1];
+        symbols.push({
+          name,
+          kind: currentClass ? SymbolKind.METHOD : SymbolKind.FUNCTION,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+          parentSymbolName: currentClass,
+        });
+      }
+    }
+  }
+
+  private static parseScala(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    let currentClass: string | undefined = undefined;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.startsWith('import ')) {
+        imports.push(line);
+        continue;
+      }
+
+      const classMatch = line.match(
+        /^(?:case\s+)?(class|trait|object)\s+([A-Za-z0-9_]+)/,
+      );
+      if (classMatch && classMatch[2]) {
+        const name = classMatch[2];
+        exports.push(name);
+        currentClass = name;
+        symbols.push({
+          name,
+          kind: line.includes('trait') ? SymbolKind.INTERFACE : SymbolKind.CLASS,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+        });
+        continue;
+      }
+
+      const defMatch = line.match(/^def\s+([A-Za-z0-9_]+)\s*(?:\[[^\]]+\])?\s*\(/);
+      if (defMatch && defMatch[1]) {
+        const name = defMatch[1];
+        symbols.push({
+          name,
+          kind: currentClass ? SymbolKind.METHOD : SymbolKind.FUNCTION,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+          parentSymbolName: currentClass,
+        });
+      }
+    }
+  }
+
+  private static parseShell(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    _imports: string[],
+    exports: string[],
+  ): void {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      const fnMatch = line.match(/^(?:function\s+)?([A-Za-z0-9_-]+)\s*\(\)\s*\{?/);
+      if (fnMatch && fnMatch[1]) {
+        const name = fnMatch[1];
+        exports.push(name);
+        symbols.push({
+          name,
+          kind: SymbolKind.FUNCTION,
+          signature: line,
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+        });
+      }
+    }
+  }
+
+  private static parseSql(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    _imports: string[],
+    exports: string[],
+  ): void {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      const createTable = line.match(/^CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z0-9_."]+)/i);
+      if (createTable && createTable[1]) {
+        const name = createTable[1].replace(/["`]/g, '');
+        exports.push(name);
+        symbols.push({
+          name,
+          kind: SymbolKind.CLASS,
+          signature: line,
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+        });
+        continue;
+      }
+
+      const createProc = line.match(/^CREATE\s+(?:OR\s+REPLACE\s+)?(PROCEDURE|FUNCTION|VIEW)\s+([A-Za-z0-9_."]+)/i);
+      if (createProc && createProc[2]) {
+        const name = createProc[2].replace(/["`]/g, '');
+        exports.push(name);
+        symbols.push({
+          name,
+          kind: SymbolKind.FUNCTION,
+          signature: line,
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: true,
+        });
+      }
+    }
+  }
+
+  private static parseDart(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    let currentClass: string | undefined = undefined;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.startsWith('import ')) {
+        imports.push(line);
+        continue;
+      }
+
+      const classMatch = line.match(
+        /^(?:abstract\s+)?(class|mixin|extension)\s+([A-Za-z0-9_]+)/,
+      );
+      if (classMatch && classMatch[2]) {
+        const name = classMatch[2];
+        const isExported = !name.startsWith('_');
+        if (isExported) exports.push(name);
+        currentClass = name;
+        symbols.push({
+          name,
+          kind: SymbolKind.CLASS,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+        });
+        continue;
+      }
+
+      const fnMatch = line.match(
+        /^(?:void|Future<[^>]+>|Stream<[^>]+>|[A-Za-z0-9_<>]+)\s+([A-Za-z0-9_]+)\s*\(([^)]*)\)\s*(?:async\s*)?\{?/,
+      );
+      if (fnMatch && fnMatch[1]) {
+        const name = fnMatch[1];
+        symbols.push({
+          name,
+          kind: currentClass ? SymbolKind.METHOD : SymbolKind.FUNCTION,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported: !name.startsWith('_'),
+          parentSymbolName: currentClass,
+        });
+      }
+    }
+  }
+
+  private static parseLua(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.includes('require(') || line.includes('require "')) {
+        imports.push(line);
+        continue;
+      }
+
+      const fnMatch = line.match(/^(?:local\s+)?function\s+([A-Za-z0-9_.:]+)\s*\(/);
+      if (fnMatch && fnMatch[1]) {
+        const name = fnMatch[1];
+        const isExported = !line.startsWith('local ');
+        if (isExported) exports.push(name);
+        symbols.push({
+          name,
+          kind: name.includes(':') || name.includes('.') ? SymbolKind.METHOD : SymbolKind.FUNCTION,
+          signature: line,
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+        });
+      }
+    }
+  }
+
+  private static parseZig(
+    filePath: string,
+    lines: string[],
+    symbols: CodeSymbol[],
+    imports: string[],
+    exports: string[],
+  ): void {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!.trim();
+      const lineNum = i + 1;
+
+      if (line.includes('@import(')) {
+        imports.push(line);
+        continue;
+      }
+
+      const structMatch = line.match(/^(?:pub\s+)?const\s+([A-Za-z0-9_]+)\s*=\s*(struct|enum|union)/);
+      if (structMatch && structMatch[1]) {
+        const name = structMatch[1];
+        const isExported = line.startsWith('pub ');
+        if (isExported) exports.push(name);
+        symbols.push({
+          name,
+          kind: structMatch[2] === 'enum' ? SymbolKind.ENUM : SymbolKind.CLASS,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+        });
+        continue;
+      }
+
+      const fnMatch = line.match(/^(?:pub\s+)?fn\s+([A-Za-z0-9_]+)\s*\(/);
+      if (fnMatch && fnMatch[1]) {
+        const name = fnMatch[1];
+        const isExported = line.startsWith('pub ');
+        if (isExported) exports.push(name);
+        symbols.push({
+          name,
+          kind: SymbolKind.FUNCTION,
+          signature: line.replace(/\{.*$/, '').trim(),
+          filePath,
+          startLine: lineNum,
+          endLine: lineNum,
+          isExported,
+        });
+      }
+    }
+  }
+
   private static parseGeneric(
     filePath: string,
     lines: string[],
@@ -696,6 +1624,8 @@ export class SourceCodeIndexer {
     switch (ext) {
       case '.ts':
       case '.tsx':
+      case '.mts':
+      case '.cts':
         return 'typescript';
       case '.js':
       case '.jsx':
@@ -703,6 +1633,7 @@ export class SourceCodeIndexer {
       case '.cjs':
         return 'javascript';
       case '.py':
+      case '.pyi':
         return 'python';
       case '.go':
         return 'go';
@@ -710,6 +1641,40 @@ export class SourceCodeIndexer {
         return 'rust';
       case '.java':
         return 'java';
+      case '.cs':
+        return 'csharp';
+      case '.c':
+      case '.h':
+      case '.cpp':
+      case '.hpp':
+      case '.cc':
+      case '.cxx':
+      case '.c++':
+      case '.h++':
+        return 'c_cpp';
+      case '.rb':
+        return 'ruby';
+      case '.php':
+        return 'php';
+      case '.swift':
+        return 'swift';
+      case '.kt':
+      case '.kts':
+        return 'kotlin';
+      case '.scala':
+        return 'scala';
+      case '.sh':
+      case '.bash':
+      case '.zsh':
+        return 'shell';
+      case '.sql':
+        return 'sql';
+      case '.dart':
+        return 'dart';
+      case '.lua':
+        return 'lua';
+      case '.zig':
+        return 'zig';
       default:
         return 'unknown';
     }

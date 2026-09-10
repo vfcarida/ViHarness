@@ -6,11 +6,12 @@
  */
 import { fileURLToPath } from 'node:url';
 import * as path from 'node:path';
+import * as fs from 'node:fs';
 import { triggerBackgroundUpdateCheck } from './update-check.js';
 import { ProfileLoader } from '../infra/profile/profile-loader.js';
 import { ProfileManager } from '../infra/profile/profile-manager.js';
 
-const VERSION = '0.1.0';
+const VERSION = '0.2.0';
 
 export function printHelp(): void {
   console.log(`
@@ -18,9 +19,12 @@ Vi-Harness — Enterprise-Grade Coding Agent Harness (v${VERSION})
 
 USAGE:
   vi-harness [command] [options]
+  vi-harness -p "<task>" [options]
   vih [command] [options]
 
 COMMANDS:
+  chat, repl [options]                 Interactive terminal REPL session (with slash commands)
+  solve [options]                      Run autonomous coding agent on target repository (-p "<prompt>")
   sessions <list|show|resume|branch>   Manage persisted SQLite sessions and tree branches
   mcp <start>                         Start Model Context Protocol (MCP) server
   acp <start>                         Start Agent Client Protocol (ACP) automation server
@@ -30,9 +34,10 @@ COMMANDS:
   bench:projdevbench                  Run ProjDevBench project construction evaluation
 
 OPTIONS:
-  --profile, -p <name>   Launch with distribution profile (web, headless, ci, eval, custom)
-  --version, -v          Print version information
-  --help, -h             Print this help message
+  -p, --prompt, --message <task>       Directly solve a coding task in the current workspace
+  --profile <name>                     Launch with distribution profile (web, headless, ci, eval, custom)
+  --version, -v                        Print version information
+  --help, -h                           Print this help message
 
 PROFILES:
   web                    Web UI + API server with MCP & SQLite persistence
@@ -42,7 +47,9 @@ PROFILES:
   custom                 User-defined profile from ~/.vi-harness/profiles/
 
 EXAMPLES:
-  vi-harness --profile headless
+  vi-harness chat
+  vi-harness solve -p "Implement binary search in search.py"
+  vi-harness -p "Fix CMake build errors" --cwd ./my-project
   vi-harness sessions list --limit 10
   vi-harness bench:tbench --tasks test-env-task --mode eval
   vi-harness mcp start --transport http --port 3000
@@ -53,7 +60,26 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
   // Fire background update check (non-blocking)
   triggerBackgroundUpdateCheck(VERSION);
 
-  if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
+  // If invoked with no arguments in an interactive terminal, launch interactive REPL
+  if (args.length === 0) {
+    if (process.stdin.isTTY) {
+      const { runChatCli } = await import('./commands/chat.js');
+      return runChatCli([]);
+    }
+    printHelp();
+    return 0;
+  }
+
+  if (args.includes('--help') || args.includes('-h')) {
+    // If help was requested with solve subcommand
+    if (args[0] === 'solve') {
+      const { runSolveCli } = await import('./commands/solve.js');
+      return runSolveCli(args.slice(1));
+    }
+    if (args[0] === 'chat' || args[0] === 'repl') {
+      const { runChatCli } = await import('./commands/chat.js');
+      return runChatCli(args.slice(1));
+    }
     printHelp();
     return 0;
   }
@@ -63,8 +89,21 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
     return 0;
   }
 
-  // Profile flag handling
-  const profileFlagIdx = args.findIndex((a) => a === '--profile' || a === '-p');
+  // 1. Solve command routing (explicit or via -p / --prompt / --message shorthand)
+  if (
+    args[0] === 'solve' ||
+    args[0] === '-p' ||
+    args[0] === '--prompt' ||
+    args[0] === '--message' ||
+    (!args.includes('--profile') && (args.includes('-p') || args.includes('--prompt') || args.includes('--message')))
+  ) {
+    const solveArgs = args[0] === 'solve' ? args.slice(1) : args;
+    const { runSolveCli } = await import('./commands/solve.js');
+    return runSolveCli(solveArgs);
+  }
+
+  // 2. Profile flag handling (requires explicit --profile)
+  const profileFlagIdx = args.findIndex((a) => a === '--profile');
   if (profileFlagIdx >= 0) {
     const profileName = args[profileFlagIdx + 1];
     if (!profileName) {
@@ -91,6 +130,11 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
   const [command, ...subArgs] = args;
 
   switch (command) {
+    case 'chat':
+    case 'repl': {
+      const { runChatCli } = await import('./commands/chat.js');
+      return runChatCli(subArgs);
+    }
     case 'sessions': {
       const { runSessionsCli } = await import('./commands/sessions.js');
       await runSessionsCli(subArgs);
@@ -134,15 +178,31 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
   }
 }
 
-// Direct execution
-const isMain =
-  process.argv[1] &&
-  (path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) ||
-    /([\\/]cli[\\/]index\.(js|ts)|[\\/]vi-harness|[\\/]vih)$/.test(process.argv[1]) ||
-    process.argv[1].replace(/\\/g, '/').endsWith('cli/index.js') ||
-    process.argv[1].replace(/\\/g, '/').endsWith('cli/index.ts'));
+// Robust direct execution / symlink detection
+function checkIsMain(): boolean {
+  const scriptPath = process.argv[1];
+  if (!scriptPath) return false;
 
-if (isMain) {
+  const currentUrlPath = fileURLToPath(import.meta.url);
+
+  try {
+    const resolvedReal = path.resolve(fs.realpathSync(scriptPath));
+    if (resolvedReal === path.resolve(currentUrlPath)) return true;
+  } catch {
+    // Ignore realpath error if file is in-memory
+  }
+
+  const normalized = scriptPath.replace(/\\/g, '/');
+  return (
+    normalized.endsWith('/cli/index.js') ||
+    normalized.endsWith('/cli/index.ts') ||
+    normalized.endsWith('/vi-harness') ||
+    normalized.endsWith('/vih') ||
+    path.resolve(scriptPath) === path.resolve(currentUrlPath)
+  );
+}
+
+if (checkIsMain()) {
   runCli().then((code) => {
     if (code !== 0) process.exit(code);
   });

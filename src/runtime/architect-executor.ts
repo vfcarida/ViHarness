@@ -170,9 +170,16 @@ export class ArchitectExecutor {
       signal,
     };
 
+    const timeoutMs = process.env['VI_HARNESS_REQUEST_TIMEOUT_MS']
+      ? parseInt(process.env['VI_HARNESS_REQUEST_TIMEOUT_MS'], 10)
+      : 60000;
+    const maxRetries = process.env['VI_HARNESS_MAX_RETRIES']
+      ? parseInt(process.env['VI_HARNESS_MAX_RETRIES'], 10)
+      : 1;
+
     const response = await executeResiliently(architectProvider, modelRequest, {
-      maxRetries: 2,
-      defaultTimeoutMs: 30000,
+      maxRetries,
+      defaultTimeoutMs: timeoutMs,
     });
 
     return {
@@ -218,9 +225,16 @@ export class ArchitectExecutor {
       signal,
     };
 
+    const timeoutMs = process.env['VI_HARNESS_REQUEST_TIMEOUT_MS']
+      ? parseInt(process.env['VI_HARNESS_REQUEST_TIMEOUT_MS'], 10)
+      : 60000;
+    const maxRetries = process.env['VI_HARNESS_MAX_RETRIES']
+      ? parseInt(process.env['VI_HARNESS_MAX_RETRIES'], 10)
+      : 1;
+
     const response = await executeResiliently(editorProvider, modelRequest, {
-      maxRetries: 2,
-      defaultTimeoutMs: 20000,
+      maxRetries,
+      defaultTimeoutMs: timeoutMs,
     });
 
     return {

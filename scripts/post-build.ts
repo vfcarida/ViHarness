@@ -37,6 +37,15 @@ export function runPostBuild(options: PostBuildOptions = {}): void {
     }
   }
 
+  const binWrapper = path.join(rootDir, 'bin', 'vi-harness.js');
+  if (fs.existsSync(binWrapper)) {
+    try {
+      fs.chmodSync(binWrapper, 0o755);
+    } catch {
+      // Ignore chmod on Windows
+    }
+  }
+
   // 2. Copy SQL Migrations to dist/infra/storage/migrations
   const srcMigrationsDir = path.join(rootDir, 'src', 'infra', 'storage', 'migrations');
   const distMigrationsDir = path.join(distDir, 'infra', 'storage', 'migrations');

@@ -13,11 +13,13 @@
 
 **The open-source coding agent harness — built by studying, synthesizing, and improving upon the best patterns in the field.**
 
-[![CI / Tests](https://img.shields.io/badge/Tests-1076%20Passing%20(165%20Files)-brightgreen.svg?style=for-the-badge&logo=vitest)](https://github.com/vfcarida/Vi-Harness/actions)
+[![CI Status](https://github.com/vfcarida/Vi-Harness/actions/workflows/ci.yml/badge.svg?branch=main&style=for-the-badge)](https://github.com/vfcarida/Vi-Harness/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/Tests-1%2C325%20Passing%20(196%20Files)-brightgreen.svg?style=for-the-badge&logo=vitest)](https://github.com/vfcarida/Vi-Harness/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict%205.8-blue.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-green.svg?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0%20(20%2C22%2C24)-green.svg?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-Compliant%20v2024--11-purple.svg?style=for-the-badge)](https://modelcontextprotocol.io/)
 [![ACP Protocol](https://img.shields.io/badge/ACP-JSON--RPC%202.0-orange.svg?style=for-the-badge)](https://github.com/vfcarida/Vi-Harness)
+[![npm version](https://img.shields.io/badge/npm-v0.2.0-red.svg?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/vi-harness)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](./LICENSE)
 
 <br/>
@@ -155,12 +157,15 @@ flowchart TB
     IterationLoop --> OuterLoop_Layer
 ```
 
+> 📖 **Interactive Architecture Tour**: For an interactive deep dive into the 14 FSM states, 6-stage context compilation pipeline, AST syntax gates, and step-by-step developer extension recipes, explore the [Architecture Tour & Extension Guide](docs/architecture/tour.md).
+
 ---
 
 ## Features
 
 ### Context & Memory
 - **5-Stage Compaction Pipeline** — Progressive context reduction (`Snip` $\to$ `Micro-compact` $\to$ `Collapse` $\to$ `Auto-compact` $\to$ `Cache-Aware`) with read-time virtual projection preserving full history on disk (inspired by Claude Code).
+- **Dynamic Micro-Compactor & Stale Read Tombstoning** — Automatic invalidation of outdated file reads when files are modified in subsequent iterations (replacing code dumps with lightweight tombstones) and compaction of resolved command/test failure logs into concise resolution notes once subsequent executions pass.
 - **Cache-Aware Compaction** — Uses provider prompt-cache metrics and exact prefix alignment to achieve $\ge 85\%$ token spend reduction (inspired by Claude Code).
 - **Frozen Memory Snapshots** — Load-once system prompt for maximum provider KV prefix cache reuse with zero attention degradation (inspired by Hermes).
 - **Tree-Structured Sessions** — Append-only JSONL event-sourced session store with arbitrary tree branching, exploration, and crash recovery (inspired by Pi + DeepSeek Harness).
@@ -168,6 +173,7 @@ flowchart TB
 ### Code Intelligence
 - **PageRank Repo Map** — Tree-sitter AST symbol extraction ranked by cross-file reference frequency and PageRank importance (inspired by Aider).
 - **Two-Phase Git Commits** — Transparently separates pre-existing user modifications from AI alterations with safe rollback guarantees (inspired by Aider).
+- **Batch Semantic Discovery & Code Search** — High-throughput AST tools (`batch_find_symbols`, `search_code`, `find_definitions`, `find_references`, `get_outline`) resolving multiple symbol declarations and regex patterns concurrently in a single model turn, reducing exploration overhead by up to 70%.
 - **Architect Mode** — Model specialization splitting high-level reasoning (`Architect`) from exact code modification (`Editor`) (inspired by Aider + Prime Agent).
 
 ### Agent Runtime & DeepSeek Innovations
@@ -180,6 +186,8 @@ flowchart TB
 ### Infrastructure & Security
 - **MCP & ACP Protocols** — Full native support for Model Context Protocol (stdio + HTTP/SSE) and Agent Client Protocol (JSON-RPC 2.0).
 - **7-Layer Security Perimeter** — Deny-first unbypassable policy engine, path confinement, command sanitization, and Shannon entropy secret redaction ($-\sum p_i \log_2 p_i \ge 4.5$).
+- **Pre-Write In-Memory AST Syntax Gate** — Intercepts all file writes and search-and-replace edits, validating syntax in-memory across TypeScript, JavaScript, JSON, and Python to prevent broken syntax from ever polluting the workspace or Git tree.
+- **Dual-Pass Adversarial QA Auditor Gate** — Pre-commit automated auditor detecting potential command injection vulnerabilities, unescaped shell concatenations, credential leaks, unclosed streams, and unchecked `as any` type bypasses before final patch generation (`--adversarial-qa`).
 - **Cryptographic Audit Integrity** — HMAC SHA-256 signing for all execution journals and state transitions.
 - **Utility Model Router** — Multi-provider routing (OpenAI, Anthropic, DeepSeek, Local) with health checks, failover, and cost tracking.
 
@@ -209,6 +217,8 @@ Tool Batch: [read_file, search_code, write_file, read_file]
 
 ## 📊 Empirical Benchmarks
 
+> **Reproducibility Guarantee**: All benchmark figures are backed by verifiable execution artifacts. See the comprehensive [Benchmark Reproduction Guide](docs/benchmarks/REPRODUCTION_GUIDE.md) for execution commands, environment specifications, and tolerances, or explore the [Raw Benchmark Artifacts](benchmark-results/README.md).
+
 ### 1. Canonical Benchmark (Pi vs Vi-Harness)
 Evaluated across 7 standard SWE coding benchmarks with identical models (`gpt-4o`, temp: 0.2):
 
@@ -232,9 +242,9 @@ Comparing token accumulation over long-horizon editing iterations:
 
 ### 3. Repository Test Suite Quality
 ```bash
-Test Files : 150 passed (150)
-Tests      : 1,022 passed (1,022)
-Duration   : 61.2s
+Test Files : 196 passed (196)
+Tests      : 1,325 passed (1,325)
+Duration   : ~95s
 Integrity  : Zero mocks in verification pipeline, real Git integration
 ```
 
@@ -242,11 +252,17 @@ Integrity  : Zero mocks in verification pipeline, real Git integration
 
 ## 🖥️ Terminal UI Dashboard (TUI)
 
-Vi-Harness includes a rich, ANSI-rendered live terminal dashboard:
+Vi-Harness provides real-time terminal telemetry and autonomous execution feedback:
+
+<p align="center">
+  <img src="docs/assets/terminal-demo.svg" alt="Vi-Harness Autonomous Solve Session" width="100%">
+</p>
+
+### Live ANSI Dashboard View
 
 ```
 ============================================================================
- VI-HARNESS v0.1.0 — DETERMINISTIC CODING AGENT RUNTIME
+ VI-HARNESS v0.2.0 — DETERMINISTIC CODING AGENT RUNTIME
 ============================================================================
  Task ID: task-018f3a9e-7b2c-7000-8000-000000000001
  Goal: Implement HMAC authentication middleware with unit tests.
@@ -356,7 +372,7 @@ npm install
 ### Build & Validate
 ```bash
 npm run build              # Compiles strict TypeScript to dist/
-npm test                   # Runs full test suite (1,072 tests, 163 files)
+npm test                   # Runs full test suite (1,304 tests, 193 files)
 npm run smoke              # Fast production smoke test (< 0.1s)
 npm run prepublish-check   # Pre-publish tarball & packaging validation
 ```
@@ -417,6 +433,19 @@ vi-harness solve \
   --auto-rollback \
   --prompt-caching \
   --mode text
+
+# Autonomous Judge-in-the-Loop: evaluate against ACMOJ / SWE-bench judge and auto-repair on failure
+vi-harness solve \
+  -p "Implement binary search tree operations" \
+  --judge-command "python judge.py" \
+  --max-judge-retries 4 \
+  --output-patch ./predictions/task_bst.patch
+
+# Enable Dual-Pass Adversarial QA Audit before exporting solution patch
+vi-harness solve \
+  -p "Implement safe shell execution helper" \
+  --adversarial-qa \
+  --output-patch ./predictions/safe_exec.patch
 
 # Stream machine-readable JSONL events for CI/CD or benchmark runners
 vi-harness solve -p "Refactor API router" --mode jsonl
@@ -593,7 +622,7 @@ Vi-Harness/
 
 ## Contributing
 
-We welcome contributions from the community! See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, development setup, and code of conduct.
+We welcome contributions from the community! See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, development setup, and code of conduct. You can also explore the [Community Hub](docs/community/README.md) and [Launch Kit](docs/community/LAUNCH_KIT.md).
 
 ---
 
@@ -648,7 +677,7 @@ If you use Vi-Harness in your research, evaluations, or software engineering pro
   title = {Vi-Harness: Enterprise-Grade, Model-Agnostic Coding-Agent Runtime and Harness},
   year = {2026},
   url = {https://github.com/vfcarida/Vi-Harness},
-  version = {0.1.0}
+  version = {0.2.0}
 }
 ```
 

@@ -85,4 +85,22 @@ describe('Benchmark CLI Command Suite', () => {
     const printed = logSpy.mock.calls.map((c: any[]) => c.join(' ')).join('\n');
     expect(printed).toContain('Context-Efficiency');
   });
+
+  it('runBenchmarkCli executes deterministic canonical reproduction run with mock provider', async () => {
+    const code = await runBenchmarkCli([
+      '--suite',
+      'canonical',
+      '--provider',
+      'mock',
+      '--runs',
+      '1',
+      '--limit',
+      '1',
+    ]);
+    expect(code).toBe(0);
+    const printed = logSpy.mock.calls.map((c: any[]) => c.join(' ')).join('\n');
+    expect(printed).toContain('BENCHMARK SUMMARY LEADERBOARD');
+    expect(printed).toContain('[Vi-Harness]');
+    expect(printed).toContain('[Pi]');
+  });
 });

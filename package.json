@@ -50,6 +50,7 @@
     "developer-tools"
   ],
   "license": "MIT",
+  "author": "Vi-Harness Contributors",
   "repository": {
     "type": "git",
     "url": "https://github.com/vfcarida/Vi-Harness"
@@ -61,6 +62,7 @@
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
+    "test:e2e-scripted": "vitest run tests/integration/solve-e2e-scripted.test.ts",
     "test:int": "vitest run tests/integration",
     "test:live": "vitest run tests/live",
     "test:watch": "vitest",
@@ -79,7 +81,8 @@
     "prepublishOnly": "npm run prepublish-check",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
-    "clean": "node -e \"const fs=require('fs');fs.rmSync('dist',{recursive:true,force:true})\""
+    "clean": "node -e \"const fs=require('fs');fs.rmSync('dist',{recursive:true,force:true})\"",
+    "check-readme-badge": "tsx scripts/check-readme-badge.ts"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

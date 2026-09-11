@@ -25,6 +25,7 @@ import type {
 } from '../../core/model/compiler-types.js';
 import { InMemoryCollapseStore } from './context-collapse.js';
 import { DefaultToolResultPruner } from './tool-result-pruner.js';
+import { MicroCompactor } from './micro-compactor.js';
 
 export type { MultiTierCompressorOptions };
 
@@ -125,8 +126,21 @@ export class ContextCompressor {
     const pruner = options?.pruner ?? new DefaultToolResultPruner(maxToolResultTokens * 4);
     const collapseStore = options?.collapseStore ?? new InMemoryCollapseStore();
 
+    // Stage 2 Micro-Compactor pre-pass (dynamic stale read invalidation & failure compaction)
+    let processedScored = scoredObjects;
+    if (options?.enableMicroCompactor !== false) {
+      const compactor = new MicroCompactor(options?.microCompactorOptions);
+      const rawObjects = scoredObjects.map((s) => s.object);
+      const microResult = compactor.compactContextObjects(rawObjects);
+      const objMap = new Map<string, ContextObject>(microResult.objects.map((o) => [o.id, o]));
+      processedScored = scoredObjects.map((s) => ({
+        ...s,
+        object: objMap.get(s.object.id) ?? s.object,
+      }));
+    }
+
     // Step 0: Initial Sorting — Invariant MUST-PRESERVE items first, then score descending
-    const sorted = [...scoredObjects].sort((a, b) => {
+    const sorted = [...processedScored].sort((a, b) => {
       if (a.mustPreserve !== b.mustPreserve) {
         return a.mustPreserve ? -1 : 1;
       }
@@ -284,7 +298,27 @@ export class ContextCompressor {
       // ---------------------------------------------------------------------
       // STAGE 2: MICRO-COMPACT (Repeated tool outputs and redundant executions)
       // ---------------------------------------------------------------------
-      if (isToolOutput) {
+      if (obj.tags.includes('stale_read_tombstone')) {
+        explanations.push({
+          id: obj.id,
+          type: obj.type,
+          action: 'TRIMMED',
+          score: scored.score,
+          tokenCost: obj.costTokens,
+          reason: 'MICRO-COMPACT Stage: Stale read invalidated with lightweight tombstone due to subsequent file modification',
+          mustPreserve: false,
+        });
+      } else if (obj.tags.includes('resolved_failure')) {
+        explanations.push({
+          id: obj.id,
+          type: obj.type,
+          action: 'TRIMMED',
+          score: scored.score,
+          tokenCost: obj.costTokens,
+          reason: 'MICRO-COMPACT Stage: Resolved failure stack trace compacted due to subsequent passing run',
+          mustPreserve: false,
+        });
+      } else if (isToolOutput) {
         const signature = this.computeToolOutputSignature(obj.content);
         const occurrences = seenToolSignatures.get(signature) ?? 0;
         seenToolSignatures.set(signature, occurrences + 1);

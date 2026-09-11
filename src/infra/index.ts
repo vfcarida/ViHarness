@@ -119,6 +119,14 @@ export { DefaultToolResultPruner } from './compiler/tool-result-pruner.js';
 export type { PruneOptions } from './compiler/tool-result-pruner.js';
 export { SwePruner } from './compiler/swe-pruner.js';
 export type { SwePrunerOptions } from './compiler/swe-pruner.js';
+export { MicroCompactor } from './compiler/micro-compactor.js';
+export type {
+  MicroCompactorOptions,
+  MicroCompactedEntry,
+  MicroCompactionResult,
+  IterationToolResultCompaction,
+  PriorIterationRecord,
+} from './compiler/micro-compactor.js';
 export { InMemoryCompactionLock } from './compiler/compaction-lock.js';
 export type { LockState, InMemoryCompactionLockOptions } from './compiler/compaction-lock.js';
 export { ContextValidator } from './compiler/context-validator.js';
@@ -169,6 +177,11 @@ export {
   DEFAULT_ALLOWED_REPRODUCER_PATTERNS,
 } from './security/test-protection-gate.js';
 export type { TestProtectionGateOptions } from './security/test-protection-gate.js';
+export { PreWriteSyntaxGate } from './security/pre-write-syntax-gate.js';
+export type {
+  SyntaxValidationResult,
+  PreWriteSyntaxGateOptions,
+} from './security/pre-write-syntax-gate.js';
 export { RiskClassifier } from './security/risk-classifier.js';
 export { CredentialProtectionRule } from './security/rules/credential-protection-rule.js';
 export { PathRestrictionRule } from './security/rules/path-restriction-rule.js';
@@ -422,10 +435,25 @@ export { TerminalTool } from './tools/terminal-tool.js';
 export type { TerminalToolOptions } from './tools/terminal-tool.js';
 export { OjFeedbackIngester } from './eval/oj-feedback-ingester.js';
 export type { OjFeedbackPayload } from './eval/oj-feedback-ingester.js';
+export { JudgeInTheLoopOrchestrator } from './eval/judge-orchestrator.js';
+export type {
+  JudgeExecutionResult,
+  JudgeLoopOptions,
+  JudgeAttemptRecord,
+  JudgeLoopOutcome,
+} from './eval/judge-orchestrator.js';
 export { TddEnforcer, TddPhase } from './verification/tdd-enforcer.js';
 export type { TddEvaluationResult, TddEnforcerOptions } from './verification/tdd-enforcer.js';
 export { PolyglotTestRunner, ProjectEcosystem } from './verification/polyglot-test-runner.js';
 export type { TestExecutionVerdict } from './verification/polyglot-test-runner.js';
+export { QaAuditorGate } from './verification/qa-auditor-gate.js';
+export type {
+  QaAuditFinding,
+  QaAuditOptions,
+  QaAuditResult,
+  QaFindingCategory,
+  QaFindingSeverity,
+} from './verification/qa-auditor-gate.js';
 export { SweBenchTaskLoader } from './eval/swebench/index.js';
 export type {
   SweBenchInstance,
@@ -441,6 +469,8 @@ export {
   FindDefinitionsTool,
   FindReferencesTool,
   GetOutlineTool,
+  BatchFindSymbolsTool,
+  SearchCodeTool,
   createSemanticNavigationTools,
 } from './tools/semantic-navigation-tools.js';
 

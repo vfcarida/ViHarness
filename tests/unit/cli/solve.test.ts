@@ -293,6 +293,20 @@ describe('Vi-Harness Solve CLI Suite', () => {
     expect(parsed.modelId).toBe('anthropic.claude-3-5-sonnet-20241022-v2:0');
   });
 
+  it('14b. parseSolveArgs: Parses --provider anthropic and aliases', () => {
+    const parsed = parseSolveArgs([
+      '-p',
+      'task',
+      '--provider',
+      'anthropic',
+      '-m',
+      'claude-3-7-sonnet-20250219',
+    ]);
+
+    expect(parsed.providerId).toBe('anthropic');
+    expect(parsed.modelId).toBe('claude-3-7-sonnet-20250219');
+  });
+
   it('15. parseSolveArgs: Parses --tdd and --no-tdd flags', () => {
     const defaultParsed = parseSolveArgs(['-p', 'task']);
     expect(defaultParsed.tdd).toBe(false);

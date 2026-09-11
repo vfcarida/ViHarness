@@ -33,8 +33,11 @@ import {
   FindDefinitionsTool,
   FindReferencesTool,
   GetOutlineTool,
+  BatchFindSymbolsTool,
+  SearchCodeTool,
 } from './semantic-navigation-tools.js';
 import { WorktreeDockerBridge, type WorktreeMountConfig } from '../git/worktree-docker-bridge.js';
+import { PreWriteSyntaxGate } from '../security/pre-write-syntax-gate.js';
 
 export type {
   SubtaskRunOptions,
@@ -59,6 +62,8 @@ export interface WorkspaceToolsOptions {
   readonly subtaskRunner?: SubtaskRunnerFn;
   readonly protectTests?: boolean;
   readonly testProtectionGate?: TestProtectionGate;
+  readonly enableSyntaxGate?: boolean;
+  readonly syntaxGate?: PreWriteSyntaxGate;
   readonly enableSemanticNavigation?: boolean;
   readonly baseWorkspacePath?: string;
   readonly additionalMounts?: ReadonlyArray<{
@@ -295,13 +300,16 @@ export class WorkspaceWriteFileTool implements Tool {
   };
 
   private readonly testProtectionGate?: TestProtectionGate;
+  private readonly syntaxGate?: PreWriteSyntaxGate;
 
   constructor(
     private readonly workspacePath: string,
     private readonly idFactory?: IdFactory,
     testProtectionGate?: TestProtectionGate,
+    syntaxGate?: PreWriteSyntaxGate,
   ) {
     this.testProtectionGate = testProtectionGate;
+    this.syntaxGate = syntaxGate;
   }
 
   async execute(input: ToolInput, context: ToolExecutionContext): Promise<ToolResult> {
@@ -330,6 +338,28 @@ export class WorkspaceWriteFileTool implements Tool {
       if (!fs.existsSync(parentDir)) {
         fs.mkdirSync(parentDir, { recursive: true });
       }
+
+      if (this.syntaxGate) {
+        const syntaxResult = this.syntaxGate.validate(filePath, content);
+        if (!syntaxResult.valid) {
+          return {
+            toolCallId: callId,
+            name: this.definition.name,
+            success: false,
+            output: `[PreWriteSyntaxGate Error]: In-memory syntax validation failed for '${rawPath}' (${syntaxResult.language}) at line ${syntaxResult.line ?? 1}, col ${syntaxResult.column ?? 1}: ${syntaxResult.error}. The modification was NOT written to disk. Please correct the syntax and try again.`,
+            durationMs: Date.now() - start,
+            error: 'SYNTAX_VALIDATION_FAILED',
+            metadata: {
+              path: rawPath,
+              code: 'SYNTAX_VALIDATION_FAILED',
+              syntaxError: syntaxResult.error,
+              line: syntaxResult.line,
+              column: syntaxResult.column,
+            },
+          };
+        }
+      }
+
       fs.writeFileSync(filePath, content, 'utf-8');
       let output = `Successfully wrote ${Buffer.byteLength(content, 'utf-8')} bytes to ${rawPath}`;
       const syntaxNotice = checkSyntaxIntegrity(filePath, content);
@@ -366,8 +396,7 @@ export class WorkspaceEditFileTool implements Tool {
   public readonly definition = {
     name: 'edit_file',
     version: '1.0.0',
-    description:
-      'Edit a file by replacing a unique exact text block (old_string) with new text (new_string). For precise edits without rewriting entire files.',
+    description: 'Perform targeted search-and-replace modification on a target file.',
     category: ToolCategory.WRITE,
     riskLevel: ToolRiskLevel.MEDIUM,
     mutating: true,
@@ -378,26 +407,25 @@ export class WorkspaceEditFileTool implements Tool {
       type: 'object',
       properties: {
         path: { type: 'string', description: 'Relative path of file inside workspace to edit' },
-        old_string: { type: 'string', description: 'Exact text block to be replaced' },
-        new_string: { type: 'string', description: 'Replacement text block' },
-        replace_all: {
-          type: 'boolean',
-          description:
-            'If true, replace all occurrences. If false, fails if old_string occurs more than once (default: false)',
-        },
+        old_string: { type: 'string', description: 'Exact string to find and replace' },
+        new_string: { type: 'string', description: 'New string to replace old_string with' },
+        replace_all: { type: 'boolean', description: 'Replace all occurrences instead of requiring unique match (default: false)' },
       },
       required: ['path', 'old_string', 'new_string'],
     },
   };
 
   private readonly testProtectionGate?: TestProtectionGate;
+  private readonly syntaxGate?: PreWriteSyntaxGate;
 
   constructor(
     private readonly workspacePath: string,
     private readonly idFactory?: IdFactory,
     testProtectionGate?: TestProtectionGate,
+    syntaxGate?: PreWriteSyntaxGate,
   ) {
     this.testProtectionGate = testProtectionGate;
+    this.syntaxGate = syntaxGate;
   }
 
   async execute(input: ToolInput, context: ToolExecutionContext): Promise<ToolResult> {
@@ -514,6 +542,27 @@ export class WorkspaceEditFileTool implements Tool {
             updated = updated.replace(/\n/g, '\r\n');
           }
 
+          if (this.syntaxGate) {
+            const syntaxResult = this.syntaxGate.validate(filePath, updated);
+            if (!syntaxResult.valid) {
+              return {
+                toolCallId: callId,
+                name: this.definition.name,
+                success: false,
+                output: `[PreWriteSyntaxGate Error]: In-memory syntax validation failed for '${rawPath}' (${syntaxResult.language}) at line ${syntaxResult.line ?? 1}, col ${syntaxResult.column ?? 1}: ${syntaxResult.error}. The modification was NOT written to disk. Please correct the syntax and try again.`,
+                durationMs: Date.now() - start,
+                error: 'SYNTAX_VALIDATION_FAILED',
+                metadata: {
+                  path: rawPath,
+                  code: 'SYNTAX_VALIDATION_FAILED',
+                  syntaxError: syntaxResult.error,
+                  line: syntaxResult.line,
+                  column: syntaxResult.column,
+                },
+              };
+            }
+          }
+
           fs.writeFileSync(filePath, updated, 'utf-8');
           let output = `Successfully replaced ${count} occurrence(s) in ${rawPath}`;
           const syntaxNotice = checkSyntaxIntegrity(filePath, updated);
@@ -561,6 +610,27 @@ export class WorkspaceEditFileTool implements Tool {
       const updated = replaceAll
         ? fileContent.split(oldString).join(newString)
         : fileContent.replace(oldString, newString);
+
+      if (this.syntaxGate) {
+        const syntaxResult = this.syntaxGate.validate(filePath, updated);
+        if (!syntaxResult.valid) {
+          return {
+            toolCallId: callId,
+            name: this.definition.name,
+            success: false,
+            output: `[PreWriteSyntaxGate Error]: In-memory syntax validation failed for '${rawPath}' (${syntaxResult.language}) at line ${syntaxResult.line ?? 1}, col ${syntaxResult.column ?? 1}: ${syntaxResult.error}. The modification was NOT written to disk. Please correct the syntax and try again.`,
+            durationMs: Date.now() - start,
+            error: 'SYNTAX_VALIDATION_FAILED',
+            metadata: {
+              path: rawPath,
+              code: 'SYNTAX_VALIDATION_FAILED',
+              syntaxError: syntaxResult.error,
+              line: syntaxResult.line,
+              column: syntaxResult.column,
+            },
+          };
+        }
+      }
 
       fs.writeFileSync(filePath, updated, 'utf-8');
       let output = `Successfully replaced ${occurrences} occurrence(s) in ${rawPath}`;
@@ -1198,11 +1268,14 @@ export function createWorkspaceTools(
   const testProtectionGate =
     options?.testProtectionGate ??
     (options?.protectTests ? new TestProtectionGate({ enabled: true }) : undefined);
+  const syntaxGate =
+    options?.syntaxGate ??
+    (options?.enableSyntaxGate !== false ? new PreWriteSyntaxGate() : undefined);
 
   const tools: Tool[] = [
     new WorkspaceReadFileTool(resolvedPath, options?.idFactory),
-    new WorkspaceWriteFileTool(resolvedPath, options?.idFactory, testProtectionGate),
-    new WorkspaceEditFileTool(resolvedPath, options?.idFactory, testProtectionGate),
+    new WorkspaceWriteFileTool(resolvedPath, options?.idFactory, testProtectionGate, syntaxGate),
+    new WorkspaceEditFileTool(resolvedPath, options?.idFactory, testProtectionGate, syntaxGate),
     new WorkspaceRevertFileTool(resolvedPath, options?.idFactory),
     new WorkspaceListDirectoryTool(resolvedPath, options?.idFactory),
     new WorkspaceRunCommandTool(resolvedPath, options),
@@ -1223,6 +1296,8 @@ export function createWorkspaceTools(
       new FindDefinitionsTool(resolvedPath, options?.idFactory),
       new FindReferencesTool(resolvedPath, options?.idFactory),
       new GetOutlineTool(resolvedPath, options?.idFactory),
+      new BatchFindSymbolsTool(resolvedPath, options?.idFactory),
+      new SearchCodeTool(resolvedPath, options?.idFactory),
     );
   }
 

@@ -8,14 +8,39 @@
  */
 import type { Tool } from '../../core/interfaces/tool.js';
 import type { ToolRegistry, ValidationResult } from '../../core/interfaces/tool-registry.js';
-import type { ToolCategory, ToolInput } from '../../core/model/tool-types.js';
+import type {
+  ToolCategory,
+  ToolInput,
+  ToolDefinition,
+  ToolResult,
+  ToolExecutionContext,
+} from '../../core/model/tool-types.js';
 import { HarnessError } from '../../core/errors/base-error.js';
 import { ErrorCode, ErrorCategory } from '../../core/errors/error-codes.js';
 
 export class DefaultToolRegistry implements ToolRegistry {
   private readonly tools = new Map<string, Tool>();
 
-  register(tool: Tool): void {
+  register(toolOrDef: Tool | ToolDefinition): void {
+    const isTool = 'definition' in toolOrDef && (toolOrDef as Tool).definition !== undefined;
+    const toolDef = isTool ? (toolOrDef as Tool).definition : (toolOrDef as ToolDefinition);
+    const tool: Tool = isTool
+      ? (toolOrDef as Tool)
+      : {
+          definition: toolDef,
+          execute: async (input: ToolInput, context: ToolExecutionContext): Promise<ToolResult> => {
+            const rawArgs = (input as Record<string, unknown>) ?? {};
+            if (typeof toolDef.execute === 'function') {
+              return toolDef.execute(rawArgs, context);
+            }
+            throw new HarnessError({
+              code: ErrorCode.TOOL_EXECUTION_FAILED,
+              category: ErrorCategory.TOOL,
+              message: `Tool [${toolDef.name}] has no execute method.`,
+            });
+          },
+        };
+
     if (!tool.definition || !tool.definition.name) {
       throw new HarnessError({
         code: ErrorCode.TOOL_NOT_FOUND,

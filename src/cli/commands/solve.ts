@@ -17,8 +17,10 @@ import { DefaultToolRegistry } from '../../infra/tools/default-tool-registry.js'
 import { DefaultToolExecutor } from '../../infra/tools/default-tool-executor.js';
 import { createWorkspaceTools } from '../../infra/tools/workspace-tools.js';
 import { OpenAICompatibleProvider } from '../../infra/model/openai-compatible-provider.js';
+import { AnthropicModelProvider } from '../../infra/model/anthropic-provider.js';
 import { BedrockConverseProvider } from '../../infra/model/bedrock-provider.js';
 import { MockModelProvider } from '../../infra/model/mock-model-provider.js';
+import { ScriptedModelProvider } from '../../infra/model/scripted-model-provider.js';
 import { UuidV7IdFactory } from '../../infra/id/uuid-id-factory.js';
 import { SystemClock } from '../../infra/time/system-clock.js';
 import { UtilityModelRouter } from '../../infra/router/utility-model-router.js';
@@ -32,6 +34,8 @@ import { ProjectRuleLoader } from '../../infra/config/project-rule-loader.js';
 import { WorktreeIsolationManager } from '../../infra/git/worktree-isolation-manager.js';
 import { RolloutSelector, type RolloutCandidate } from '../../infra/eval/rollout-selector.js';
 import { CrossRolloutBlackboard, RolloutDistiller } from '../../infra/eval/pdr/index.js';
+import { JudgeInTheLoopOrchestrator } from '../../infra/eval/judge-orchestrator.js';
+import { QaAuditorGate } from '../../infra/verification/qa-auditor-gate.js';
 
 const IGNORED_SCAN_DIRS = new Set([
   '.git',
@@ -151,6 +155,9 @@ export interface SolveCliArgs {
   maxCpuTimeSec?: number;
   maxMemoryMb?: number;
   ingestFeedback?: string;
+  judgeCommand?: string;
+  maxJudgeRetries: number;
+  adversarialQa: boolean;
   tdd: boolean;
   tddKPass: number;
   protectTests: boolean;
@@ -173,7 +180,7 @@ OPTIONS:
   -m, --model <id>                Model identifier (default: process.env.MODEL_ID or gpt-4o)
   --base-url <url>                API Base URL (OpenRouter, LiteLLM, or OpenAI-compatible)
   --api-key <key>                 API key for the provider
-  --provider-id <id>              Provider identifier (default: openai-compatible)
+  --provider-id <id>              Provider identifier: openai, mock, scripted, bedrock (default: openai-compatible)
   --mode <text|json|jsonl>        Output format: human text or machine-readable JSONL stream (default: text)
   --reasoning-effort <effort>     Reasoning effort level: low, medium, or high
   --request-timeout-ms <ms>       Per-request model timeout in ms (default: 180000 / 3 minutes)
@@ -190,6 +197,9 @@ OPTIONS:
   --max-cpu-time-sec <sec>        Limit execution time for local commands (detects TLE)
   --max-memory-mb <mb>            Limit virtual memory for local commands (detects MLE)
   --ingest-feedback <file|json>   Ingest external Online Judge (ACMOJ / SWE-bench) verdict/log for targeted repair
+  --judge-command <cmd>           Autonomous Judge-in-the-Loop: execute <cmd> and automatically repair on failure
+  --max-judge-retries <n>         Maximum repair retry attempts for judge failures (default: 3)
+  --adversarial-qa / --no-adversarial-qa  Enable independent QA Auditor pass before completion (default: false)
   --output-patch <file>           Export git diff patch of agent modifications (SWE-bench / ProjDevBench format)
   --sandbox <local|docker>        Command execution environment: local or docker container (default: local)
   --docker-image <image>          Docker image used when --sandbox is docker (default: ubuntu:22.04)
@@ -209,6 +219,9 @@ ENVIRONMENT VARIABLES:
   VI_HARNESS_TDD_K_PASS                     Default K-pass repeats for TDD verification (1..10)
   VI_HARNESS_MAX_CPU_TIME_SEC               Default CPU time limit in seconds
   VI_HARNESS_MAX_MEMORY_MB                  Default virtual memory limit in MB
+  VI_HARNESS_JUDGE_COMMAND                  Default judge command for autonomous evaluation
+  VI_HARNESS_MAX_JUDGE_RETRIES              Default max retries for judge loop (1..10)
+  VI_HARNESS_ADVERSARIAL_QA                 Default adversarial QA enforcement (true/false)
 `);
 }
 
@@ -241,6 +254,9 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
     maxMemoryMb: process.env['VI_HARNESS_MAX_MEMORY_MB']
       ? parseInt(process.env['VI_HARNESS_MAX_MEMORY_MB'], 10)
       : undefined,
+    judgeCommand: process.env['VI_HARNESS_JUDGE_COMMAND'],
+    maxJudgeRetries: parseInt(process.env['VI_HARNESS_MAX_JUDGE_RETRIES'] ?? '3', 10) || 3,
+    adversarialQa: process.env['VI_HARNESS_ADVERSARIAL_QA'] === 'true' || false,
     help: false,
   };
 
@@ -261,7 +277,7 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
       result.baseUrl = args[++i]!;
     } else if (arg === '--api-key' && i + 1 < args.length) {
       result.apiKey = args[++i]!;
-    } else if (arg === '--provider-id' && i + 1 < args.length) {
+    } else if ((arg === '--provider-id' || arg === '--provider') && i + 1 < args.length) {
       result.providerId = args[++i]!;
     } else if (arg === '--mode' && i + 1 < args.length) {
       const m = args[++i]!.toLowerCase();
@@ -319,6 +335,17 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
       result.maxMemoryMb = parseInt(args[++i]!, 10);
     } else if (arg === '--ingest-feedback' && i + 1 < args.length) {
       result.ingestFeedback = args[++i]!;
+    } else if (arg === '--judge-command' && i + 1 < args.length) {
+      result.judgeCommand = args[++i]!;
+    } else if (
+      (arg === '--max-judge-retries' || arg === '--judge-retries') &&
+      i + 1 < args.length
+    ) {
+      result.maxJudgeRetries = Math.max(1, Math.min(10, parseInt(args[++i]!, 10) || 3));
+    } else if (arg === '--adversarial-qa') {
+      result.adversarialQa = true;
+    } else if (arg === '--no-adversarial-qa') {
+      result.adversarialQa = false;
     } else if (arg === '--output-patch' && i + 1 < args.length) {
       result.outputPatch = args[++i]!;
     } else if (arg === '--sandbox' && i + 1 < args.length) {
@@ -396,6 +423,61 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
       defaultModelId: parsed.modelId,
       baseUrl: parsed.baseUrl,
       apiKey: parsed.apiKey,
+    });
+  } else if (parsed.providerId === 'scripted') {
+    let scriptedSteps;
+    const scriptedFile = process.env['VI_HARNESS_SCRIPTED_STEPS_FILE'];
+    if (scriptedFile && fs.existsSync(scriptedFile)) {
+      try {
+        scriptedSteps = JSON.parse(fs.readFileSync(scriptedFile, 'utf-8'));
+      } catch {
+        // fallback
+      }
+    }
+    if (!scriptedSteps) {
+      scriptedSteps = [
+        {
+          content: 'Inspecting workspace files.',
+          toolCalls: [{ name: 'list_directory', input: { path: '.' } }],
+        },
+        {
+          content: 'Writing solution to target file.',
+          toolCalls: [{ name: 'write_file', input: { path: 'solution.ts', content: 'export const status = "fixed";\n' } }],
+        },
+        {
+          content: 'Verifying task completion.',
+          toolCalls: [{ name: 'read_file', input: { path: 'solution.ts' } }],
+        },
+        {
+          content: 'Task completed successfully and verified.',
+          toolCalls: [],
+        },
+      ];
+    }
+    provider = new ScriptedModelProvider({
+      providerId: 'scripted',
+      descriptor: { id: parsed.modelId || 'scripted-model' },
+      steps: scriptedSteps,
+    });
+  } else if (
+    parsed.providerId === 'anthropic' ||
+    (parsed.modelId && (parsed.modelId.startsWith('claude') || parsed.modelId.includes('anthropic')))
+  ) {
+    provider = new AnthropicModelProvider({
+      providerId: parsed.providerId ?? 'anthropic',
+      baseUrl: parsed.baseUrl ?? process.env['ANTHROPIC_BASE_URL'],
+      apiKey: parsed.apiKey ?? process.env['ANTHROPIC_API_KEY'],
+      defaultModelId: parsed.modelId ?? 'claude-3-7-sonnet-20250219',
+      promptCaching: parsed.promptCaching,
+    });
+  } else if (
+    parsed.providerId === 'bedrock' ||
+    (parsed.modelId && parsed.modelId.startsWith('anthropic.'))
+  ) {
+    provider = new BedrockConverseProvider({
+      providerId: parsed.providerId ?? 'bedrock',
+      region: process.env['AWS_REGION'] ?? 'us-east-1',
+      defaultModelId: parsed.modelId ?? 'anthropic.claude-3-5-sonnet-20241022-v2:0',
     });
   } else {
     provider = new OpenAICompatibleProvider({
@@ -675,6 +757,56 @@ Guidelines for this workspace:
         }
       }
       await isolationManager.cleanupAll(workspacePath);
+    } else if (parsed.judgeCommand) {
+      logInfo(
+        `Starting Autonomous Judge-in-the-Loop with command: "${parsed.judgeCommand}" (max retries: ${parsed.maxJudgeRetries})...`,
+      );
+
+      const judgeOutcome = await JudgeInTheLoopOrchestrator.runInteractiveLoop({
+        judgeCommand: parsed.judgeCommand,
+        maxRetries: parsed.maxJudgeRetries,
+        cwd: workspacePath,
+        logger: {
+          info: logInfo,
+          warn: logInfo,
+          error: logError,
+        },
+        runIteration: async (_attempt: number, feedbackPrompt?: string) => {
+          let iterationPrompt = fullPrompt;
+          if (feedbackPrompt) {
+            iterationPrompt = `${fullPrompt}\n\n${feedbackPrompt}`;
+          }
+
+          const iterationGoal: Goal = {
+            ...goal,
+            id: idFactory.create<'Goal'>(),
+            description: iterationPrompt,
+            createdAt: clock.now(),
+            updatedAt: clock.now(),
+          };
+
+          const iterResult = await runtime.execute(iterationGoal, {
+            architectMode: parsed.architect,
+            requestTimeoutMs: parsed.requestTimeoutMs,
+            maxRetries: parsed.maxRetries,
+            reasoningEffort: parsed.reasoningEffort,
+            autoLintAfterWrite: parsed.autoLint,
+            autoRollback: parsed.autoRollback,
+            rollbackOnAnomaly: parsed.autoRollback,
+            promptCaching: parsed.promptCaching,
+            requireTdd: parsed.tdd,
+            tddKPass: parsed.tddKPass,
+            toolExecutor,
+          } as any);
+
+          result = iterResult;
+          return { success: Boolean(iterResult?.success) };
+        },
+      });
+
+      logInfo(
+        `Judge-in-the-Loop concluded: finalVerdict=[${judgeOutcome.finalVerdict}], attempts=${judgeOutcome.totalAttempts}, success=${judgeOutcome.success}`,
+      );
     } else {
       result = await runtime.execute(goal, {
         architectMode: parsed.architect,
@@ -689,6 +821,53 @@ Guidelines for this workspace:
         tddKPass: parsed.tddKPass,
         toolExecutor,
       } as any);
+    }
+
+    // 7c. Optional Adversarial Verification Subagent / Dual-Pass QA Auditor Pass
+    if (parsed.adversarialQa && result?.success) {
+      logInfo('Running Adversarial QA Auditor pass to evaluate edge cases and invariants...');
+      try {
+        const gitManager = new RealGitManager({ workingDir: workspacePath });
+        const diff = (await gitManager.getDiff()) || '';
+        const auditor = new QaAuditorGate();
+        const auditResult = await auditor.audit({
+          workspacePath,
+          taskDescription: parsed.prompt,
+          patch: diff,
+        });
+
+        if (!auditResult.approved) {
+          logInfo(
+            `Adversarial QA Auditor rejected candidate solution (score: ${auditResult.score}/100, ${auditResult.findings.length} findings). Running targeted hardening iteration...`,
+          );
+          const hardeningGoal: Goal = {
+            ...goal,
+            id: idFactory.create<'Goal'>(),
+            description: `${fullPrompt}\n\n${QaAuditorGate.formatAuditorPrompt(auditResult)}`,
+            createdAt: clock.now(),
+            updatedAt: clock.now(),
+          };
+
+          result = await runtime.execute(hardeningGoal, {
+            architectMode: parsed.architect,
+            requestTimeoutMs: parsed.requestTimeoutMs,
+            maxRetries: parsed.maxRetries,
+            reasoningEffort: parsed.reasoningEffort,
+            autoLintAfterWrite: parsed.autoLint,
+            autoRollback: parsed.autoRollback,
+            rollbackOnAnomaly: parsed.autoRollback,
+            promptCaching: parsed.promptCaching,
+            requireTdd: parsed.tdd,
+            tddKPass: parsed.tddKPass,
+            toolExecutor,
+          } as any);
+        } else {
+          logInfo(`Adversarial QA Auditor approved solution with score ${auditResult.score}/100.`);
+        }
+      } catch (qaErr: unknown) {
+        const message = qaErr instanceof Error ? qaErr.message : String(qaErr);
+        logInfo(`Warning: Adversarial QA Auditor pass skipped due to: ${message}`);
+      }
     }
 
     // 8. Optional Output Patch Export (SWE-bench / ProjDevBench format)

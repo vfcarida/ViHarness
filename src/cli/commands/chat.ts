@@ -20,6 +20,7 @@ import { DefaultToolExecutor } from '../../infra/tools/default-tool-executor.js'
 import { createWorkspaceTools } from '../../infra/tools/workspace-tools.js';
 import { UtilityModelRouter } from '../../infra/router/utility-model-router.js';
 import { OpenAICompatibleProvider } from '../../infra/model/openai-compatible-provider.js';
+import { AnthropicModelProvider } from '../../infra/model/anthropic-provider.js';
 import { MockModelProvider } from '../../infra/model/mock-model-provider.js';
 import { TerminalDashboardRenderer, type DashboardState } from '../../infra/tui/terminal-dashboard-renderer.js';
 import { ReplVisualizers } from '../../infra/tui/repl-visualizers.js';
@@ -73,7 +74,7 @@ export function parseChatArgs(args: string[]): ChatCliArgs {
       result.baseUrl = args[++i]!;
     } else if (arg === '--api-key' && i + 1 < args.length) {
       result.apiKey = args[++i]!;
-    } else if (arg === '--provider-id' && i + 1 < args.length) {
+    } else if ((arg === '--provider-id' || arg === '--provider') && i + 1 < args.length) {
       result.providerId = args[++i]!;
     } else if (arg === '--auto-approve' || arg === '-y') {
       result.autoApprove = true;
@@ -421,6 +422,17 @@ Estimated Cost (USD) : $${totalSessionCostDollars.toFixed(5)}
           descriptor: { id: currentModelId },
           providerId: 'mock',
           defaultResponseText: 'I have analyzed your request and updated the workspace.',
+        });
+      } else if (
+        parsed.providerId === 'anthropic' ||
+        (currentModelId && (currentModelId.startsWith('claude') || currentModelId.includes('anthropic')))
+      ) {
+        provider = new AnthropicModelProvider({
+          providerId: parsed.providerId ?? 'anthropic',
+          baseUrl: parsed.baseUrl ?? process.env['ANTHROPIC_BASE_URL'],
+          apiKey: parsed.apiKey ?? process.env['ANTHROPIC_API_KEY'],
+          defaultModelId: currentModelId || 'claude-3-7-sonnet-20250219',
+          promptCaching: parsed.promptCaching,
         });
       } else {
         provider = new OpenAICompatibleProvider({

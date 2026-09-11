@@ -76,6 +76,27 @@ npm run test:watch
 - **Integration tests clean up after themselves.** Temporary workspaces and SQLite databases must use sandbox directories and be cleanly deleted after test runs.
 - **All security changes must include regression tests** under `tests/unit/security/`.
 
+### Coverage Policy
+
+Vi-Harness enforces a minimum coverage threshold on the unit test suite:
+
+| Metric | Minimum Threshold |
+|---|---|
+| Statements | 70% |
+| Branches | 65% |
+| Functions | 70% |
+| Lines | 70% |
+
+Run and verify coverage locally before submitting a pull request:
+
+```bash
+npm run test:coverage
+```
+
+The `vitest.config.ts` `coverage.thresholds` block enforces these values automatically — the CI build will fail if any new code drops below the threshold.
+
+> **Note**: Some thin infrastructure shell modules (e.g., barrel `index.ts` re-exports) are intentionally excluded from coverage measurement via `coverage.exclude`.
+
 ---
 
 ## Code Style & Quality
@@ -178,6 +199,8 @@ Vi-Harness enforces a strict **inward dependency contract**:
 - **`src/runtime/`**: Agent execution loop, state machine orchestrator, tool validators, and architect execution.
 - **`src/cli/`**: Command-line entrypoints, benchmark runners, and TUI dashboards.
 
+> 💡 **Deep Dive**: For an interactive walkthrough of all 14 FSM states, 6-stage context compilation pipeline, pre-write syntax gates, and developer extension recipes, see the [Architecture Tour & Extension Guide](docs/architecture/tour.md).
+
 ---
 
 ## Extending Vi-Harness
@@ -244,6 +267,14 @@ Vi-Harness enforces a strict **inward dependency contract**:
    ```
 2. Register the provider in `ModelRouter` (`src/infra/router/`) and dependency injection container (`src/di/`).
 3. Add tests verifying request serialization, token usage tracking, and fault tolerance.
+
+---
+
+## Community & Launch Resources
+
+Looking for ready-to-share summaries or community launch copy?
+- Check the [Community Launch Kit](docs/community/LAUNCH_KIT.md) for pre-formatted copy for Hacker News, Reddit, Twitter/X, and Discord.
+- Browse the [Community Hub](docs/community/README.md) for guidelines and channels.
 
 ---
 

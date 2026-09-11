@@ -10,6 +10,15 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.ts'],
       exclude: ['src/**/index.ts'],
+      // Minimum thresholds enforced per CI run.
+      // Values reflect achievable unit-test-only coverage (integration tests supplement these numbers).
+      // Raise these gradually as coverage improves — never lower them.
+      thresholds: {
+        statements: 70,
+        branches: 65,
+        functions: 70,
+        lines: 70,
+      },
     },
     testTimeout: 30000,
     hookTimeout: 30000,

@@ -5,7 +5,7 @@
  * and querying tools by category or risk level.
  */
 import type { Tool } from './tool.js';
-import type { ToolCategory, ToolInput } from '../model/tool-types.js';
+import type { ToolCategory, ToolInput, ToolDefinition } from '../model/tool-types.js';
 
 export interface ValidationResult {
   readonly valid: boolean;
@@ -13,8 +13,8 @@ export interface ValidationResult {
 }
 
 export interface ToolRegistry {
-  /** Register a tool in the registry. Throws if invalid or duplicate. */
-  register(tool: Tool): void;
+  /** Register a tool or tool definition in the registry. Throws if invalid or duplicate. */
+  register(tool: Tool | ToolDefinition): void;
 
   /** Unregister a tool by name. Returns true if removed. */
   unregister(name: string): boolean;

@@ -1,0 +1,11 @@
+﻿blank_issues_enabled: false
+contact_links:
+  - name: Q&A — Usage Questions
+    url: https://github.com/vfcarida/Vi-Harness/discussions/categories/q-a
+    about: Ask usage questions and get help from the community in GitHub Discussions.
+  - name: Ideas & Feature Requests
+    url: https://github.com/vfcarida/Vi-Harness/discussions/categories/ideas
+    about: Suggest new features or improvements and discuss them with maintainers.
+  - name: Show and Tell
+    url: https://github.com/vfcarida/Vi-Harness/discussions/categories/show-and-tell
+    about: Share what you have built with Vi-Harness.

@@ -70,7 +70,7 @@ import { PreStepPipeline } from './pre-step-pipeline.js';
 import { ArchitectExecutor, type ArchitectExecutionResult } from './architect-executor.js';
 import { LoopFingerprinter, type LoopStateSnapshot } from './loop-fingerprinter.js';
 import { TddEnforcer } from '../infra/verification/tdd-enforcer.js';
-import { SwePruner } from '../infra/compiler/swe-pruner.js';
+import { MicroCompactor } from '../infra/compiler/micro-compactor.js';
 
 export interface IterationExecutorParams {
   readonly executionId: ExecutionId;
@@ -265,6 +265,12 @@ export class IterationExecutor {
       });
     }
 
+    // Initialize cross-iteration micro-compactor for dynamic stale read invalidation & failure compaction
+    const iterationCompactor = MicroCompactor.createIterationCompactor(
+      iterationsSoFar,
+      sequenceNumber,
+    );
+
     // Append prior iteration assistant tool calls, tool results & evidence as structured messages
     for (const priorIter of iterationsSoFar) {
       if (priorIter.actionProposals && priorIter.actionProposals.length > 0) {
@@ -288,20 +294,16 @@ export class IterationExecutor {
       for (const res of priorIter.toolResults) {
         const toolCallId = String(res.metadata['toolCallId'] ?? res.actionId);
         const toolName = String(res.metadata['toolName'] ?? 'tool');
-        const isError =
-          res.status === ActionResultStatus.FAILURE || res.status === ActionResultStatus.DENIED;
-
-        const effectiveOutput = SwePruner.processPriorToolResult({
+        const compaction = iterationCompactor.compactToolResult({
           iterationSeq: priorIter.sequenceNumber,
-          currentSeq: sequenceNumber,
           actionResult: res,
-        }).output;
+        });
 
         const resMsg = ProviderMessageAdapter.createToolResultMessage({
           toolCallId,
           name: toolName,
-          output: effectiveOutput,
-          isError,
+          output: compaction.output,
+          isError: compaction.isError,
         });
         messages.push({
           ...resMsg,

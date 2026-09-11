@@ -2,9 +2,9 @@
   "suiteId": "suite-baseline-v1",
   "suiteName": "Canonical Harness Baseline Evaluation Suite v1",
   "seed": "reproducible-seed-9876",
-  "runsPerTask": 3,
+  "runsPerTask": 1,
   "modelConfig": {
-    "providerId": "openai",
+    "providerId": "mock",
     "modelId": "gpt-4o",
     "temperature": 0.2
   },
@@ -28,8 +28,8 @@
           "harnessVersion": "0.1.0-vi-harness",
           "model": "gpt-4o",
           "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
+          "totalRuns": 1,
+          "successfulRuns": 1,
           "successRate": 1,
           "costDistribution": {
             "mean": 0.001392,
@@ -39,8 +39,6 @@
             "max": 0.001392,
             "stdDev": 0,
             "samples": [
-              0.0013919999999999998,
-              0.0013919999999999998,
               0.0013919999999999998
             ]
           },
@@ -52,8 +50,6 @@
             "max": 6,
             "stdDev": 0,
             "samples": [
-              6,
-              6,
               6
             ]
           },
@@ -66,8 +62,6 @@
               "max": 1086,
               "stdDev": 0,
               "samples": [
-                1086,
-                1086,
                 1086
               ]
             },
@@ -79,8 +73,6 @@
               "max": 153,
               "stdDev": 0,
               "samples": [
-                153,
-                153,
                 153
               ]
             },
@@ -92,23 +84,19 @@
               "max": 1239,
               "stdDev": 0,
               "samples": [
-                1239,
-                1239,
                 1239
               ]
             }
           },
           "latencyDistribution": {
-            "mean": 376.333333,
-            "median": 365,
-            "p95": 412,
-            "min": 352,
-            "max": 412,
-            "stdDev": 31.564748,
+            "mean": 854,
+            "median": 854,
+            "p95": 854,
+            "min": 854,
+            "max": 854,
+            "stdDev": 0,
             "samples": [
-              352,
-              365,
-              412
+              854
             ]
           },
           "testPassRateDistribution": {
@@ -119,8 +107,6 @@
             "max": 1,
             "stdDev": 0,
             "samples": [
-              1,
-              1,
               1
             ]
           },
@@ -132,24 +118,22 @@
             "max": 0,
             "stdDev": 0,
             "samples": [
-              0,
-              0,
               0
             ]
           },
           "runs": [
             {
-              "runId": "01a03e6a-19a7-741a-a1f2-30be821a21ae",
+              "runId": "01a091bb-7383-77fe-9cba-c1a41fd63fd4",
               "harness": "Vi-Harness",
               "harnessVersion": "0.1.0-vi-harness",
               "model": "gpt-4o",
               "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a183e-9b594c",
+              "repositoryCommit": "init-1a091bb7023-264d21",
               "taskId": "task-001-small-bug",
               "runIndex": 0,
               "seed": "reproducible-seed-9876-suite-baseline-v1-task-001-small-bug-Vi-Harness-0",
-              "startedAt": "2026-08-26T14:12:15.550Z",
-              "completedAt": "2026-08-26T14:12:15.911Z",
+              "startedAt": "2026-09-11T18:29:35.395Z",
+              "completedAt": "2026-09-11T18:29:36.259Z",
               "success": true,
               "testsPassed": 1,
               "totalTests": 1,
@@ -161,68 +145,14 @@
               "outputTokens": 153,
               "totalTokens": 1239,
               "estimatedCost": 0.0013919999999999998,
-              "latency": 352,
+              "latency": 854,
               "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-001-small-bug-vi-harness-r0-PahQtZ"
-            },
-            {
-              "runId": "01a03e6a-1b1f-70a8-8762-ed72edb23d1a",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a19ae-60f07f",
-              "taskId": "task-001-small-bug",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-001-small-bug-Vi-Harness-1",
-              "startedAt": "2026-08-26T14:12:15.918Z",
-              "completedAt": "2026-08-26T14:12:16.287Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1086,
-              "outputTokens": 153,
-              "totalTokens": 1239,
-              "estimatedCost": 0.0013919999999999998,
-              "latency": 365,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-001-small-bug-vi-harness-r1-8JjjxR"
-            },
-            {
-              "runId": "01a03e6a-1cc8-750b-af33-aab1e1318dcb",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a1b26-8e2184",
-              "taskId": "task-001-small-bug",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-001-small-bug-Vi-Harness-2",
-              "startedAt": "2026-08-26T14:12:16.294Z",
-              "completedAt": "2026-08-26T14:12:16.712Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1086,
-              "outputTokens": 153,
-              "totalTokens": 1239,
-              "estimatedCost": 0.0013919999999999998,
-              "latency": 412,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-001-small-bug-vi-harness-r2-DioUey"
+              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-001-small-bug-vi-harness-r0-MOobho"
             }
           ],
           "metadata": {
             "modelId": "gpt-4o",
-            "providerId": "openai",
+            "providerId": "mock",
             "harnessVersion": "0.1.0-vi-harness",
             "tools": [
               "read_file",
@@ -245,14 +175,14 @@
               "variables": {}
             },
             "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:16.713Z"
+            "timestamp": "2026-09-11T18:29:36.261Z"
           },
           "correctness": {
             "taskSuccess": true,
             "testPassRate": 1,
             "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
+            "totalTestsRun": 1,
+            "testsPassed": 1,
             "regressionsDetected": 0
           },
           "efficiency": {
@@ -262,7 +192,7 @@
             "totalCostUSD": 0.001392,
             "iterations": 6,
             "toolCalls": 6,
-            "totalLatencyMs": 376.333333
+            "totalLatencyMs": 854
           },
           "contextEfficiency": {
             "averageContextSizeTokens": 1086,
@@ -283,7 +213,7 @@
             "costUSD": 0.001392,
             "successToCostRatio": 718.3908045977012
           },
-          "executionTimeMs": 376.333333
+          "executionTimeMs": 854
         },
         "Pi": {
           "taskId": "task-001-small-bug",
@@ -291,8 +221,8 @@
           "harnessVersion": "0.1.0-pi-harness",
           "model": "gpt-4o",
           "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
+          "totalRuns": 1,
+          "successfulRuns": 1,
           "successRate": 1,
           "costDistribution": {
             "mean": 0.042,
@@ -302,8 +232,6 @@
             "max": 0.042,
             "stdDev": 0,
             "samples": [
-              0.041999999999999996,
-              0.041999999999999996,
               0.041999999999999996
             ]
           },
@@ -315,8 +243,6 @@
             "max": 3,
             "stdDev": 0,
             "samples": [
-              3,
-              3,
               3
             ]
           },
@@ -329,8 +255,6 @@
               "max": 12600,
               "stdDev": 0,
               "samples": [
-                12600,
-                12600,
                 12600
               ]
             },
@@ -342,8 +266,6 @@
               "max": 1050,
               "stdDev": 0,
               "samples": [
-                1050,
-                1050,
                 1050
               ]
             },
@@ -355,8 +277,6 @@
               "max": 13650,
               "stdDev": 0,
               "samples": [
-                13650,
-                13650,
                 13650
               ]
             }
@@ -369,8 +289,6 @@
             "max": 80,
             "stdDev": 0,
             "samples": [
-              80,
-              80,
               80
             ]
           },
@@ -382,8 +300,6 @@
             "max": 1,
             "stdDev": 0,
             "samples": [
-              1,
-              1,
               1
             ]
           },
@@ -395,24 +311,22 @@
             "max": 0,
             "stdDev": 0,
             "samples": [
-              0,
-              0,
               0
             ]
           },
           "runs": [
             {
-              "runId": "01a03e6a-1cd4-7558-a94a-10348eea9696",
+              "runId": "01a091bb-738e-75eb-82be-f72f9bbb9dca",
               "harness": "Pi",
               "harnessVersion": "0.1.0-pi-harness",
               "model": "gpt-4o",
               "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a1ccf-03bcbb",
+              "repositoryCommit": "init-1a091bb738a-d24c6c",
               "taskId": "task-001-small-bug",
               "runIndex": 0,
               "seed": "reproducible-seed-9876-suite-baseline-v1-task-001-small-bug-Pi-0",
-              "startedAt": "2026-08-26T14:12:16.719Z",
-              "completedAt": "2026-08-26T14:12:16.724Z",
+              "startedAt": "2026-09-11T18:29:36.266Z",
+              "completedAt": "2026-09-11T18:29:36.270Z",
               "success": true,
               "testsPassed": 1,
               "totalTests": 1,
@@ -426,66 +340,12 @@
               "estimatedCost": 0.041999999999999996,
               "latency": 80,
               "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-001-small-bug-pi-r0-3okNhQ"
-            },
-            {
-              "runId": "01a03e6a-1cde-70f7-b6c8-c76029aa02be",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a1cd9-89946c",
-              "taskId": "task-001-small-bug",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-001-small-bug-Pi-1",
-              "startedAt": "2026-08-26T14:12:16.729Z",
-              "completedAt": "2026-08-26T14:12:16.734Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 3,
-              "toolCalls": 6,
-              "inputTokens": 12600,
-              "outputTokens": 1050,
-              "totalTokens": 13650,
-              "estimatedCost": 0.041999999999999996,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-001-small-bug-pi-r1-ESXj1b"
-            },
-            {
-              "runId": "01a03e6a-1ce7-7565-a106-fca7234b6f10",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a1ce3-930b84",
-              "taskId": "task-001-small-bug",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-001-small-bug-Pi-2",
-              "startedAt": "2026-08-26T14:12:16.739Z",
-              "completedAt": "2026-08-26T14:12:16.743Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 3,
-              "toolCalls": 6,
-              "inputTokens": 12600,
-              "outputTokens": 1050,
-              "totalTokens": 13650,
-              "estimatedCost": 0.041999999999999996,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-001-small-bug-pi-r2-J6E3pU"
+              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-001-small-bug-pi-r0-6qDEdH"
             }
           ],
           "metadata": {
             "modelId": "gpt-4o",
-            "providerId": "openai",
+            "providerId": "mock",
             "harnessVersion": "0.1.0-pi-harness",
             "tools": [
               "read_file",
@@ -508,14 +368,14 @@
               "variables": {}
             },
             "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:16.744Z"
+            "timestamp": "2026-09-11T18:29:36.271Z"
           },
           "correctness": {
             "taskSuccess": true,
             "testPassRate": 1,
             "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
+            "totalTestsRun": 1,
+            "testsPassed": 1,
             "regressionsDetected": 0
           },
           "efficiency": {
@@ -549,3241 +409,23 @@
           "executionTimeMs": 80
         }
       }
-    },
-    {
-      "taskId": "task-002-medium-feature",
-      "taskName": "Medium Feature Implementation",
-      "category": "MEDIUM_FEATURE",
-      "harnessResults": {
-        "Vi-Harness": {
-          "taskId": "task-002-medium-feature",
-          "harness": "Vi-Harness",
-          "harnessVersion": "0.1.0-vi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.001408,
-            "median": 0.001408,
-            "p95": 0.001408,
-            "min": 0.001408,
-            "max": 0.001408,
-            "stdDev": 0,
-            "samples": [
-              0.0014080000000000004,
-              0.0014080000000000004,
-              0.0014080000000000004
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 6,
-            "median": 6,
-            "p95": 6,
-            "min": 6,
-            "max": 6,
-            "stdDev": 0,
-            "samples": [
-              6,
-              6,
-              6
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 1092,
-              "median": 1092,
-              "p95": 1092,
-              "min": 1092,
-              "max": 1092,
-              "stdDev": 0,
-              "samples": [
-                1092,
-                1092,
-                1092
-              ]
-            },
-            "outputTokens": {
-              "mean": 158,
-              "median": 158,
-              "p95": 158,
-              "min": 158,
-              "max": 158,
-              "stdDev": 0,
-              "samples": [
-                158,
-                158,
-                158
-              ]
-            },
-            "totalTokens": {
-              "mean": 1250,
-              "median": 1250,
-              "p95": 1250,
-              "min": 1250,
-              "max": 1250,
-              "stdDev": 0,
-              "samples": [
-                1250,
-                1250,
-                1250
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 373.333333,
-            "median": 346,
-            "p95": 446,
-            "min": 328,
-            "max": 446,
-            "stdDev": 63.571482,
-            "samples": [
-              328,
-              346,
-              446
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-1e3a-739b-ae1a-e0daa5b53781",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a1ced-4d1442",
-              "taskId": "task-002-medium-feature",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-002-medium-feature-Vi-Harness-0",
-              "startedAt": "2026-08-26T14:12:16.749Z",
-              "completedAt": "2026-08-26T14:12:17.082Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1092,
-              "outputTokens": 158,
-              "totalTokens": 1250,
-              "estimatedCost": 0.0014080000000000004,
-              "latency": 328,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-002-medium-feature-vi-harness-r0-Vu52B3"
-            },
-            {
-              "runId": "01a03e6a-2003-702e-9978-de2d887fed41",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a1e3f-987070",
-              "taskId": "task-002-medium-feature",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-002-medium-feature-Vi-Harness-1",
-              "startedAt": "2026-08-26T14:12:17.087Z",
-              "completedAt": "2026-08-26T14:12:17.539Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1092,
-              "outputTokens": 158,
-              "totalTokens": 1250,
-              "estimatedCost": 0.0014080000000000004,
-              "latency": 446,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-002-medium-feature-vi-harness-r1-amDtng"
-            },
-            {
-              "runId": "01a03e6a-2168-73e6-a495-0ab018e4e985",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2009-00f485",
-              "taskId": "task-002-medium-feature",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-002-medium-feature-Vi-Harness-2",
-              "startedAt": "2026-08-26T14:12:17.546Z",
-              "completedAt": "2026-08-26T14:12:17.896Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1092,
-              "outputTokens": 158,
-              "totalTokens": 1250,
-              "estimatedCost": 0.0014080000000000004,
-              "latency": 346,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-002-medium-feature-vi-harness-r2-1gVeTp"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-vi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 25000,
-              "maxCostUSD": 0.25,
-              "maxIterations": 10
-            },
-            "taskId": "task-002-medium-feature",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:17.897Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 1250,
-            "promptTokens": 1092,
-            "completionTokens": 158,
-            "totalCostUSD": 0.001408,
-            "iterations": 6,
-            "toolCalls": 6,
-            "totalLatencyMs": 373.333333
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 1092,
-            "maxContextSizeTokens": 1092,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.001408,
-            "successToCostRatio": 710.2272727272727
-          },
-          "executionTimeMs": 373.333333
-        },
-        "Pi": {
-          "taskId": "task-002-medium-feature",
-          "harness": "Pi",
-          "harnessVersion": "0.1.0-pi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.0635,
-            "median": 0.0635,
-            "p95": 0.0635,
-            "min": 0.0635,
-            "max": 0.0635,
-            "stdDev": 0,
-            "samples": [
-              0.0635,
-              0.0635,
-              0.0635
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 4,
-            "median": 4,
-            "p95": 4,
-            "min": 4,
-            "max": 4,
-            "stdDev": 0,
-            "samples": [
-              4,
-              4,
-              4
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 19800,
-              "median": 19800,
-              "p95": 19800,
-              "min": 19800,
-              "max": 19800,
-              "stdDev": 0,
-              "samples": [
-                19800,
-                19800,
-                19800
-              ]
-            },
-            "outputTokens": {
-              "mean": 1400,
-              "median": 1400,
-              "p95": 1400,
-              "min": 1400,
-              "max": 1400,
-              "stdDev": 0,
-              "samples": [
-                1400,
-                1400,
-                1400
-              ]
-            },
-            "totalTokens": {
-              "mean": 21200,
-              "median": 21200,
-              "p95": 21200,
-              "min": 21200,
-              "max": 21200,
-              "stdDev": 0,
-              "samples": [
-                21200,
-                21200,
-                21200
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 80,
-            "median": 80,
-            "p95": 80,
-            "min": 80,
-            "max": 80,
-            "stdDev": 0,
-            "samples": [
-              80,
-              80,
-              80
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-2174-710b-bf5a-fc12acc12caf",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2170-cbe934",
-              "taskId": "task-002-medium-feature",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-002-medium-feature-Pi-0",
-              "startedAt": "2026-08-26T14:12:17.904Z",
-              "completedAt": "2026-08-26T14:12:17.908Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-002-medium-feature-pi-r0-O0SE53"
-            },
-            {
-              "runId": "01a03e6a-217e-7053-ac53-17165022ae0b",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a217a-8b1d4e",
-              "taskId": "task-002-medium-feature",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-002-medium-feature-Pi-1",
-              "startedAt": "2026-08-26T14:12:17.914Z",
-              "completedAt": "2026-08-26T14:12:17.918Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-002-medium-feature-pi-r1-YrW82p"
-            },
-            {
-              "runId": "01a03e6a-218a-72ad-9c5b-76a8cd6b2da9",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2183-a8b3bb",
-              "taskId": "task-002-medium-feature",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-002-medium-feature-Pi-2",
-              "startedAt": "2026-08-26T14:12:17.923Z",
-              "completedAt": "2026-08-26T14:12:17.930Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-002-medium-feature-pi-r2-TpFZOz"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-pi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 25000,
-              "maxCostUSD": 0.25,
-              "maxIterations": 10
-            },
-            "taskId": "task-002-medium-feature",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:17.930Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 21200,
-            "promptTokens": 19800,
-            "completionTokens": 1400,
-            "totalCostUSD": 0.0635,
-            "iterations": 4,
-            "toolCalls": 8,
-            "totalLatencyMs": 80
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 19800,
-            "maxContextSizeTokens": 19800,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.0635,
-            "successToCostRatio": 15.748031496062993
-          },
-          "executionTimeMs": 80
-        }
-      }
-    },
-    {
-      "taskId": "task-003-multi-file-refactor",
-      "taskName": "Multi-File Refactoring",
-      "category": "MULTI_FILE_REFACTOR",
-      "harnessResults": {
-        "Vi-Harness": {
-          "taskId": "task-003-multi-file-refactor",
-          "harness": "Vi-Harness",
-          "harnessVersion": "0.1.0-vi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.001792,
-            "median": 0.001792,
-            "p95": 0.001792,
-            "min": 0.001792,
-            "max": 0.001792,
-            "stdDev": 0,
-            "samples": [
-              0.0017919999999999998,
-              0.0017919999999999998,
-              0.0017919999999999998
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 6,
-            "median": 6,
-            "p95": 6,
-            "min": 6,
-            "max": 6,
-            "stdDev": 0,
-            "samples": [
-              6,
-              6,
-              6
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 1478,
-              "median": 1478,
-              "p95": 1478,
-              "min": 1478,
-              "max": 1478,
-              "stdDev": 0,
-              "samples": [
-                1478,
-                1478,
-                1478
-              ]
-            },
-            "outputTokens": {
-              "mean": 157,
-              "median": 157,
-              "p95": 157,
-              "min": 157,
-              "max": 157,
-              "stdDev": 0,
-              "samples": [
-                157,
-                157,
-                157
-              ]
-            },
-            "totalTokens": {
-              "mean": 1635,
-              "median": 1635,
-              "p95": 1635,
-              "min": 1635,
-              "max": 1635,
-              "stdDev": 0,
-              "samples": [
-                1635,
-                1635,
-                1635
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 340,
-            "median": 362,
-            "p95": 395,
-            "min": 263,
-            "max": 395,
-            "stdDev": 68.694978,
-            "samples": [
-              263,
-              362,
-              395
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-2321-746d-b815-5a74681381e8",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2191-bdedc3",
-              "taskId": "task-003-multi-file-refactor",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-003-multi-file-refactor-Vi-Harness-0",
-              "startedAt": "2026-08-26T14:12:17.937Z",
-              "completedAt": "2026-08-26T14:12:18.337Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1478,
-              "outputTokens": 157,
-              "totalTokens": 1635,
-              "estimatedCost": 0.0017919999999999998,
-              "latency": 395,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-003-multi-file-refactor-vi-harness-r0-z1hKby"
-            },
-            {
-              "runId": "01a03e6a-2497-73b9-9eac-8c7f117de6d1",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2328-863e57",
-              "taskId": "task-003-multi-file-refactor",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-003-multi-file-refactor-Vi-Harness-1",
-              "startedAt": "2026-08-26T14:12:18.344Z",
-              "completedAt": "2026-08-26T14:12:18.710Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1478,
-              "outputTokens": 157,
-              "totalTokens": 1635,
-              "estimatedCost": 0.0017919999999999998,
-              "latency": 362,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-003-multi-file-refactor-vi-harness-r1-0ajHPJ"
-            },
-            {
-              "runId": "01a03e6a-25a9-758f-a30b-9c2c4244ae67",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a249d-8cf8f5",
-              "taskId": "task-003-multi-file-refactor",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-003-multi-file-refactor-Vi-Harness-2",
-              "startedAt": "2026-08-26T14:12:18.717Z",
-              "completedAt": "2026-08-26T14:12:18.985Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1478,
-              "outputTokens": 157,
-              "totalTokens": 1635,
-              "estimatedCost": 0.0017919999999999998,
-              "latency": 263,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-003-multi-file-refactor-vi-harness-r2-IxSFhP"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-vi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 50000,
-              "maxCostUSD": 0.5,
-              "maxIterations": 15
-            },
-            "taskId": "task-003-multi-file-refactor",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:18.985Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 1635,
-            "promptTokens": 1478,
-            "completionTokens": 157,
-            "totalCostUSD": 0.001792,
-            "iterations": 6,
-            "toolCalls": 6,
-            "totalLatencyMs": 340
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 1478,
-            "maxContextSizeTokens": 1478,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.001792,
-            "successToCostRatio": 558.0357142857143
-          },
-          "executionTimeMs": 340
-        },
-        "Pi": {
-          "taskId": "task-003-multi-file-refactor",
-          "harness": "Pi",
-          "harnessVersion": "0.1.0-pi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.0635,
-            "median": 0.0635,
-            "p95": 0.0635,
-            "min": 0.0635,
-            "max": 0.0635,
-            "stdDev": 0,
-            "samples": [
-              0.0635,
-              0.0635,
-              0.0635
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 4,
-            "median": 4,
-            "p95": 4,
-            "min": 4,
-            "max": 4,
-            "stdDev": 0,
-            "samples": [
-              4,
-              4,
-              4
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 19800,
-              "median": 19800,
-              "p95": 19800,
-              "min": 19800,
-              "max": 19800,
-              "stdDev": 0,
-              "samples": [
-                19800,
-                19800,
-                19800
-              ]
-            },
-            "outputTokens": {
-              "mean": 1400,
-              "median": 1400,
-              "p95": 1400,
-              "min": 1400,
-              "max": 1400,
-              "stdDev": 0,
-              "samples": [
-                1400,
-                1400,
-                1400
-              ]
-            },
-            "totalTokens": {
-              "mean": 21200,
-              "median": 21200,
-              "p95": 21200,
-              "min": 21200,
-              "max": 21200,
-              "stdDev": 0,
-              "samples": [
-                21200,
-                21200,
-                21200
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 80,
-            "median": 80,
-            "p95": 80,
-            "min": 80,
-            "max": 80,
-            "stdDev": 0,
-            "samples": [
-              80,
-              80,
-              80
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-25b4-768f-95bb-48863c607c90",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a25b0-3c5722",
-              "taskId": "task-003-multi-file-refactor",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-003-multi-file-refactor-Pi-0",
-              "startedAt": "2026-08-26T14:12:18.992Z",
-              "completedAt": "2026-08-26T14:12:18.996Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-003-multi-file-refactor-pi-r0-pdFmVL"
-            },
-            {
-              "runId": "01a03e6a-25be-7268-88d6-44e39aaa653c",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a25b9-a39d44",
-              "taskId": "task-003-multi-file-refactor",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-003-multi-file-refactor-Pi-1",
-              "startedAt": "2026-08-26T14:12:19.001Z",
-              "completedAt": "2026-08-26T14:12:19.006Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-003-multi-file-refactor-pi-r1-IkZljF"
-            },
-            {
-              "runId": "01a03e6a-25c7-70a0-9845-de89606a0738",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a25c3-c45a2e",
-              "taskId": "task-003-multi-file-refactor",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-003-multi-file-refactor-Pi-2",
-              "startedAt": "2026-08-26T14:12:19.011Z",
-              "completedAt": "2026-08-26T14:12:19.015Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-003-multi-file-refactor-pi-r2-no3v74"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-pi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 50000,
-              "maxCostUSD": 0.5,
-              "maxIterations": 15
-            },
-            "taskId": "task-003-multi-file-refactor",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:19.015Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 21200,
-            "promptTokens": 19800,
-            "completionTokens": 1400,
-            "totalCostUSD": 0.0635,
-            "iterations": 4,
-            "toolCalls": 8,
-            "totalLatencyMs": 80
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 19800,
-            "maxContextSizeTokens": 19800,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.0635,
-            "successToCostRatio": 15.748031496062993
-          },
-          "executionTimeMs": 80
-        }
-      }
-    },
-    {
-      "taskId": "task-004-test-repair",
-      "taskName": "Flaky / Broken Test Repair",
-      "category": "TEST_REPAIR",
-      "harnessResults": {
-        "Vi-Harness": {
-          "taskId": "task-004-test-repair",
-          "harness": "Vi-Harness",
-          "harnessVersion": "0.1.0-vi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.00144,
-            "median": 0.00144,
-            "p95": 0.00144,
-            "min": 0.00144,
-            "max": 0.00144,
-            "stdDev": 0,
-            "samples": [
-              0.0014400000000000003,
-              0.0014400000000000003,
-              0.0014400000000000003
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 6,
-            "median": 6,
-            "p95": 6,
-            "min": 6,
-            "max": 6,
-            "stdDev": 0,
-            "samples": [
-              6,
-              6,
-              6
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 1122,
-              "median": 1122,
-              "p95": 1122,
-              "min": 1122,
-              "max": 1122,
-              "stdDev": 0,
-              "samples": [
-                1122,
-                1122,
-                1122
-              ]
-            },
-            "outputTokens": {
-              "mean": 159,
-              "median": 159,
-              "p95": 159,
-              "min": 159,
-              "max": 159,
-              "stdDev": 0,
-              "samples": [
-                159,
-                159,
-                159
-              ]
-            },
-            "totalTokens": {
-              "mean": 1281,
-              "median": 1281,
-              "p95": 1281,
-              "min": 1281,
-              "max": 1281,
-              "stdDev": 0,
-              "samples": [
-                1281,
-                1281,
-                1281
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 286.666667,
-            "median": 257,
-            "p95": 354,
-            "min": 249,
-            "max": 354,
-            "stdDev": 58.449408,
-            "samples": [
-              249,
-              257,
-              354
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-26ca-7650-a8e1-cc4710d30af4",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a25cc-749740",
-              "taskId": "task-004-test-repair",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-004-test-repair-Vi-Harness-0",
-              "startedAt": "2026-08-26T14:12:19.020Z",
-              "completedAt": "2026-08-26T14:12:19.274Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1122,
-              "outputTokens": 159,
-              "totalTokens": 1281,
-              "estimatedCost": 0.0014400000000000003,
-              "latency": 249,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-004-test-repair-vi-harness-r0-lfSypC"
-            },
-            {
-              "runId": "01a03e6a-27d7-740d-82bb-baac823c1d18",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a26d1-aa0e3a",
-              "taskId": "task-004-test-repair",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-004-test-repair-Vi-Harness-1",
-              "startedAt": "2026-08-26T14:12:19.281Z",
-              "completedAt": "2026-08-26T14:12:19.543Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1122,
-              "outputTokens": 159,
-              "totalTokens": 1281,
-              "estimatedCost": 0.0014400000000000003,
-              "latency": 257,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-004-test-repair-vi-harness-r1-9dcgXJ"
-            },
-            {
-              "runId": "01a03e6a-2942-718a-a03c-d73daaa85be3",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a27dc-bfc69a",
-              "taskId": "task-004-test-repair",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-004-test-repair-Vi-Harness-2",
-              "startedAt": "2026-08-26T14:12:19.548Z",
-              "completedAt": "2026-08-26T14:12:19.906Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1122,
-              "outputTokens": 159,
-              "totalTokens": 1281,
-              "estimatedCost": 0.0014400000000000003,
-              "latency": 354,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-004-test-repair-vi-harness-r2-mVR5KZ"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-vi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 20000,
-              "maxCostUSD": 0.2,
-              "maxIterations": 8
-            },
-            "taskId": "task-004-test-repair",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:19.906Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 1281,
-            "promptTokens": 1122,
-            "completionTokens": 159,
-            "totalCostUSD": 0.00144,
-            "iterations": 6,
-            "toolCalls": 6,
-            "totalLatencyMs": 286.666667
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 1122,
-            "maxContextSizeTokens": 1122,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.00144,
-            "successToCostRatio": 694.4444444444445
-          },
-          "executionTimeMs": 286.666667
-        },
-        "Pi": {
-          "taskId": "task-004-test-repair",
-          "harness": "Pi",
-          "harnessVersion": "0.1.0-pi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.0635,
-            "median": 0.0635,
-            "p95": 0.0635,
-            "min": 0.0635,
-            "max": 0.0635,
-            "stdDev": 0,
-            "samples": [
-              0.0635,
-              0.0635,
-              0.0635
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 4,
-            "median": 4,
-            "p95": 4,
-            "min": 4,
-            "max": 4,
-            "stdDev": 0,
-            "samples": [
-              4,
-              4,
-              4
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 19800,
-              "median": 19800,
-              "p95": 19800,
-              "min": 19800,
-              "max": 19800,
-              "stdDev": 0,
-              "samples": [
-                19800,
-                19800,
-                19800
-              ]
-            },
-            "outputTokens": {
-              "mean": 1400,
-              "median": 1400,
-              "p95": 1400,
-              "min": 1400,
-              "max": 1400,
-              "stdDev": 0,
-              "samples": [
-                1400,
-                1400,
-                1400
-              ]
-            },
-            "totalTokens": {
-              "mean": 21200,
-              "median": 21200,
-              "p95": 21200,
-              "min": 21200,
-              "max": 21200,
-              "stdDev": 0,
-              "samples": [
-                21200,
-                21200,
-                21200
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 80,
-            "median": 80,
-            "p95": 80,
-            "min": 80,
-            "max": 80,
-            "stdDev": 0,
-            "samples": [
-              80,
-              80,
-              80
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-294d-74da-8eba-789b2244cc14",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2949-800e35",
-              "taskId": "task-004-test-repair",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-004-test-repair-Pi-0",
-              "startedAt": "2026-08-26T14:12:19.913Z",
-              "completedAt": "2026-08-26T14:12:19.917Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-004-test-repair-pi-r0-UyPz8b"
-            },
-            {
-              "runId": "01a03e6a-2956-748b-a087-c3e3b1cc3bef",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2952-86b3ad",
-              "taskId": "task-004-test-repair",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-004-test-repair-Pi-1",
-              "startedAt": "2026-08-26T14:12:19.922Z",
-              "completedAt": "2026-08-26T14:12:19.926Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-004-test-repair-pi-r1-XsIgUj"
-            },
-            {
-              "runId": "01a03e6a-2961-7215-96de-4ba74c8dfa85",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a295b-a597e5",
-              "taskId": "task-004-test-repair",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-004-test-repair-Pi-2",
-              "startedAt": "2026-08-26T14:12:19.931Z",
-              "completedAt": "2026-08-26T14:12:19.937Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-004-test-repair-pi-r2-MaSdYm"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-pi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 20000,
-              "maxCostUSD": 0.2,
-              "maxIterations": 8
-            },
-            "taskId": "task-004-test-repair",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:19.937Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 21200,
-            "promptTokens": 19800,
-            "completionTokens": 1400,
-            "totalCostUSD": 0.0635,
-            "iterations": 4,
-            "toolCalls": 8,
-            "totalLatencyMs": 80
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 19800,
-            "maxContextSizeTokens": 19800,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.0635,
-            "successToCostRatio": 15.748031496062993
-          },
-          "executionTimeMs": 80
-        }
-      }
-    },
-    {
-      "taskId": "task-005-long-debugging-task",
-      "taskName": "Long-Horizon Memory Debugging",
-      "category": "LONG_DEBUGGING_TASK",
-      "harnessResults": {
-        "Vi-Harness": {
-          "taskId": "task-005-long-debugging-task",
-          "harness": "Vi-Harness",
-          "harnessVersion": "0.1.0-vi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.00147,
-            "median": 0.00147,
-            "p95": 0.00147,
-            "min": 0.00147,
-            "max": 0.00147,
-            "stdDev": 0,
-            "samples": [
-              0.00147,
-              0.00147,
-              0.00147
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 6,
-            "median": 6,
-            "p95": 6,
-            "min": 6,
-            "max": 6,
-            "stdDev": 0,
-            "samples": [
-              6,
-              6,
-              6
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 1146,
-              "median": 1146,
-              "p95": 1146,
-              "min": 1146,
-              "max": 1146,
-              "stdDev": 0,
-              "samples": [
-                1146,
-                1146,
-                1146
-              ]
-            },
-            "outputTokens": {
-              "mean": 162,
-              "median": 162,
-              "p95": 162,
-              "min": 162,
-              "max": 162,
-              "stdDev": 0,
-              "samples": [
-                162,
-                162,
-                162
-              ]
-            },
-            "totalTokens": {
-              "mean": 1308,
-              "median": 1308,
-              "p95": 1308,
-              "min": 1308,
-              "max": 1308,
-              "stdDev": 0,
-              "samples": [
-                1308,
-                1308,
-                1308
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 469,
-            "median": 385,
-            "p95": 660,
-            "min": 362,
-            "max": 660,
-            "stdDev": 165.810132,
-            "samples": [
-              362,
-              385,
-              660
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-2ad5-7060-990c-0d026ab14c31",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2966-d22365",
-              "taskId": "task-005-long-debugging-task",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-005-long-debugging-task-Vi-Harness-0",
-              "startedAt": "2026-08-26T14:12:19.942Z",
-              "completedAt": "2026-08-26T14:12:20.309Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1146,
-              "outputTokens": 162,
-              "totalTokens": 1308,
-              "estimatedCost": 0.00147,
-              "latency": 362,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-005-long-debugging-task-vi-harness-r0-V72WiV"
-            },
-            {
-              "runId": "01a03e6a-2c61-7592-8dbc-414a2824b504",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2adc-dbf907",
-              "taskId": "task-005-long-debugging-task",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-005-long-debugging-task-Vi-Harness-1",
-              "startedAt": "2026-08-26T14:12:20.316Z",
-              "completedAt": "2026-08-26T14:12:20.705Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1146,
-              "outputTokens": 162,
-              "totalTokens": 1308,
-              "estimatedCost": 0.00147,
-              "latency": 385,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-005-long-debugging-task-vi-harness-r1-b0vHth"
-            },
-            {
-              "runId": "01a03e6a-2eff-7028-b8e4-c82f47d03276",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2c66-58095e",
-              "taskId": "task-005-long-debugging-task",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-005-long-debugging-task-Vi-Harness-2",
-              "startedAt": "2026-08-26T14:12:20.710Z",
-              "completedAt": "2026-08-26T14:12:21.375Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1146,
-              "outputTokens": 162,
-              "totalTokens": 1308,
-              "estimatedCost": 0.00147,
-              "latency": 660,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-005-long-debugging-task-vi-harness-r2-QJSoEP"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-vi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 80000,
-              "maxCostUSD": 0.8,
-              "maxIterations": 20
-            },
-            "taskId": "task-005-long-debugging-task",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:21.375Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 1308,
-            "promptTokens": 1146,
-            "completionTokens": 162,
-            "totalCostUSD": 0.00147,
-            "iterations": 6,
-            "toolCalls": 6,
-            "totalLatencyMs": 469
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 1146,
-            "maxContextSizeTokens": 1146,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.00147,
-            "successToCostRatio": 680.2721088435375
-          },
-          "executionTimeMs": 469
-        },
-        "Pi": {
-          "taskId": "task-005-long-debugging-task",
-          "harness": "Pi",
-          "harnessVersion": "0.1.0-pi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.0635,
-            "median": 0.0635,
-            "p95": 0.0635,
-            "min": 0.0635,
-            "max": 0.0635,
-            "stdDev": 0,
-            "samples": [
-              0.0635,
-              0.0635,
-              0.0635
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 4,
-            "median": 4,
-            "p95": 4,
-            "min": 4,
-            "max": 4,
-            "stdDev": 0,
-            "samples": [
-              4,
-              4,
-              4
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 19800,
-              "median": 19800,
-              "p95": 19800,
-              "min": 19800,
-              "max": 19800,
-              "stdDev": 0,
-              "samples": [
-                19800,
-                19800,
-                19800
-              ]
-            },
-            "outputTokens": {
-              "mean": 1400,
-              "median": 1400,
-              "p95": 1400,
-              "min": 1400,
-              "max": 1400,
-              "stdDev": 0,
-              "samples": [
-                1400,
-                1400,
-                1400
-              ]
-            },
-            "totalTokens": {
-              "mean": 21200,
-              "median": 21200,
-              "p95": 21200,
-              "min": 21200,
-              "max": 21200,
-              "stdDev": 0,
-              "samples": [
-                21200,
-                21200,
-                21200
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 80,
-            "median": 80,
-            "p95": 80,
-            "min": 80,
-            "max": 80,
-            "stdDev": 0,
-            "samples": [
-              80,
-              80,
-              80
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-2f0a-740a-8a65-c3f60bf16614",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2f05-ad4c32",
-              "taskId": "task-005-long-debugging-task",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-005-long-debugging-task-Pi-0",
-              "startedAt": "2026-08-26T14:12:21.381Z",
-              "completedAt": "2026-08-26T14:12:21.386Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-005-long-debugging-task-pi-r0-J1zWVD"
-            },
-            {
-              "runId": "01a03e6a-2f13-7748-a85d-61b54f80dc4a",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2f0f-4e895f",
-              "taskId": "task-005-long-debugging-task",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-005-long-debugging-task-Pi-1",
-              "startedAt": "2026-08-26T14:12:21.391Z",
-              "completedAt": "2026-08-26T14:12:21.395Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-005-long-debugging-task-pi-r1-FeqRi5"
-            },
-            {
-              "runId": "01a03e6a-2f1d-70a9-a2a4-b99541ecda94",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2f18-a4afa2",
-              "taskId": "task-005-long-debugging-task",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-005-long-debugging-task-Pi-2",
-              "startedAt": "2026-08-26T14:12:21.400Z",
-              "completedAt": "2026-08-26T14:12:21.405Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-005-long-debugging-task-pi-r2-lGSXHk"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-pi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 80000,
-              "maxCostUSD": 0.8,
-              "maxIterations": 20
-            },
-            "taskId": "task-005-long-debugging-task",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:21.405Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 21200,
-            "promptTokens": 19800,
-            "completionTokens": 1400,
-            "totalCostUSD": 0.0635,
-            "iterations": 4,
-            "toolCalls": 8,
-            "totalLatencyMs": 80
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 19800,
-            "maxContextSizeTokens": 19800,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.0635,
-            "successToCostRatio": 15.748031496062993
-          },
-          "executionTimeMs": 80
-        }
-      }
-    },
-    {
-      "taskId": "task-006-security-sensitive-change",
-      "taskName": "Security-Sensitive Permission Modification",
-      "category": "SECURITY_SENSITIVE_CHANGE",
-      "harnessResults": {
-        "Vi-Harness": {
-          "taskId": "task-006-security-sensitive-change",
-          "harness": "Vi-Harness",
-          "harnessVersion": "0.1.0-vi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.00147,
-            "median": 0.00147,
-            "p95": 0.00147,
-            "min": 0.00147,
-            "max": 0.00147,
-            "stdDev": 0,
-            "samples": [
-              0.0014700000000000002,
-              0.0014700000000000002,
-              0.0014700000000000002
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 6,
-            "median": 6,
-            "p95": 6,
-            "min": 6,
-            "max": 6,
-            "stdDev": 0,
-            "samples": [
-              6,
-              6,
-              6
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 1140,
-              "median": 1140,
-              "p95": 1140,
-              "min": 1140,
-              "max": 1140,
-              "stdDev": 0,
-              "samples": [
-                1140,
-                1140,
-                1140
-              ]
-            },
-            "outputTokens": {
-              "mean": 165,
-              "median": 165,
-              "p95": 165,
-              "min": 165,
-              "max": 165,
-              "stdDev": 0,
-              "samples": [
-                165,
-                165,
-                165
-              ]
-            },
-            "totalTokens": {
-              "mean": 1305,
-              "median": 1305,
-              "p95": 1305,
-              "min": 1305,
-              "max": 1305,
-              "stdDev": 0,
-              "samples": [
-                1305,
-                1305,
-                1305
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 322,
-            "median": 327,
-            "p95": 341,
-            "min": 298,
-            "max": 341,
-            "stdDev": 21.931712,
-            "samples": [
-              298,
-              327,
-              341
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-3072-7028-8f52-7c3452ef552a",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a2f27-6dd5bb",
-              "taskId": "task-006-security-sensitive-change",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-006-security-sensitive-change-Vi-Harness-0",
-              "startedAt": "2026-08-26T14:12:21.415Z",
-              "completedAt": "2026-08-26T14:12:21.746Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1140,
-              "outputTokens": 165,
-              "totalTokens": 1305,
-              "estimatedCost": 0.0014700000000000002,
-              "latency": 327,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-006-security-sensitive-change-vi-harness-r0-uAd7Lw"
-            },
-            {
-              "runId": "01a03e6a-31d1-762b-a114-aa06f87887c1",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a3078-c9ca4e",
-              "taskId": "task-006-security-sensitive-change",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-006-security-sensitive-change-Vi-Harness-1",
-              "startedAt": "2026-08-26T14:12:21.752Z",
-              "completedAt": "2026-08-26T14:12:22.097Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1140,
-              "outputTokens": 165,
-              "totalTokens": 1305,
-              "estimatedCost": 0.0014700000000000002,
-              "latency": 341,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-006-security-sensitive-change-vi-harness-r1-ro3FKq"
-            },
-            {
-              "runId": "01a03e6a-3325-73ab-80a1-eee130321bf6",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a31f6-cc1522",
-              "taskId": "task-006-security-sensitive-change",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-006-security-sensitive-change-Vi-Harness-2",
-              "startedAt": "2026-08-26T14:12:22.134Z",
-              "completedAt": "2026-08-26T14:12:22.436Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1140,
-              "outputTokens": 165,
-              "totalTokens": 1305,
-              "estimatedCost": 0.0014700000000000002,
-              "latency": 298,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-006-security-sensitive-change-vi-harness-r2-9IVAbl"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-vi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 30000,
-              "maxCostUSD": 0.3,
-              "maxIterations": 10
-            },
-            "taskId": "task-006-security-sensitive-change",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:22.437Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 1305,
-            "promptTokens": 1140,
-            "completionTokens": 165,
-            "totalCostUSD": 0.00147,
-            "iterations": 6,
-            "toolCalls": 6,
-            "totalLatencyMs": 322
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 1140,
-            "maxContextSizeTokens": 1140,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.00147,
-            "successToCostRatio": 680.2721088435375
-          },
-          "executionTimeMs": 322
-        },
-        "Pi": {
-          "taskId": "task-006-security-sensitive-change",
-          "harness": "Pi",
-          "harnessVersion": "0.1.0-pi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.0635,
-            "median": 0.0635,
-            "p95": 0.0635,
-            "min": 0.0635,
-            "max": 0.0635,
-            "stdDev": 0,
-            "samples": [
-              0.0635,
-              0.0635,
-              0.0635
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 4,
-            "median": 4,
-            "p95": 4,
-            "min": 4,
-            "max": 4,
-            "stdDev": 0,
-            "samples": [
-              4,
-              4,
-              4
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 19800,
-              "median": 19800,
-              "p95": 19800,
-              "min": 19800,
-              "max": 19800,
-              "stdDev": 0,
-              "samples": [
-                19800,
-                19800,
-                19800
-              ]
-            },
-            "outputTokens": {
-              "mean": 1400,
-              "median": 1400,
-              "p95": 1400,
-              "min": 1400,
-              "max": 1400,
-              "stdDev": 0,
-              "samples": [
-                1400,
-                1400,
-                1400
-              ]
-            },
-            "totalTokens": {
-              "mean": 21200,
-              "median": 21200,
-              "p95": 21200,
-              "min": 21200,
-              "max": 21200,
-              "stdDev": 0,
-              "samples": [
-                21200,
-                21200,
-                21200
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 80,
-            "median": 80,
-            "p95": 80,
-            "min": 80,
-            "max": 80,
-            "stdDev": 0,
-            "samples": [
-              80,
-              80,
-              80
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-3332-76b6-98c6-377e36cce11d",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a332e-f44cbf",
-              "taskId": "task-006-security-sensitive-change",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-006-security-sensitive-change-Pi-0",
-              "startedAt": "2026-08-26T14:12:22.446Z",
-              "completedAt": "2026-08-26T14:12:22.450Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-006-security-sensitive-change-pi-r0-8ZUEu7"
-            },
-            {
-              "runId": "01a03e6a-333c-7616-96a0-b8a4ffc910b5",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a3337-0dd0ca",
-              "taskId": "task-006-security-sensitive-change",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-006-security-sensitive-change-Pi-1",
-              "startedAt": "2026-08-26T14:12:22.456Z",
-              "completedAt": "2026-08-26T14:12:22.460Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-006-security-sensitive-change-pi-r1-naI5G0"
-            },
-            {
-              "runId": "01a03e6a-3346-7389-aecb-2e59e4eb8efe",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a3341-06b2db",
-              "taskId": "task-006-security-sensitive-change",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-006-security-sensitive-change-Pi-2",
-              "startedAt": "2026-08-26T14:12:22.465Z",
-              "completedAt": "2026-08-26T14:12:22.470Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-006-security-sensitive-change-pi-r2-VhHEQ2"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-pi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 30000,
-              "maxCostUSD": 0.3,
-              "maxIterations": 10
-            },
-            "taskId": "task-006-security-sensitive-change",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:22.470Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 21200,
-            "promptTokens": 19800,
-            "completionTokens": 1400,
-            "totalCostUSD": 0.0635,
-            "iterations": 4,
-            "toolCalls": 8,
-            "totalLatencyMs": 80
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 19800,
-            "maxContextSizeTokens": 19800,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.0635,
-            "successToCostRatio": 15.748031496062993
-          },
-          "executionTimeMs": 80
-        }
-      }
-    },
-    {
-      "taskId": "task-007-regression-repair",
-      "taskName": "Regression Repair under Precedence Rules",
-      "category": "REGRESSION_REPAIR",
-      "harnessResults": {
-        "Vi-Harness": {
-          "taskId": "task-007-regression-repair",
-          "harness": "Vi-Harness",
-          "harnessVersion": "0.1.0-vi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.001464,
-            "median": 0.001464,
-            "p95": 0.001464,
-            "min": 0.001464,
-            "max": 0.001464,
-            "stdDev": 0,
-            "samples": [
-              0.0014639999999999998,
-              0.0014639999999999998,
-              0.0014639999999999998
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 6,
-            "median": 6,
-            "p95": 6,
-            "min": 6,
-            "max": 6,
-            "stdDev": 0,
-            "samples": [
-              6,
-              6,
-              6
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 1134,
-              "median": 1134,
-              "p95": 1134,
-              "min": 1134,
-              "max": 1134,
-              "stdDev": 0,
-              "samples": [
-                1134,
-                1134,
-                1134
-              ]
-            },
-            "outputTokens": {
-              "mean": 165,
-              "median": 165,
-              "p95": 165,
-              "min": 165,
-              "max": 165,
-              "stdDev": 0,
-              "samples": [
-                165,
-                165,
-                165
-              ]
-            },
-            "totalTokens": {
-              "mean": 1299,
-              "median": 1299,
-              "p95": 1299,
-              "min": 1299,
-              "max": 1299,
-              "stdDev": 0,
-              "samples": [
-                1299,
-                1299,
-                1299
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 317,
-            "median": 340,
-            "p95": 351,
-            "min": 260,
-            "max": 351,
-            "stdDev": 49.668904,
-            "samples": [
-              260,
-              340,
-              351
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-34b3-750d-a947-48e17e8963b9",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a334b-e2341f",
-              "taskId": "task-007-regression-repair",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-007-regression-repair-Vi-Harness-0",
-              "startedAt": "2026-08-26T14:12:22.479Z",
-              "completedAt": "2026-08-26T14:12:22.835Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1134,
-              "outputTokens": 165,
-              "totalTokens": 1299,
-              "estimatedCost": 0.0014639999999999998,
-              "latency": 351,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-007-regression-repair-vi-harness-r0-n7nDhx"
-            },
-            {
-              "runId": "01a03e6a-3610-73b2-9203-474c97f4a923",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a34b8-70e2b9",
-              "taskId": "task-007-regression-repair",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-007-regression-repair-Vi-Harness-1",
-              "startedAt": "2026-08-26T14:12:22.840Z",
-              "completedAt": "2026-08-26T14:12:23.184Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1134,
-              "outputTokens": 165,
-              "totalTokens": 1299,
-              "estimatedCost": 0.0014639999999999998,
-              "latency": 340,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-007-regression-repair-vi-harness-r1-Ab1GMz"
-            },
-            {
-              "runId": "01a03e6a-3721-7364-8705-58420a1811e3",
-              "harness": "Vi-Harness",
-              "harnessVersion": "0.1.0-vi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a3618-27f6df",
-              "taskId": "task-007-regression-repair",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-007-regression-repair-Vi-Harness-2",
-              "startedAt": "2026-08-26T14:12:23.192Z",
-              "completedAt": "2026-08-26T14:12:23.457Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 6,
-              "toolCalls": 6,
-              "inputTokens": 1134,
-              "outputTokens": 165,
-              "totalTokens": 1299,
-              "estimatedCost": 0.0014639999999999998,
-              "latency": 260,
-              "terminationReason": "SUCCESS",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-007-regression-repair-vi-harness-r2-7dvFHx"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-vi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 35000,
-              "maxCostUSD": 0.35,
-              "maxIterations": 12
-            },
-            "taskId": "task-007-regression-repair",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:23.457Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 1299,
-            "promptTokens": 1134,
-            "completionTokens": 165,
-            "totalCostUSD": 0.001464,
-            "iterations": 6,
-            "toolCalls": 6,
-            "totalLatencyMs": 317
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 1134,
-            "maxContextSizeTokens": 1134,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.001464,
-            "successToCostRatio": 683.0601092896175
-          },
-          "executionTimeMs": 317
-        },
-        "Pi": {
-          "taskId": "task-007-regression-repair",
-          "harness": "Pi",
-          "harnessVersion": "0.1.0-pi-harness",
-          "model": "gpt-4o",
-          "modelVersion": "default",
-          "totalRuns": 3,
-          "successfulRuns": 3,
-          "successRate": 1,
-          "costDistribution": {
-            "mean": 0.0635,
-            "median": 0.0635,
-            "p95": 0.0635,
-            "min": 0.0635,
-            "max": 0.0635,
-            "stdDev": 0,
-            "samples": [
-              0.0635,
-              0.0635,
-              0.0635
-            ]
-          },
-          "iterationDistribution": {
-            "mean": 4,
-            "median": 4,
-            "p95": 4,
-            "min": 4,
-            "max": 4,
-            "stdDev": 0,
-            "samples": [
-              4,
-              4,
-              4
-            ]
-          },
-          "tokenDistribution": {
-            "inputTokens": {
-              "mean": 19800,
-              "median": 19800,
-              "p95": 19800,
-              "min": 19800,
-              "max": 19800,
-              "stdDev": 0,
-              "samples": [
-                19800,
-                19800,
-                19800
-              ]
-            },
-            "outputTokens": {
-              "mean": 1400,
-              "median": 1400,
-              "p95": 1400,
-              "min": 1400,
-              "max": 1400,
-              "stdDev": 0,
-              "samples": [
-                1400,
-                1400,
-                1400
-              ]
-            },
-            "totalTokens": {
-              "mean": 21200,
-              "median": 21200,
-              "p95": 21200,
-              "min": 21200,
-              "max": 21200,
-              "stdDev": 0,
-              "samples": [
-                21200,
-                21200,
-                21200
-              ]
-            }
-          },
-          "latencyDistribution": {
-            "mean": 80,
-            "median": 80,
-            "p95": 80,
-            "min": 80,
-            "max": 80,
-            "stdDev": 0,
-            "samples": [
-              80,
-              80,
-              80
-            ]
-          },
-          "testPassRateDistribution": {
-            "mean": 1,
-            "median": 1,
-            "p95": 1,
-            "min": 1,
-            "max": 1,
-            "stdDev": 0,
-            "samples": [
-              1,
-              1,
-              1
-            ]
-          },
-          "regressionsDistribution": {
-            "mean": 0,
-            "median": 0,
-            "p95": 0,
-            "min": 0,
-            "max": 0,
-            "stdDev": 0,
-            "samples": [
-              0,
-              0,
-              0
-            ]
-          },
-          "runs": [
-            {
-              "runId": "01a03e6a-372a-76c9-a52e-ddb5ea178435",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a3726-a73e99",
-              "taskId": "task-007-regression-repair",
-              "runIndex": 0,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-007-regression-repair-Pi-0",
-              "startedAt": "2026-08-26T14:12:23.462Z",
-              "completedAt": "2026-08-26T14:12:23.466Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-007-regression-repair-pi-r0-XgRbIO"
-            },
-            {
-              "runId": "01a03e6a-3733-737b-9feb-7866c18d5d50",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a372f-e53680",
-              "taskId": "task-007-regression-repair",
-              "runIndex": 1,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-007-regression-repair-Pi-1",
-              "startedAt": "2026-08-26T14:12:23.471Z",
-              "completedAt": "2026-08-26T14:12:23.475Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-007-regression-repair-pi-r1-GKC89d"
-            },
-            {
-              "runId": "01a03e6a-373c-731d-b57a-1c232c6d2bf3",
-              "harness": "Pi",
-              "harnessVersion": "0.1.0-pi-harness",
-              "model": "gpt-4o",
-              "modelVersion": "default",
-              "repositoryCommit": "init-1a03e6a3738-8c7bff",
-              "taskId": "task-007-regression-repair",
-              "runIndex": 2,
-              "seed": "reproducible-seed-9876-suite-baseline-v1-task-007-regression-repair-Pi-2",
-              "startedAt": "2026-08-26T14:12:23.480Z",
-              "completedAt": "2026-08-26T14:12:23.484Z",
-              "success": true,
-              "testsPassed": 1,
-              "totalTests": 1,
-              "testPassRate": 1,
-              "regressions": 0,
-              "iterations": 4,
-              "toolCalls": 8,
-              "inputTokens": 19800,
-              "outputTokens": 1400,
-              "totalTokens": 21200,
-              "estimatedCost": 0.0635,
-              "latency": 80,
-              "terminationReason": "MAX_TURNS_OR_STOP_TOKEN",
-              "workspacePath": "C:\\Users\\vinicius\\AppData\\Local\\Temp\\vi-bench-workspaces\\bench-suite-baseline-v1-task-007-regression-repair-pi-r2-1DxOQO"
-            }
-          ],
-          "metadata": {
-            "modelId": "gpt-4o",
-            "providerId": "openai",
-            "harnessVersion": "0.1.0-pi-harness",
-            "tools": [
-              "read_file",
-              "write_file",
-              "run_command"
-            ],
-            "policy": "deny-first-enterprise",
-            "budget": {
-              "maxTokens": 35000,
-              "maxCostUSD": 0.35,
-              "maxIterations": 12
-            },
-            "taskId": "task-007-regression-repair",
-            "environment": {
-              "os": "win32",
-              "nodeVersion": "v24.16.0",
-              "harnessVersion": "0.1.0-benchmark",
-              "isolatedWorkspace": true,
-              "containerized": false,
-              "variables": {}
-            },
-            "reproducibilitySeed": "seed-default-1234",
-            "timestamp": "2026-08-26T14:12:23.484Z"
-          },
-          "correctness": {
-            "taskSuccess": true,
-            "testPassRate": 1,
-            "regressionRate": 0,
-            "totalTestsRun": 3,
-            "testsPassed": 3,
-            "regressionsDetected": 0
-          },
-          "efficiency": {
-            "totalTokens": 21200,
-            "promptTokens": 19800,
-            "completionTokens": 1400,
-            "totalCostUSD": 0.0635,
-            "iterations": 4,
-            "toolCalls": 8,
-            "totalLatencyMs": 80
-          },
-          "contextEfficiency": {
-            "averageContextSizeTokens": 19800,
-            "maxContextSizeTokens": 19800,
-            "averageCompressionRatio": 0.25,
-            "retrievedMemoryVolumeBytes": 1024
-          },
-          "reliability": {
-            "recoverySuccess": true,
-            "loopFrequency": 0,
-            "oscillationFrequency": 0,
-            "escalationRate": 0,
-            "processCrashesRecovered": 0
-          },
-          "modelEfficiency": {
-            "modelId": "gpt-4o",
-            "success": true,
-            "costUSD": 0.0635,
-            "successToCostRatio": 15.748031496062993
-          },
-          "executionTimeMs": 80
-        }
-      }
     }
   ],
   "harnessSummaries": {
     "Vi-Harness": {
       "harness": "Vi-Harness",
       "harnessVersion": "0.1.0-vi-harness",
-      "totalRuns": 21,
+      "totalRuns": 1,
       "overallSuccessRate": 1,
       "costDistribution": {
-        "mean": 0.001491,
-        "median": 0.001464,
-        "p95": 0.001792,
+        "mean": 0.001392,
+        "median": 0.001392,
+        "p95": 0.001392,
         "min": 0.001392,
-        "max": 0.001792,
-        "stdDev": 0.000129,
+        "max": 0.001392,
+        "stdDev": 0,
         "samples": [
-          0.0013919999999999998,
-          0.0013919999999999998,
-          0.0013919999999999998,
-          0.0014080000000000004,
-          0.0014080000000000004,
-          0.0014080000000000004,
-          0.0014400000000000003,
-          0.0014400000000000003,
-          0.0014400000000000003,
-          0.0014639999999999998,
-          0.0014639999999999998,
-          0.0014639999999999998,
-          0.00147,
-          0.00147,
-          0.00147,
-          0.0014700000000000002,
-          0.0014700000000000002,
-          0.0014700000000000002,
-          0.0017919999999999998,
-          0.0017919999999999998,
-          0.0017919999999999998
+          0.0013919999999999998
         ]
       },
       "iterationDistribution": {
@@ -3794,153 +436,53 @@
         "max": 6,
         "stdDev": 0,
         "samples": [
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
           6
         ]
       },
       "tokenDistribution": {
         "inputTokens": {
-          "mean": 1171.142857,
-          "median": 1134,
-          "p95": 1478,
+          "mean": 1086,
+          "median": 1086,
+          "p95": 1086,
           "min": 1086,
-          "max": 1478,
-          "stdDev": 130.232978,
+          "max": 1086,
+          "stdDev": 0,
           "samples": [
-            1086,
-            1086,
-            1086,
-            1092,
-            1092,
-            1092,
-            1122,
-            1122,
-            1122,
-            1134,
-            1134,
-            1134,
-            1140,
-            1140,
-            1140,
-            1146,
-            1146,
-            1146,
-            1478,
-            1478,
-            1478
+            1086
           ]
         },
         "outputTokens": {
-          "mean": 159.857143,
-          "median": 159,
-          "p95": 165,
+          "mean": 153,
+          "median": 153,
+          "p95": 153,
           "min": 153,
-          "max": 165,
-          "stdDev": 4.186714,
+          "max": 153,
+          "stdDev": 0,
           "samples": [
-            153,
-            153,
-            153,
-            157,
-            157,
-            157,
-            158,
-            158,
-            158,
-            159,
-            159,
-            159,
-            162,
-            162,
-            162,
-            165,
-            165,
-            165,
-            165,
-            165,
-            165
+            153
           ]
         },
         "totalTokens": {
-          "mean": 1331,
-          "median": 1299,
-          "p95": 1635,
+          "mean": 1239,
+          "median": 1239,
+          "p95": 1239,
           "min": 1239,
-          "max": 1635,
-          "stdDev": 129.713145,
+          "max": 1239,
+          "stdDev": 0,
           "samples": [
-            1239,
-            1239,
-            1239,
-            1250,
-            1250,
-            1250,
-            1281,
-            1281,
-            1281,
-            1299,
-            1299,
-            1299,
-            1305,
-            1305,
-            1305,
-            1308,
-            1308,
-            1308,
-            1635,
-            1635,
-            1635
+            1239
           ]
         }
       },
       "latencyDistribution": {
-        "mean": 354.904762,
-        "median": 351,
-        "p95": 446,
-        "min": 249,
-        "max": 660,
-        "stdDev": 86.853845,
+        "mean": 854,
+        "median": 854,
+        "p95": 854,
+        "min": 854,
+        "max": 854,
+        "stdDev": 0,
         "samples": [
-          249,
-          257,
-          260,
-          263,
-          298,
-          327,
-          328,
-          340,
-          341,
-          346,
-          351,
-          352,
-          354,
-          362,
-          362,
-          365,
-          385,
-          395,
-          412,
-          446,
-          660
+          854
         ]
       },
       "testPassRateDistribution": {
@@ -3951,26 +493,6 @@
         "max": 1,
         "stdDev": 0,
         "samples": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
           1
         ]
       },
@@ -3982,26 +504,6 @@
         "max": 0,
         "stdDev": 0,
         "samples": [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
           0
         ]
       }
@@ -4009,162 +511,62 @@
     "Pi": {
       "harness": "Pi",
       "harnessVersion": "0.1.0-pi-harness",
-      "totalRuns": 21,
+      "totalRuns": 1,
       "overallSuccessRate": 1,
       "costDistribution": {
-        "mean": 0.060429,
-        "median": 0.0635,
-        "p95": 0.0635,
+        "mean": 0.042,
+        "median": 0.042,
+        "p95": 0.042,
         "min": 0.042,
-        "max": 0.0635,
-        "stdDev": 0.007709,
+        "max": 0.042,
+        "stdDev": 0,
         "samples": [
-          0.041999999999999996,
-          0.041999999999999996,
-          0.041999999999999996,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635,
-          0.0635
+          0.041999999999999996
         ]
       },
       "iterationDistribution": {
-        "mean": 3.857143,
-        "median": 4,
-        "p95": 4,
+        "mean": 3,
+        "median": 3,
+        "p95": 3,
         "min": 3,
-        "max": 4,
-        "stdDev": 0.358569,
+        "max": 3,
+        "stdDev": 0,
         "samples": [
-          3,
-          3,
-          3,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4,
-          4
+          3
         ]
       },
       "tokenDistribution": {
         "inputTokens": {
-          "mean": 18771.428571,
-          "median": 19800,
-          "p95": 19800,
+          "mean": 12600,
+          "median": 12600,
+          "p95": 12600,
           "min": 12600,
-          "max": 19800,
-          "stdDev": 2581.693796,
+          "max": 12600,
+          "stdDev": 0,
           "samples": [
-            12600,
-            12600,
-            12600,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800,
-            19800
+            12600
           ]
         },
         "outputTokens": {
-          "mean": 1350,
-          "median": 1400,
-          "p95": 1400,
+          "mean": 1050,
+          "median": 1050,
+          "p95": 1050,
           "min": 1050,
-          "max": 1400,
-          "stdDev": 125.499004,
+          "max": 1050,
+          "stdDev": 0,
           "samples": [
-            1050,
-            1050,
-            1050,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400,
-            1400
+            1050
           ]
         },
         "totalTokens": {
-          "mean": 20121.428571,
-          "median": 21200,
-          "p95": 21200,
+          "mean": 13650,
+          "median": 13650,
+          "p95": 13650,
           "min": 13650,
-          "max": 21200,
-          "stdDev": 2707.1928,
+          "max": 13650,
+          "stdDev": 0,
           "samples": [
-            13650,
-            13650,
-            13650,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200,
-            21200
+            13650
           ]
         }
       },
@@ -4176,26 +578,6 @@
         "max": 80,
         "stdDev": 0,
         "samples": [
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
-          80,
           80
         ]
       },
@@ -4207,26 +589,6 @@
         "max": 1,
         "stdDev": 0,
         "samples": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
           1
         ]
       },
@@ -4238,30 +600,10 @@
         "max": 0,
         "stdDev": 0,
         "samples": [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
           0
         ]
       }
     }
   },
-  "generatedAt": "2026-08-26T14:12:23.485Z"
+  "generatedAt": "2026-09-11T18:29:36.271Z"
 }

@@ -77,4 +77,13 @@ Vi-Harness applies defence-in-depth across four layers. Reviewers and researcher
 3. **Execution Sandbox**: Process timeout bounds, git hook isolation (`-c core.hooksPath=/dev/null`), subagent permission containment and nesting limits.
 4. **Output Sanitisation**: `SecretScrubber` automatically redacts credentials from all tool outputs and compiled context.
 
+## Dependency Audit Policy
+
+Vi-Harness enforces automated dependency auditing on every push and pull request:
+
+- **CI build gate** (`ci.yml`): `npm audit --audit-level=high` — blocks the build if any dependency has a High or Critical severity CVE.
+- **Weekly security scan** (`security.yml`): dedicated `npm audit --audit-level=high` run on a weekly schedule, independent of push triggers.
+
+All three runtime dependencies (`better-sqlite3`, `uuid`, `zod`) are explicitly locked in `package-lock.json`. Dependabot is configured to open automated PRs for dependency updates on a weekly basis.
+
 **Important limitation:** Vi-Harness does not provide kernel-level OS isolation (containers, microVMs). For production deployments running untrusted test suites, wrap the agent in a container or gVisor/Firecracker environment.

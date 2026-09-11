@@ -148,6 +148,13 @@ import type { CacheMetrics } from './model-io.js';
 
 export type CompactionTrigger = 'pressure' | 'context-overflow';
 
+export interface MicroCompactorConfig {
+  readonly invalidateStaleReads?: boolean;
+  readonly compactResolvedFailures?: boolean;
+  readonly collapseRedundantOutputs?: boolean;
+  readonly minCharThreshold?: number;
+}
+
 export interface MultiTierCompressorOptions {
   readonly modelContextTokens?: number;
   readonly aggressiveThreshold?: number; // 0.0 - 1.0 threshold
@@ -162,6 +169,8 @@ export interface MultiTierCompressorOptions {
   readonly cachedPrefixIds?: ReadonlySet<string> | ReadonlyArray<string>;
   readonly cacheMetrics?: CacheMetrics;
   readonly deferBoundaryMarkers?: boolean;
+  readonly enableMicroCompactor?: boolean;
+  readonly microCompactorOptions?: MicroCompactorConfig;
 }
 
 export type CompactionOptions = MultiTierCompressorOptions;

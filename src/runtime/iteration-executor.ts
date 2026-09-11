@@ -820,16 +820,16 @@ export class IterationExecutor {
         goal.constraints.requireTdd ||
         goal.metadata?.['requireTdd'] ||
         goal.metadata?.['tddMode'] ||
-        (options as any)?.requireTdd ||
-        (options as any)?.tddMode,
+        options?.requireTdd ||
+        options?.tddMode,
       );
 
       if (isTddActive) {
         const kPass = Number(
           goal.metadata?.['tddKPass'] ??
           goal.metadata?.['tddKPassRepeats'] ??
-          (options as any)?.tddKPass ??
-          (options as any)?.tddKPassRepeats ??
+          options?.tddKPass ??
+          options?.tddKPassRepeats ??
           1,
         );
         const tddEnforcer = new TddEnforcer({ kPassRepeats: kPass });

@@ -198,6 +198,8 @@ export type { RealGitManagerOptions } from './git/real-git-manager.js';
 export { DefaultRollbackManager } from './git/default-rollback-manager.js';
 export { WorktreeIsolationManager } from './git/worktree-isolation-manager.js';
 export type { RolloutWorkspace } from './git/worktree-isolation-manager.js';
+export { WorktreeDockerBridge } from './git/worktree-docker-bridge.js';
+export type { WorktreeMountConfig, WorktreeDockerBridgeOptions } from './git/worktree-docker-bridge.js';
 
 // Subagent Subsystem
 export { DefaultSubagentManager } from './subagent/default-subagent-manager.js';
@@ -422,6 +424,8 @@ export { OjFeedbackIngester } from './eval/oj-feedback-ingester.js';
 export type { OjFeedbackPayload } from './eval/oj-feedback-ingester.js';
 export { TddEnforcer, TddPhase } from './verification/tdd-enforcer.js';
 export type { TddEvaluationResult, TddEnforcerOptions } from './verification/tdd-enforcer.js';
+export { PolyglotTestRunner, ProjectEcosystem } from './verification/polyglot-test-runner.js';
+export type { TestExecutionVerdict } from './verification/polyglot-test-runner.js';
 export { SweBenchTaskLoader } from './eval/swebench/index.js';
 export type {
   SweBenchInstance,
@@ -431,6 +435,14 @@ export type {
 } from './eval/swebench/index.js';
 export { ReplVisualizers } from './tui/repl-visualizers.js';
 export type { ContextEconomicsOptions } from './tui/repl-visualizers.js';
+export { CrossRolloutBlackboard, RolloutDistiller } from './eval/pdr/index.js';
+export type { RolloutFinding, BlackboardReport, DistillParams } from './eval/pdr/index.js';
+export {
+  FindDefinitionsTool,
+  FindReferencesTool,
+  GetOutlineTool,
+  createSemanticNavigationTools,
+} from './tools/semantic-navigation-tools.js';
 
 // MCP Transports & Transport Registry
 export { StdioTransport, HttpTransport } from './mcp/transports/index.js';

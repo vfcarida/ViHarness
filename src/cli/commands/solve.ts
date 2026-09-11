@@ -29,6 +29,9 @@ import { SourceCodeIndexer } from '../../infra/syntax/source-code-indexer.js';
 import { OjFeedbackIngester } from '../../infra/eval/oj-feedback-ingester.js';
 import { TddEnforcer } from '../../infra/verification/tdd-enforcer.js';
 import { ProjectRuleLoader } from '../../infra/config/project-rule-loader.js';
+import { WorktreeIsolationManager } from '../../infra/git/worktree-isolation-manager.js';
+import { RolloutSelector, type RolloutCandidate } from '../../infra/eval/rollout-selector.js';
+import { CrossRolloutBlackboard, RolloutDistiller } from '../../infra/eval/pdr/index.js';
 
 const IGNORED_SCAN_DIRS = new Set([
   '.git',
@@ -422,6 +425,7 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
     maxCpuTimeSec: parsed.maxCpuTimeSec,
     maxMemoryMb: parsed.maxMemoryMb,
     protectTests: parsed.protectTests,
+    enableSemanticNavigation: true,
   });
 
   const toolRegistry = new DefaultToolRegistry();
@@ -579,19 +583,113 @@ Guidelines for this workspace:
 
   // 7. Execute Runtime Loop
   try {
-    const result = await runtime.execute(goal, {
-      architectMode: parsed.architect,
-      requestTimeoutMs: parsed.requestTimeoutMs,
-      maxRetries: parsed.maxRetries,
-      reasoningEffort: parsed.reasoningEffort,
-      autoLintAfterWrite: parsed.autoLint,
-      autoRollback: parsed.autoRollback,
-      rollbackOnAnomaly: parsed.autoRollback,
-      promptCaching: parsed.promptCaching,
-      requireTdd: parsed.tdd,
-      tddKPass: parsed.tddKPass,
-      toolExecutor,
-    } as any);
+    let result;
+    if (parsed.rollouts > 1) {
+      logInfo(`Executing ${parsed.rollouts} speculative rollouts with Parallel-Distill-Refine (PDR)...`);
+      const isolationManager = new WorktreeIsolationManager();
+      const blackboard = new CrossRolloutBlackboard();
+      const candidates: RolloutCandidate[] = [];
+
+      for (let r = 1; r <= parsed.rollouts; r++) {
+        logInfo(`\n[PDR] Launching Speculative Rollout #${r}/${parsed.rollouts}...`);
+        const rolloutWs = await isolationManager.createRollout(workspacePath, String(r));
+        const pdrSection = blackboard.formatGuidancePrompt();
+
+        const rolloutPrompt = pdrSection ? `${fullPrompt}\n\n${pdrSection}` : fullPrompt;
+        const rolloutGoal: Goal = {
+          ...goal,
+          id: idFactory.create<'Goal'>(),
+          description: rolloutPrompt,
+          metadata: { ...goal.metadata, workspacePath: rolloutWs.path, rolloutIndex: r },
+        };
+
+        const rolloutTools = createWorkspaceTools(rolloutWs.path, {
+          idFactory,
+          sandbox: parsed.sandbox,
+          dockerImage: parsed.dockerImage,
+          strictCompilerCheck: parsed.strictCompiler,
+          protectTests: parsed.protectTests,
+          maxCpuTimeSec: parsed.maxCpuTimeSec,
+          maxMemoryMb: parsed.maxMemoryMb,
+          baseWorkspacePath: workspacePath,
+          enableSemanticNavigation: true,
+        });
+        const rolloutRegistry = new DefaultToolRegistry();
+        for (const t of rolloutTools) rolloutRegistry.register(t);
+        const rolloutExecutor = new DefaultToolExecutor({ registry: rolloutRegistry, idFactory });
+
+        const rolloutRes = await runtime.execute(rolloutGoal, {
+          architectMode: parsed.architect,
+          requestTimeoutMs: parsed.requestTimeoutMs,
+          maxRetries: parsed.maxRetries,
+          reasoningEffort: parsed.reasoningEffort,
+          autoLintAfterWrite: parsed.autoLint,
+          autoRollback: parsed.autoRollback,
+          rollbackOnAnomaly: parsed.autoRollback,
+          promptCaching: parsed.promptCaching,
+          requireTdd: parsed.tdd,
+          tddKPass: parsed.tddKPass,
+          toolExecutor: rolloutExecutor,
+        } as any);
+
+        const gitMgr = new RealGitManager({ workingDir: rolloutWs.path });
+        const diff = await gitMgr.getDiff().catch(() => '');
+        const finding = RolloutDistiller.distill({
+          rolloutIndex: r,
+          workspacePath: rolloutWs.path,
+          success: rolloutRes.success,
+          patch: diff,
+        });
+        blackboard.recordFinding(finding);
+
+        candidates.push({
+          rolloutId: `rollout-${r}`,
+          workspacePath: rolloutWs.path,
+          success: rolloutRes.success,
+          testPassRate: finding.testPassRate,
+          compilerWarningsCount: finding.compilerWarnings,
+          linesChanged: diff ? diff.split('\n').length : 0,
+          durationMs: 0,
+          patch: diff,
+        });
+
+        result = rolloutRes;
+        if (rolloutRes.success) {
+          logInfo(`Rollout #${r} achieved SUCCESS!`);
+          break;
+        }
+      }
+
+      const selection = RolloutSelector.selectBestRollout(candidates);
+      if (selection?.winner) {
+        logInfo(`Best-of-${parsed.rollouts} selected ${selection.winner.rolloutId}.`);
+        if (selection.winner.patch) {
+          try {
+            const tempPatch = path.join(workspacePath, '.pdr-best.patch');
+            fs.writeFileSync(tempPatch, selection.winner.patch, 'utf-8');
+            child_process.execSync(`git apply --whitespace=nowarn "${tempPatch}"`, { cwd: workspacePath, stdio: 'ignore' });
+            fs.unlinkSync(tempPatch);
+          } catch {
+            // Non-fatal if patch application fails
+          }
+        }
+      }
+      await isolationManager.cleanupAll(workspacePath);
+    } else {
+      result = await runtime.execute(goal, {
+        architectMode: parsed.architect,
+        requestTimeoutMs: parsed.requestTimeoutMs,
+        maxRetries: parsed.maxRetries,
+        reasoningEffort: parsed.reasoningEffort,
+        autoLintAfterWrite: parsed.autoLint,
+        autoRollback: parsed.autoRollback,
+        rollbackOnAnomaly: parsed.autoRollback,
+        promptCaching: parsed.promptCaching,
+        requireTdd: parsed.tdd,
+        tddKPass: parsed.tddKPass,
+        toolExecutor,
+      } as any);
+    }
 
     // 8. Optional Output Patch Export (SWE-bench / ProjDevBench format)
     if (parsed.outputPatch) {
@@ -629,6 +727,11 @@ Guidelines for this workspace:
       } catch (gitErr: any) {
         logError(`Git commit failed: ${gitErr?.message ?? String(gitErr)}`);
       }
+    }
+
+    if (!result) {
+      logError('Execution produced no result.');
+      return 1;
     }
 
     if (result.success) {

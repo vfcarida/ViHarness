@@ -29,6 +29,12 @@ import {
   DelegateSubtaskTool,
   type SubtaskRunnerFn,
 } from './builtin/delegate-subtask-tool.js';
+import {
+  FindDefinitionsTool,
+  FindReferencesTool,
+  GetOutlineTool,
+} from './semantic-navigation-tools.js';
+import { WorktreeDockerBridge, type WorktreeMountConfig } from '../git/worktree-docker-bridge.js';
 
 export type {
   SubtaskRunOptions,
@@ -53,6 +59,13 @@ export interface WorkspaceToolsOptions {
   readonly subtaskRunner?: SubtaskRunnerFn;
   readonly protectTests?: boolean;
   readonly testProtectionGate?: TestProtectionGate;
+  readonly enableSemanticNavigation?: boolean;
+  readonly baseWorkspacePath?: string;
+  readonly additionalMounts?: ReadonlyArray<{
+    hostPath: string;
+    containerPath: string;
+    readonly?: boolean;
+  }>;
 }
 
 function checkDockerCliAvailable(): boolean {
@@ -778,6 +791,12 @@ export class WorkspaceRunCommandTool implements Tool {
   private readonly persistentShell: boolean;
   private shellSession?: PersistentShellSession;
   private readonly ownsShellSession: boolean;
+  private readonly baseWorkspacePath?: string;
+  private readonly additionalMounts?: ReadonlyArray<{
+    hostPath: string;
+    containerPath: string;
+    readonly?: boolean;
+  }>;
 
   constructor(
     private readonly workspacePath: string,
@@ -793,6 +812,8 @@ export class WorkspaceRunCommandTool implements Tool {
     this.maxCpuTimeSec = options?.maxCpuTimeSec;
     this.maxMemoryMb = options?.maxMemoryMb;
     this.persistentShell = options?.persistentShell ?? false;
+    this.baseWorkspacePath = options?.baseWorkspacePath;
+    this.additionalMounts = options?.additionalMounts;
 
     if (options?.shellSession) {
       this.shellSession = options.shellSession;
@@ -1016,10 +1037,16 @@ export class WorkspaceRunCommandTool implements Tool {
     let executionCommand = command;
     let isDockerActive = false;
     let sandboxNotice = '';
+    let bridgeMounts: WorktreeMountConfig | undefined;
 
     if (this.sandbox === 'docker') {
       if (checkDockerCliAvailable()) {
         isDockerActive = true;
+        bridgeMounts = WorktreeDockerBridge.prepareMounts(this.workspacePath, {
+          dockerWorkdir: this.dockerWorkdir,
+          baseWorkspacePath: this.baseWorkspacePath,
+        });
+
         const hostMount = path.resolve(this.workspacePath).replace(/\\/g, '/');
         let innerCmd = command;
         if (this.maxMemoryMb) {
@@ -1029,7 +1056,15 @@ export class WorkspaceRunCommandTool implements Tool {
           innerCmd = `timeout --signal=KILL ${this.maxCpuTimeSec}s /bin/bash -c '${innerCmd.replace(/'/g, "'\\''")}'`;
         }
         const escapedCmd = innerCmd.replace(/'/g, "'\\''");
-        executionCommand = `docker run --rm -v "${hostMount}:${this.dockerWorkdir}" -w "${this.dockerWorkdir}" ${this.dockerImage} /bin/bash -c '${escapedCmd}'`;
+
+        const extraArgs = [...bridgeMounts.extraDockerArgs];
+        if (this.additionalMounts) {
+          for (const m of this.additionalMounts) {
+            extraArgs.push(`-v "${m.hostPath}:${m.containerPath}${m.readonly ? ':ro' : ''}"`);
+          }
+        }
+        const extraMountStr = extraArgs.length > 0 ? ' ' + extraArgs.join(' ') : '';
+        executionCommand = `docker run --rm -v "${hostMount}:${this.dockerWorkdir}"${extraMountStr} -w "${this.dockerWorkdir}" ${this.dockerImage} /bin/bash -c '${escapedCmd}'`;
       } else {
         sandboxNotice = '[Vi-Harness Sandbox Notice]: Docker is unavailable on host system, executed locally.\n';
       }
@@ -1057,6 +1092,7 @@ export class WorkspaceRunCommandTool implements Tool {
           maxBuffer: this.maxBufferBytes,
         },
         (error, stdout, stderr) => {
+          bridgeMounts?.cleanup?.();
           const durationMs = Date.now() - start;
           const exitCode = error ? (typeof (error as any).code === 'number' ? (error as any).code : 1) : 0;
           const isKilled = (error as any)?.killed ?? false;
@@ -1179,6 +1215,14 @@ export function createWorkspaceTools(
         runner: options.subtaskRunner,
         idFactory: options.idFactory,
       }),
+    );
+  }
+
+  if (options?.enableSemanticNavigation) {
+    tools.push(
+      new FindDefinitionsTool(resolvedPath, options?.idFactory),
+      new FindReferencesTool(resolvedPath, options?.idFactory),
+      new GetOutlineTool(resolvedPath, options?.idFactory),
     );
   }
 

@@ -10,6 +10,8 @@
  * - Prevents false-positive completions where an agent hallucinates a fix without testing it.
  */
 
+import { PolyglotTestRunner } from './polyglot-test-runner.js';
+
 export enum TddPhase {
   INITIAL = 'INITIAL',                         // No reproduction attempt yet
   REPRODUCER_CONFIRMED = 'REPRODUCER_CONFIRMED', // Reproducer ran and failed (Red phase verified)
@@ -114,7 +116,8 @@ export class TddEnforcer {
 
       if (isTestCmd) {
         // Did it fail?
-        const failed = exitCode !== 0 || (output && /\b(?:FAIL|FAILED|AssertionError|assert)\b/i.test(output));
+        const verdict = PolyglotTestRunner.parseVerdict(output ?? '', exitCode ?? 0);
+        const failed = !verdict.success;
 
         if (this.phase === TddPhase.INITIAL) {
           if (failed) {
@@ -258,8 +261,6 @@ export class TddEnforcer {
   }
 
   private isTestCommand(command: string): boolean {
-    return /\b(?:pytest|vitest|jest|ctest|npm\s+test|python(?:3)?\s+[\w./\\-]*repro[\w./\\-]*|node\s+[\w./\\-]*repro[\w./\\-]*|cargo\s+test|make\s+test|mvn\s+test|go\s+test)\b/i.test(
-      command,
-    );
+    return PolyglotTestRunner.isRecognizedTestCommand(command);
   }
 }

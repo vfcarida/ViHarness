@@ -189,6 +189,10 @@ export interface ExecutionOptions {
   readonly maxRetries?: number;
   readonly reasoningEffort?: 'low' | 'medium' | 'high';
   readonly promptCaching?: boolean; // Default true (Prefix caching with ephemeral breakpoints)
+  readonly requireTdd?: boolean;
+  readonly tddMode?: boolean;
+  readonly tddKPass?: number;
+  readonly tddKPassRepeats?: number;
 }
 
 export interface ExecutionResult {

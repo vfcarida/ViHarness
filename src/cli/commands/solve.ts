@@ -28,6 +28,7 @@ import { RealGitManager } from '../../infra/git/real-git-manager.js';
 import { SourceCodeIndexer } from '../../infra/syntax/source-code-indexer.js';
 import { OjFeedbackIngester } from '../../infra/eval/oj-feedback-ingester.js';
 import { TddEnforcer } from '../../infra/verification/tdd-enforcer.js';
+import { ProjectRuleLoader } from '../../infra/config/project-rule-loader.js';
 
 const IGNORED_SCAN_DIRS = new Set([
   '.git',
@@ -148,6 +149,9 @@ export interface SolveCliArgs {
   maxMemoryMb?: number;
   ingestFeedback?: string;
   tdd: boolean;
+  tddKPass: number;
+  protectTests: boolean;
+  rollouts: number;
   help: boolean;
 }
 
@@ -177,6 +181,9 @@ OPTIONS:
   --prompt-caching / --no-prompt-caching  Enable static prefix prompt caching breakpoints (default: true)
   --strict-compiler / --no-strict-compiler  Treat compiler warnings as fatal errors (ACMOJ / SWE-bench strict gate, default: false)
   --tdd / --no-tdd                Enforce autonomous Test-Driven Development (Red-Green reproducer verification, default: false)
+  --tdd-k-pass <n>                Require K consecutive passing runs of the reproducer to rule out flakiness (default: 1)
+  --protect-tests / --no-protect-tests  Protect test suites and test configurations against reward hacking (default: false)
+  --rollouts <n>                  Number of speculative rollouts to explore via git worktree (default: 1)
   --max-cpu-time-sec <sec>        Limit execution time for local commands (detects TLE)
   --max-memory-mb <mb>            Limit virtual memory for local commands (detects MLE)
   --ingest-feedback <file|json>   Ingest external Online Judge (ACMOJ / SWE-bench) verdict/log for targeted repair
@@ -196,6 +203,7 @@ ENVIRONMENT VARIABLES:
   MODEL_ID, OPENAI_MODEL                    Default model ID
   VI_HARNESS_STRICT_COMPILER                Default strict compiler enforcement (true/false)
   VI_HARNESS_TDD_MODE                       Default TDD mode enforcement (true/false)
+  VI_HARNESS_TDD_K_PASS                     Default K-pass repeats for TDD verification (1..10)
   VI_HARNESS_MAX_CPU_TIME_SEC               Default CPU time limit in seconds
   VI_HARNESS_MAX_MEMORY_MB                  Default virtual memory limit in MB
 `);
@@ -221,6 +229,9 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
     promptCaching: true,
     strictCompiler: process.env['VI_HARNESS_STRICT_COMPILER'] === 'true' || false,
     tdd: process.env['VI_HARNESS_TDD_MODE'] === 'true' || false,
+    tddKPass: parseInt(process.env['VI_HARNESS_TDD_K_PASS'] ?? '1', 10) || 1,
+    protectTests: process.env['VI_HARNESS_PROTECT_TESTS'] === 'true' || false,
+    rollouts: 1,
     maxCpuTimeSec: process.env['VI_HARNESS_MAX_CPU_TIME_SEC']
       ? parseInt(process.env['VI_HARNESS_MAX_CPU_TIME_SEC'], 10)
       : undefined,
@@ -291,6 +302,14 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
       result.tdd = true;
     } else if (arg === '--no-tdd') {
       result.tdd = false;
+    } else if (arg === '--tdd-k-pass' && i + 1 < args.length) {
+      result.tddKPass = Math.max(1, Math.min(10, parseInt(args[++i]!, 10) || 1));
+    } else if (arg === '--protect-tests') {
+      result.protectTests = true;
+    } else if (arg === '--no-protect-tests') {
+      result.protectTests = false;
+    } else if (arg === '--rollouts' && i + 1 < args.length) {
+      result.rollouts = Math.max(1, parseInt(args[++i]!, 10) || 1);
     } else if (arg === '--max-cpu-time-sec' && i + 1 < args.length) {
       result.maxCpuTimeSec = parseInt(args[++i]!, 10);
     } else if (arg === '--max-memory-mb' && i + 1 < args.length) {
@@ -402,6 +421,7 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
     strictCompilerCheck: parsed.strictCompiler,
     maxCpuTimeSec: parsed.maxCpuTimeSec,
     maxMemoryMb: parsed.maxMemoryMb,
+    protectTests: parsed.protectTests,
   });
 
   const toolRegistry = new DefaultToolRegistry();
@@ -504,12 +524,26 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
     }
   }
 
-  const tddSection = parsed.tdd ? `\n\n${TddEnforcer.getGuidanceContract()}` : '';
+  let projectRulesSection = '';
+  try {
+    const ruleLoader = new ProjectRuleLoader();
+    const rulesRes = await ruleLoader.loadRules(workspacePath);
+    if (rulesRes.formattedPrompt) {
+      projectRulesSection = `\n\n${rulesRes.formattedPrompt}`;
+      logInfo(
+        `Loaded ${rulesRes.rules.length} project instruction rule file(s) (${rulesRes.totalCharacters} chars).`,
+      );
+    }
+  } catch {
+    // Non-fatal if rule discovery fails
+  }
+
+  const tddSection = parsed.tdd ? `\n\n${TddEnforcer.getGuidanceContract(parsed.tddKPass)}` : '';
 
   // 7. Build Task Prompt with Contract Guidelines
   const fullPrompt = `Task Instructions:
 ${parsed.prompt}
-${repoMapSection}${feedbackSection}${tddSection}
+${repoMapSection}${projectRulesSection}${feedbackSection}${tddSection}
 
 Guidelines for this workspace:
 1. First, inspect the workspace using 'list_directory' and 'read_file' to understand existing files, declarations, and structure.
@@ -539,6 +573,7 @@ Guidelines for this workspace:
       workspacePath,
       cliInvocation: true,
       requireTdd: parsed.tdd,
+      tddKPass: parsed.tddKPass,
     },
   };
 
@@ -554,6 +589,7 @@ Guidelines for this workspace:
       rollbackOnAnomaly: parsed.autoRollback,
       promptCaching: parsed.promptCaching,
       requireTdd: parsed.tdd,
+      tddKPass: parsed.tddKPass,
       toolExecutor,
     } as any);
 

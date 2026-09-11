@@ -17,6 +17,12 @@ export { EnvConfiguration } from './config/env-configuration.js';
 export type { EnvConfigurationOptions } from './config/env-configuration.js';
 export { ConfigSchemaValidator, RuntimeConfigSchema } from './config/config-schema.js';
 export type { RuntimeConfig } from './config/config-schema.js';
+export { ProjectRuleLoader } from './config/project-rule-loader.js';
+export type {
+  LoadedRule,
+  ProjectRulesResult,
+  ProjectRuleLoaderOptions,
+} from './config/project-rule-loader.js';
 
 // Model Providers & Resilience
 export { MockModelProvider } from './model/mock-model-provider.js';
@@ -157,6 +163,12 @@ export { SecretScrubber } from './security/secret-scrubber.js';
 export { scrubEnv, SENSITIVE_PATTERNS, SecureTempManager } from './security/env-scrubber.js';
 export { PathValidator } from './security/path-validator.js';
 export type { PathValidationResult } from './security/path-validator.js';
+export {
+  TestProtectionGate,
+  DEFAULT_PROTECTED_TEST_PATTERNS,
+  DEFAULT_ALLOWED_REPRODUCER_PATTERNS,
+} from './security/test-protection-gate.js';
+export type { TestProtectionGateOptions } from './security/test-protection-gate.js';
 export { RiskClassifier } from './security/risk-classifier.js';
 export { CredentialProtectionRule } from './security/rules/credential-protection-rule.js';
 export { PathRestrictionRule } from './security/rules/path-restriction-rule.js';
@@ -184,6 +196,8 @@ export type { DefaultGitManagerOptions } from './git/default-git-manager.js';
 export { RealGitManager } from './git/real-git-manager.js';
 export type { RealGitManagerOptions } from './git/real-git-manager.js';
 export { DefaultRollbackManager } from './git/default-rollback-manager.js';
+export { WorktreeIsolationManager } from './git/worktree-isolation-manager.js';
+export type { RolloutWorkspace } from './git/worktree-isolation-manager.js';
 
 // Subagent Subsystem
 export { DefaultSubagentManager } from './subagent/default-subagent-manager.js';
@@ -226,6 +240,12 @@ export type { PiHarnessAdapterRunnerOptions } from './eval/pi-harness-adapter-ru
 export { MarkdownReportGenerator } from './eval/markdown-report-generator.js';
 export { DefaultBenchmarkRunner } from './eval/default-benchmark-runner.js';
 export type { DefaultBenchmarkRunnerOptions } from './eval/default-benchmark-runner.js';
+export { RolloutSelector } from './eval/rollout-selector.js';
+export type {
+  RolloutCandidate,
+  CandidateEvaluation,
+  RolloutSelectionResult,
+} from './eval/rollout-selector.js';
 export { DualModelCostEvaluator } from './eval/dual-model-cost-evaluator.js';
 export type {
   DualModelEvaluationReport,
@@ -401,7 +421,16 @@ export type { TerminalToolOptions } from './tools/terminal-tool.js';
 export { OjFeedbackIngester } from './eval/oj-feedback-ingester.js';
 export type { OjFeedbackPayload } from './eval/oj-feedback-ingester.js';
 export { TddEnforcer, TddPhase } from './verification/tdd-enforcer.js';
-export type { TddEvaluationResult } from './verification/tdd-enforcer.js';
+export type { TddEvaluationResult, TddEnforcerOptions } from './verification/tdd-enforcer.js';
+export { SweBenchTaskLoader } from './eval/swebench/index.js';
+export type {
+  SweBenchInstance,
+  SweBenchFilterOptions,
+  SweBenchPrediction,
+  SweBenchConversionOptions,
+} from './eval/swebench/index.js';
+export { ReplVisualizers } from './tui/repl-visualizers.js';
+export type { ContextEconomicsOptions } from './tui/repl-visualizers.js';
 
 // MCP Transports & Transport Registry
 export { StdioTransport, HttpTransport } from './mcp/transports/index.js';

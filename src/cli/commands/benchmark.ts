@@ -15,6 +15,8 @@ import {
   CANONICAL_BASELINE_SUITE,
   ViHarnessAdapterRunner,
   PiHarnessAdapterRunner,
+  SweBenchTaskLoader,
+  type SweBenchInstance,
 } from '../../infra/index.js';
 
 export type BenchmarkSuiteType =
@@ -169,7 +171,62 @@ export async function runBenchmarkCli(args: string[] = process.argv.slice(2)): P
     return 0;
   }
 
-  // Canonical & SWE-bench Comparative Benchmark Execution
+  if (parsed.suite === 'swe-bench') {
+    const datasetPath = parsed.tasks ?? path.resolve(process.cwd(), 'swe-bench.jsonl');
+    let instances: SweBenchInstance[] = [];
+
+    if (fs.existsSync(datasetPath)) {
+      const stat = fs.statSync(datasetPath);
+      instances = stat.isDirectory()
+        ? await SweBenchTaskLoader.loadFromDirectory(datasetPath, {
+            limit: parsed.limit,
+            repo: parsed.category,
+          })
+        : await SweBenchTaskLoader.loadFromFile(datasetPath, {
+            limit: parsed.limit,
+            repo: parsed.category,
+          });
+    }
+
+    console.log('='.repeat(72));
+    console.log(' VI-HARNESS SWE-BENCH BENCHMARK RUNNER');
+    console.log('='.repeat(72));
+    console.log(`Dataset Path   : ${datasetPath} (${instances.length} instance(s) loaded)`);
+    console.log(`Model          : ${parsed.providerId}/${parsed.modelId}`);
+    console.log(`Dry Run        : ${parsed.dryRun ? 'YES (inspection only)' : 'NO'}`);
+    console.log(`Output Dir     : ${parsed.outputDir}`);
+    console.log('='.repeat(72));
+
+    if (instances.length === 0) {
+      console.log(
+        `\n⚠️ No SWE-bench instances found at: ${datasetPath}.\n` +
+          `Provide a valid JSON/JSONL dataset file or directory using '--tasks <path>'.\n` +
+          `Example: vi-harness bench --suite swe-bench --tasks ./swe-bench-lite.jsonl --dry-run\n`,
+      );
+      return 0;
+    }
+
+    if (parsed.dryRun) {
+      console.log(`\nDry-run mode: Discovered ${instances.length} SWE-bench instance(s):`);
+      for (const inst of instances) {
+        const failTests = SweBenchTaskLoader.parseTestList(inst.FAIL_TO_PASS);
+        const snippet = inst.problem_statement.replace(/\s+/g, ' ').slice(0, 80);
+        console.log(` - [${inst.instance_id}] (${inst.repo}) [F2P: ${failTests.length} tests]: ${snippet}...`);
+      }
+      return 0;
+    }
+
+    // Export dataset summary and predictions template
+    if (!fs.existsSync(parsed.outputDir)) {
+      fs.mkdirSync(parsed.outputDir, { recursive: true });
+    }
+    const manifestPath = path.join(parsed.outputDir, 'swebench-instances.json');
+    fs.writeFileSync(manifestPath, JSON.stringify(instances, null, 2), 'utf-8');
+    console.log(`\n📄 Manifest of ${instances.length} SWE-bench tasks written to: ${manifestPath}`);
+    return 0;
+  }
+
+  // Canonical Comparative Benchmark Execution
   console.log('='.repeat(72));
   console.log(` VI-HARNESS BENCHMARK RUNNER [Suite: ${parsed.suite.toUpperCase()}]`);
   console.log('='.repeat(72));

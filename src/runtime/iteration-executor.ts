@@ -825,7 +825,14 @@ export class IterationExecutor {
       );
 
       if (isTddActive) {
-        const tddEnforcer = new TddEnforcer();
+        const kPass = Number(
+          goal.metadata?.['tddKPass'] ??
+          goal.metadata?.['tddKPassRepeats'] ??
+          (options as any)?.tddKPass ??
+          (options as any)?.tddKPassRepeats ??
+          1,
+        );
+        const tddEnforcer = new TddEnforcer({ kPassRepeats: kPass });
         for (const it of iterationsSoFar) {
           for (const r of it.toolResults) {
             tddEnforcer.recordAction({
@@ -858,6 +865,9 @@ export class IterationExecutor {
             data: {
               tddPhase: tddEval.phase,
               reproCommand: tddEval.reproCommand,
+              consecutivePasses: tddEval.consecutivePasses,
+              requiredPasses: tddEval.requiredPasses,
+              flakinessDetected: tddEval.flakinessDetected,
             },
             createdAt: now,
             pass: false,
@@ -877,16 +887,22 @@ export class IterationExecutor {
             data: { evidence: ev },
           });
         } else {
+          const kPassSummary = (tddEval.requiredPasses ?? 1) > 1
+            ? ` (K-Pass Verified: ${tddEval.consecutivePasses}/${tddEval.requiredPasses} consecutive clean runs)`
+            : '';
           const ev: Evidence = {
             id: idFactory.create<'Evidence'>(),
             taskId: task.id,
             type: EvidenceType.TEST_RESULT,
             outcome: EvidenceOutcome.PASS,
-            summary: `TDD_VERIFIED: Autonomous Red-Green reproduction confirmed with test: ${tddEval.reproCommand ?? 'reproducer'}`,
+            summary: `TDD_VERIFIED: Autonomous Red-Green reproduction confirmed with test: ${tddEval.reproCommand ?? 'reproducer'}${kPassSummary}`,
             data: {
               status: 'COMPLETED',
               tddPhase: tddEval.phase,
               reproCommand: tddEval.reproCommand,
+              consecutivePasses: tddEval.consecutivePasses,
+              requiredPasses: tddEval.requiredPasses,
+              flakinessDetected: tddEval.flakinessDetected,
             },
             createdAt: now,
             pass: true,

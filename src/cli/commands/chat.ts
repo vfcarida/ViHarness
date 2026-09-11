@@ -22,6 +22,8 @@ import { UtilityModelRouter } from '../../infra/router/utility-model-router.js';
 import { OpenAICompatibleProvider } from '../../infra/model/openai-compatible-provider.js';
 import { MockModelProvider } from '../../infra/model/mock-model-provider.js';
 import { TerminalDashboardRenderer, type DashboardState } from '../../infra/tui/terminal-dashboard-renderer.js';
+import { ReplVisualizers } from '../../infra/tui/repl-visualizers.js';
+import { ProjectRuleLoader } from '../../infra/config/project-rule-loader.js';
 import { RealGitManager } from '../../infra/git/real-git-manager.js';
 import { GoalStatus, type Goal } from '../../core/model/goal.js';
 import { AgentEventType, type AgentEvent } from '../../core/model/runtime-types.js';
@@ -112,6 +114,9 @@ OPTIONS:
 
 SLASH COMMANDS (within chat):
   /help                         Show available slash commands
+  /context                      Visualize token economics, context window, and cache usage
+  /rules                        Inspect active project instruction rules (VI.md, CLAUDE.md, AGENTS.md)
+  /tree [depth]                 Display repository directory tree and file size footprint (default depth: 2)
   /diff                         Show uncommitted git changes in the workspace
   /undo                         Revert uncommitted modifications in the workspace
   /model <model-id>             Switch active model on the fly
@@ -263,6 +268,9 @@ Type /help for slash commands or /exit to quit.
         if (lowerCmd === '/help') {
           console.log(`
 Available Slash Commands:
+  /context              Visualize token economics, context window, and cache usage
+  /rules                Inspect active project instruction rules (VI.md, CLAUDE.md, AGENTS.md)
+  /tree [depth]         Display repository directory tree and file size footprint (default depth: 2)
   /diff                 Show current git diff of changes in workspace
   /undo                 Revert uncommitted modifications in the workspace
   /model <model_id>     Switch the active language model dynamically
@@ -355,6 +363,46 @@ Estimated Cost (USD) : $${totalSessionCostDollars.toFixed(5)}
         if (lowerCmd === '/compact') {
           conversationHistory.length = 0;
           console.log('🧹 Multi-turn conversation context cleared.');
+          continue;
+        }
+
+        if (lowerCmd === '/context') {
+          let ruleChars = 0;
+          try {
+            const rules = await ProjectRuleLoader.loadRules(workspacePath);
+            ruleChars = rules.totalCharacters;
+          } catch {
+            // Non-fatal
+          }
+          console.log(
+            '\n' +
+              ReplVisualizers.renderContextEconomics({
+                modelId: currentModelId,
+                promptTokens: totalSessionPromptTokens,
+                completionTokens: totalSessionCompletionTokens,
+                cachedTokens: totalSessionCachedTokens,
+                costDollars: totalSessionCostDollars,
+                historyTurnCount: conversationHistory.length,
+                rulesCharCount: ruleChars,
+              }),
+          );
+          continue;
+        }
+
+        if (lowerCmd === '/rules') {
+          try {
+            const rulesRes = await ProjectRuleLoader.loadRules(workspacePath);
+            console.log('\n' + ReplVisualizers.renderProjectRules(rulesRes, workspacePath));
+          } catch (err: any) {
+            console.error(`Failed to load project rules: ${err?.message ?? String(err)}`);
+          }
+          continue;
+        }
+
+        if (lowerCmd === '/tree') {
+          const depthArg = parseInt(cmdArgs[0] ?? '2', 10);
+          const maxDepth = isNaN(depthArg) || depthArg < 1 ? 2 : Math.min(depthArg, 5);
+          console.log('\n' + ReplVisualizers.renderDirectoryTree(workspacePath, maxDepth));
           continue;
         }
 

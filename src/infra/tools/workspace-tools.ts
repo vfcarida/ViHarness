@@ -24,6 +24,7 @@ import { HarnessError } from '../../core/errors/base-error.js';
 import { ErrorCode, ErrorCategory } from '../../core/errors/error-codes.js';
 import { StrictCompilerGate } from '../verification/strict-compiler-gate.js';
 import { PersistentShellSession } from './persistent-shell-session.js';
+import { TestProtectionGate } from '../security/test-protection-gate.js';
 import {
   DelegateSubtaskTool,
   type SubtaskRunnerFn,
@@ -50,6 +51,8 @@ export interface WorkspaceToolsOptions {
   readonly shellSession?: PersistentShellSession;
   readonly enableDelegation?: boolean;
   readonly subtaskRunner?: SubtaskRunnerFn;
+  readonly protectTests?: boolean;
+  readonly testProtectionGate?: TestProtectionGate;
 }
 
 function checkDockerCliAvailable(): boolean {
@@ -278,10 +281,15 @@ export class WorkspaceWriteFileTool implements Tool {
     },
   };
 
+  private readonly testProtectionGate?: TestProtectionGate;
+
   constructor(
     private readonly workspacePath: string,
     private readonly idFactory?: IdFactory,
-  ) {}
+    testProtectionGate?: TestProtectionGate,
+  ) {
+    this.testProtectionGate = testProtectionGate;
+  }
 
   async execute(input: ToolInput, context: ToolExecutionContext): Promise<ToolResult> {
     const start = Date.now();
@@ -291,6 +299,20 @@ export class WorkspaceWriteFileTool implements Tool {
 
     try {
       const filePath = sanitizeWorkspacePath(this.workspacePath, rawPath);
+      if (this.testProtectionGate?.isProtected(rawPath, this.workspacePath)) {
+        return {
+          toolCallId: callId,
+          name: this.definition.name,
+          success: false,
+          output: this.testProtectionGate.getRejectionFeedback(rawPath),
+          durationMs: Date.now() - start,
+          error: 'PROTECTED_TEST_FILE_MUTATION_DENIED',
+          metadata: {
+            path: rawPath,
+            code: 'PROTECTED_TEST_FILE_MUTATION_DENIED',
+          },
+        };
+      }
       const parentDir = path.dirname(filePath);
       if (!fs.existsSync(parentDir)) {
         fs.mkdirSync(parentDir, { recursive: true });
@@ -355,10 +377,15 @@ export class WorkspaceEditFileTool implements Tool {
     },
   };
 
+  private readonly testProtectionGate?: TestProtectionGate;
+
   constructor(
     private readonly workspacePath: string,
     private readonly idFactory?: IdFactory,
-  ) {}
+    testProtectionGate?: TestProtectionGate,
+  ) {
+    this.testProtectionGate = testProtectionGate;
+  }
 
   async execute(input: ToolInput, context: ToolExecutionContext): Promise<ToolResult> {
     const start = Date.now();
@@ -392,6 +419,20 @@ export class WorkspaceEditFileTool implements Tool {
 
     try {
       const filePath = sanitizeWorkspacePath(this.workspacePath, rawPath);
+      if (this.testProtectionGate?.isProtected(rawPath, this.workspacePath)) {
+        return {
+          toolCallId: callId,
+          name: this.definition.name,
+          success: false,
+          output: this.testProtectionGate.getRejectionFeedback(rawPath),
+          durationMs: Date.now() - start,
+          error: 'PROTECTED_TEST_FILE_MUTATION_DENIED',
+          metadata: {
+            path: rawPath,
+            code: 'PROTECTED_TEST_FILE_MUTATION_DENIED',
+          },
+        };
+      }
       if (!fs.existsSync(filePath)) {
         return {
           toolCallId: callId,
@@ -1118,10 +1159,14 @@ export function createWorkspaceTools(
   options?: WorkspaceToolsOptions,
 ): Tool[] {
   const resolvedPath = path.resolve(workspacePath);
+  const testProtectionGate =
+    options?.testProtectionGate ??
+    (options?.protectTests ? new TestProtectionGate({ enabled: true }) : undefined);
+
   const tools: Tool[] = [
     new WorkspaceReadFileTool(resolvedPath, options?.idFactory),
-    new WorkspaceWriteFileTool(resolvedPath, options?.idFactory),
-    new WorkspaceEditFileTool(resolvedPath, options?.idFactory),
+    new WorkspaceWriteFileTool(resolvedPath, options?.idFactory, testProtectionGate),
+    new WorkspaceEditFileTool(resolvedPath, options?.idFactory, testProtectionGate),
     new WorkspaceRevertFileTool(resolvedPath, options?.idFactory),
     new WorkspaceListDirectoryTool(resolvedPath, options?.idFactory),
     new WorkspaceRunCommandTool(resolvedPath, options),

@@ -102,6 +102,84 @@ export class SkillExtractor {
   }
 
   /**
+   * Analyzes a failed or terminated execution trajectory and extracts a structured
+   * failure lesson / anti-pattern record so recurring failures feed the evolution proposer.
+   */
+  async extractFailurePatternFromExecution(
+    execution: ExecutionResult,
+    taskDescription: string,
+    goalDescription: string,
+  ): Promise<MemoryRecord | null> {
+    if (execution.success && execution.status === 'COMPLETED') {
+      return null;
+    }
+
+    const problemType = this.inferProblemType(taskDescription, goalDescription);
+    const failedTools = new Set<string>();
+    const phasesVisited = new Set<string>();
+
+    for (const it of execution.iterations) {
+      phasesVisited.add(String(it.stateBefore));
+      phasesVisited.add(String(it.stateAfter));
+      if (it.toolResults) {
+        for (const res of it.toolResults) {
+          const isSuccess =
+            (res as any).success === true || String((res as any).status) === 'SUCCESS';
+          if (!isSuccess) {
+            const name = String(
+              res.metadata?.['toolName'] ??
+                (res as any).name ??
+                (res as any).action?.toolName ??
+                'unknown_tool',
+            );
+            failedTools.add(name);
+          }
+        }
+      }
+    }
+
+    const failedToolsList = Array.from(failedTools).sort();
+    const phasesList = Array.from(phasesVisited);
+    const failureSummary =
+      execution.summary || `Terminated with status ${execution.status} after ${execution.iterationCount} iterations`;
+
+    const patternContent =
+      `When facing problem type '${problemType}': Execution failed (${execution.status}) after ${execution.iterationCount} iteration(s). ` +
+      `Summary: '${failureSummary}'. Failing tools: [${failedToolsList.join(', ') || 'none'}]. Phases: [${phasesList.join(' -> ')}].`;
+
+    return this.memoryStore.createRecord({
+      id: this.idFactory.create<'Memory'>(),
+      tier: MemoryTier.PROCEDURAL,
+      type: MemoryType.PATTERN,
+      content: patternContent,
+      source: `failure_analysis:execution_${execution.executionId}`,
+      confidence: 0.85,
+      importance: 0.8,
+      scope: MemoryScope.REPOSITORY,
+      topic: `failure_pattern_${problemType.toLowerCase()}`,
+      status: MemoryStatus.ACTIVE,
+      tags: [
+        'failure_pattern',
+        'anti_pattern',
+        'self_improvement',
+        problemType.toLowerCase(),
+      ],
+      metadata: {
+        useCount: 0,
+        isFailurePattern: true,
+        problemType,
+        status: execution.status,
+        iterationCount: execution.iterationCount,
+        failedTools: failedToolsList,
+        phasesVisited: phasesList,
+        totalCostDollars: execution.totalCostDollars,
+        executionId: execution.executionId,
+        extractedAt: this.clock.now().toISOString(),
+      },
+    });
+  }
+
+  /**
    * Record that a learned pattern skill was used, incrementing its useCount and access count.
    */
   async recordUsage(memoryId: MemoryId): Promise<MemoryRecord | null> {

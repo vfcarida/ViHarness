@@ -335,4 +335,114 @@ describe('Vi-Harness Solve CLI Suite', () => {
 
     expect(exitCode).toBe(1);
   });
+
+  it('17. parseSolveArgs: Parses --no-tui, -q, --quiet, and --raw flags', () => {
+    const parsedNoTui = parseSolveArgs(['-p', 'task', '--no-tui']);
+    expect(parsedNoTui.noTui).toBe(true);
+    expect(parsedNoTui.quiet).toBe(false);
+
+    const parsedQuiet = parseSolveArgs(['-p', 'task', '--quiet']);
+    expect(parsedQuiet.quiet).toBe(true);
+    expect(parsedQuiet.noTui).toBe(true);
+
+    const parsedQ = parseSolveArgs(['-p', 'task', '-q']);
+    expect(parsedQ.quiet).toBe(true);
+    expect(parsedQ.noTui).toBe(true);
+
+    const parsedRaw = parseSolveArgs(['-p', 'task', '--raw']);
+    expect(parsedRaw.noTui).toBe(true);
+    expect(parsedRaw.mode).toBe('text');
+  });
+
+  it('18. parseSolveArgs: Honors VI_HARNESS_NO_TUI and VI_HARNESS_QUIET environment variables', () => {
+    const originalNoTui = process.env['VI_HARNESS_NO_TUI'];
+    const originalQuiet = process.env['VI_HARNESS_QUIET'];
+
+    try {
+      process.env['VI_HARNESS_NO_TUI'] = 'true';
+      const parsedEnvNoTui = parseSolveArgs(['-p', 'task']);
+      expect(parsedEnvNoTui.noTui).toBe(true);
+      expect(parsedEnvNoTui.quiet).toBe(false);
+
+      delete process.env['VI_HARNESS_NO_TUI'];
+      process.env['VI_HARNESS_QUIET'] = 'true';
+      const parsedEnvQuiet = parseSolveArgs(['-p', 'task']);
+      expect(parsedEnvQuiet.quiet).toBe(true);
+      expect(parsedEnvQuiet.noTui).toBe(true);
+    } finally {
+      if (originalNoTui !== undefined) {
+        process.env['VI_HARNESS_NO_TUI'] = originalNoTui;
+      } else {
+        delete process.env['VI_HARNESS_NO_TUI'];
+      }
+      if (originalQuiet !== undefined) {
+        process.env['VI_HARNESS_QUIET'] = originalQuiet;
+      } else {
+        delete process.env['VI_HARNESS_QUIET'];
+      }
+    }
+  });
+
+  it('19. Headless Execution with --no-tui: Outputs formatted text without emojis or ANSI box borders', async () => {
+    const logs: string[] = [];
+    const originalLog = console.log;
+    console.log = (...args: any[]) => {
+      logs.push(args.map((a) => String(a)).join(' '));
+    };
+
+    try {
+      const exitCode = await runSolveCli([
+        '-p',
+        'Headless no-tui execution test',
+        '--cwd',
+        tempDir,
+        '--provider-id',
+        'mock',
+        '--no-tui',
+        '--max-iterations',
+        '2',
+      ]);
+
+      expect(exitCode).toBe(0);
+      const combined = logs.join('\n');
+      expect(combined).toContain('[TASK_START]');
+      expect(combined).toContain('[SUCCESS]');
+      expect(combined).not.toContain('🚀');
+      expect(combined).not.toContain('🎉');
+    } finally {
+      console.log = originalLog;
+    }
+  });
+
+  it('20. Headless Execution with --quiet: Suppresses initialization banners and outputs concise single-line tags', async () => {
+    const logs: string[] = [];
+    const originalLog = console.log;
+    console.log = (...args: any[]) => {
+      logs.push(args.map((a) => String(a)).join(' '));
+    };
+
+    try {
+      const exitCode = await runSolveCli([
+        '-p',
+        'Headless quiet execution test',
+        '--cwd',
+        tempDir,
+        '--provider-id',
+        'mock',
+        '--quiet',
+        '--max-iterations',
+        '2',
+      ]);
+
+      expect(exitCode).toBe(0);
+      const combined = logs.join('\n');
+      expect(combined).toContain('[START]');
+      expect(combined).toContain('[DONE]');
+      expect(combined).not.toContain('[vi-harness] Initializing solve agent');
+      expect(combined).not.toContain('🚀');
+    } finally {
+      console.log = originalLog;
+    }
+  });
 });
+

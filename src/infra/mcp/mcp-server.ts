@@ -17,6 +17,10 @@ import type {
 
 import type { IdFactory } from '../../core/types/identifiers.js';
 import { UuidV7IdFactory } from '../id/uuid-id-factory.js';
+import {
+  registerEvolutionMcpTools,
+  type EvolutionMcpToolsOptions,
+} from '../evolution/evolution-mcp-tools.js';
 
 export interface McpServerOptions {
   readonly serverName?: string;
@@ -25,6 +29,8 @@ export interface McpServerOptions {
   readonly toolExecutor?: ToolExecutor;
   readonly contextStore?: ContextStore;
   readonly idFactory?: IdFactory;
+  readonly enableEvolutionTools?: boolean;
+  readonly evolutionToolsOptions?: EvolutionMcpToolsOptions;
 }
 
 export class McpServer {
@@ -42,6 +48,10 @@ export class McpServer {
     this.toolExecutor = options.toolExecutor;
     this.contextStore = options.contextStore;
     this.idFactory = options.idFactory ?? new UuidV7IdFactory();
+
+    if (options.enableEvolutionTools) {
+      registerEvolutionMcpTools(this.toolRegistry, options.evolutionToolsOptions);
+    }
   }
 
   /**

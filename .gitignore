@@ -8,3 +8,5 @@ coverage/
 .DS_Store
 Thumbs.db
 benchmark-results/
+.vi-evolution/
+.vi-traces/

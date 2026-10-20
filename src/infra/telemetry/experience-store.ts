@@ -18,76 +18,26 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import type { IterationTraceRecord } from '../../core/model/trace-types.js';
-import type { ExecutionResult } from '../../core/model/runtime-types.js';
 import type { Clock } from '../../core/interfaces/clock.js';
 import type { IdFactory } from '../../core/types/identifiers.js';
-import type { HarnessRecommendation } from './harness-diagnostic-engine.js';
+import type {
+  RunIndexEntry,
+  RunRecord,
+  RecordRunParams,
+  RunTraceData,
+  AutoTuneDecision,
+  ExperienceStore,
+} from '../../core/interfaces/experience-store.js';
 import { SystemClock } from '../time/system-clock.js';
 
-export interface RunIndexEntry {
-  readonly runId: string;
-  readonly goalId?: string;
-  readonly taskId?: string;
-  readonly goalDescription: string;
-  readonly timestamp: string;
-  readonly success: boolean;
-  readonly status: string;
-  readonly totalTokens: number;
-  readonly totalCostDollars: number;
-  readonly iterationCount: number;
-  readonly finalPhase: string;
-  readonly durationMs: number;
-  readonly runDir: string;
-}
-
-export interface RunRecord {
-  readonly indexEntry: RunIndexEntry;
-  readonly harnessConfig: Record<string, unknown>;
-  readonly traces: ReadonlyArray<IterationTraceRecord>;
-  readonly scores: Record<string, unknown>;
-  readonly summaryMarkdown: string;
-}
-
-export interface RecordRunParams {
-  readonly runId: string;
-  readonly goalId?: string;
-  readonly taskId?: string;
-  readonly goalDescription: string;
-  readonly executionResult: ExecutionResult;
-  readonly harnessConfig: Record<string, unknown>;
-  readonly traceRecords?: ReadonlyArray<IterationTraceRecord>;
-  readonly summaryMarkdown?: string;
-}
-
-export interface RunTraceData {
-  readonly runId: string;
-  readonly goalDescription: string;
-  readonly success: boolean;
-  readonly finalPhase: string;
-  readonly durationMs: number;
-  readonly harnessConfig: Record<string, unknown>;
-  readonly traces: ReadonlyArray<IterationTraceRecord>;
-  readonly scores: Record<string, unknown>;
-}
-
-export interface AutoTuneDecision {
-  readonly decisionId: string;
-  readonly timestamp: string;
-  readonly recommendation: HarnessRecommendation;
-  readonly applied: boolean;
-  readonly previousConfig: Record<string, unknown>;
-  readonly updatedConfig: Record<string, unknown>;
-}
-
-export interface ExperienceStore {
-  readonly baseDir: string;
-  recordRun(params: RecordRunParams): Promise<RunRecord>;
-  getRun(runId: string): Promise<RunRecord | null>;
-  listRuns(limit?: number): Promise<ReadonlyArray<RunIndexEntry>>;
-  getRecentTraces(lastN?: number): Promise<ReadonlyArray<RunTraceData>>;
-  logTuningDecision(decision: AutoTuneDecision): Promise<void>;
-  getTuningHistory(): Promise<ReadonlyArray<AutoTuneDecision>>;
-}
+export type {
+  RunIndexEntry,
+  RunRecord,
+  RecordRunParams,
+  RunTraceData,
+  AutoTuneDecision,
+  ExperienceStore,
+};
 
 export interface ExperienceStoreOptions {
   readonly baseDir?: string;

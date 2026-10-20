@@ -2,45 +2,46 @@
 
 ## 1. Executive Summary
 
-This report documents the theoretical, empirical, and architectural research informing the design of **Vi-Harness**. We examine the shift from prompt-based conversational agents to autonomous state machines operating over structured context hierarchies.
+This report documents the theoretical, empirical, and architectural research informing the design of **Vi-Harness**. It synthesizes:
+1. **Wave 1 & 2 Execution Foundations:** Meta-Harness, Claude Code, Pi, Hermes, Prime Agent, Aider, and DeepSeek Harness.
+2. **Wave 3 Recursive Harness Evolution (2026):** **Harness²** (Google Research, arXiv:2610.14224) and the 16 companion papers that redefined self-evolving agent harnesses in 2026.
 
 ---
 
-## 2. Deep Analysis of the 6 Reference Pillars
+## 2. Foundational Execution Pillars
 
 ### 2.1. Meta-Harness: Outer-Loop Harness Engineering (Stanford IRIS Lab, arXiv:2603.28052)
-- **Core Thesis**: Rather than treating prompt templates and tool orchestration as fixed artifacts, the agent harness itself should be automatically optimized through causal analysis of execution traces.
-- **Key Empirical Finding**: Meta-Harness achieves a **4x token reduction** while improving task accuracy on TerminalBench-2 from 32.4% to 57.6% by removing conversational bloat and focusing context on diagnostic delta states.
-- **Vi-Harness Adoption**:
-  - `MetaHarnessTraceLogger`: Structured JSONL telemetry capturing causal steps, tool proposals, executions, and policy decisions.
-  - `TraceDistiller` & `HarnessDiagnosticEngine`: Outer-loop automated analysis diagnosing cache misses, tool failure hotspots, and policy friction.
+- **Core Thesis:** Rather than treating prompt templates and tool orchestration as fixed artifacts, the agent harness itself should be optimized through causal analysis of execution traces.
+- **Vi-Harness Adoption:** `MetaHarnessTraceLogger`, `TraceDistiller`, and `HarnessDiagnosticEngine`.
 
 ### 2.2. Claude Code: Operating System for AI Coding Agents (Anthropic, arXiv:2604.14228)
-- **Core Thesis**: Coding agents require an operating system layer that guarantees non-bypassable security permissions, deterministic tool sandboxing, and progressive context compaction.
-- **4-Stage Compaction Model**:
-  1. `Snip`: Truncates redundant tool outputs (e.g. 5,000-line build logs) down to error heads and tails.
-  2. `Micro-compact`: Strips formatting whitespace and stale intermediate reasoning tokens.
-  3. `Collapse`: Folds completed sub-trajectories into single-line milestone records.
-  4. `Auto-compact`: Engages when context exceeds 75% capacity, preserving critical domain invariants (`mustPreserve = true`).
-- **Vi-Harness Adoption**:
-  - `ContextCompressor` and `ContextBudgetBalancer` implementing the exact 4-stage pipeline with invariant preservation.
+- **Core Thesis:** Coding agents require an operating system layer that guarantees non-bypassable security permissions, deterministic tool sandboxing, and progressive context compaction.
+- **5-Stage Compaction Model:** `Snip → Micro-compact → Collapse → Auto-compact → Cache-Aware` (implemented in `ContextCompressor`, `MicroCompactor`, and `CachePrefixTracker`).
 
-### 2.3. Pi: Minimalism & Clean Provider Abstraction (pi.dev)
-- **Core Thesis**: The agent harness should remain minimal, transparent, and model-agnostic, providing session trees and strict provider adapters without vendor lock-in.
-- **Vi-Harness Adoption**:
-  - `ViHarnessAdapterRunner` and `PiHarnessAdapterRunner` providing side-by-side A/B comparative benchmarking under identical seeds and prompts.
+### 2.3. Pi, Hermes, Prime Agent, Aider & DeepSeek Harness
+- **Pi (pi.dev):** Model-agnostic provider abstraction and tree-structured sessions.
+- **Hermes:** Durable memory decoupled from conversational history (`FrozenMemorySnapshot`, `SkillExtractor` with both success and failure pattern extraction).
+- **Prime Agent:** Isolated subagent delegation with structured artifact/evidence returns.
+- **Aider:** AST-indexed PageRank repository maps (`SourceCodeIndexer`).
+- **DeepSeek Harness:** Composable DI modules and distribution profiles.
 
-### 2.4. Hermes: Durable Memory Decoupled from History (hermes-agent.org)
-- **Core Thesis**: Long-horizon problem solving fails when memory is stored as conversation history. Memory must be a first-class, typed domain entity with its own retrieval, decay, and contradiction resolution lifecycle.
-- **Vi-Harness Adoption**:
-  - `InMemoryMemoryStore`, `MemoryRetriever`, `MemoryLifecycle`, and `ContradictoryEvidenceResolver`.
+---
 
-### 2.5. Prime Agent: Recursive Language Models & ROI Subagents (Prime Intellect)
-- **Core Thesis**: Complex exploration tasks should be delegated to isolated subagents with explicit tool allowances, token budgets, and structured return contracts (artifacts and evidence, never raw transcripts).
-- **Vi-Harness Adoption**:
-  - `DefaultSubagentManager` enforcing maximum depth constraints (`MAX_SUBAGENT_DEPTH = 3`) and returning `SubagentArtifact` and `Evidence` objects without polluting parent context.
+## 3. The 2026 Recursive Harness Evolution Wave
 
-### 2.6. Aider: Syntax-Aware Repo-Map & AST Indexing
-- **Core Thesis**: Feeding entire source files into LLM context is wasteful and causes attention degradation. A compressed graph of symbol definitions (classes, methods, signatures) enables the LLM to navigate large codebases efficiently.
-- **Vi-Harness Adoption**:
-  - `SourceCodeIndexer` generating compact repository maps and selective token ranking in `DefaultContextCompiler`.
+### 3.1. Harness²: Recursive Agent Harnessing for an Open World (Google Research, Oct 2026, arXiv:2610.14224)
+- **Core Formalization:** A harness is an explicit tuple of editable components $H = (c_1, \dots, c_K)$ around a frozen-weight model.
+- **Coupled Dual Recursion:**
+  1. **Task-Level Recursion (Propose–Probe–Compose):** Generates invariant and domain-specific candidates, executes paired probes on the task without ground-truth rubric leakage, analyzes behavioral contrasts, and selectively composes component changes.
+  2. **Cross-Task Recursion:** Reflects on contrastive evidence to populate an executable experience library while starting every new task from a canonical baseline $H_0$ to prevent cumulative specialization drift.
+- **Vi-Harness Synthesis & Zero-Trust Advancement:** Vi-Harness implements the full Propose–Probe–Compose dual recursion (`RecursiveEvolutionEngine`), 8+4 component `HarnessManifest`, and `EightComponentAdapter`, while closing Harness²'s documented operational security gap (unrestricted network egress and disabled sandboxing) via `HarnessConstitution` and `IsolatedHarnessProbeRunner`.
+
+### 3.2. Falsifiable Observability, Regularization, Held-Out Admission & Retention
+- **Agentic Harness Engineering (AHE):** Component, experience, and decision observability; every edit predeclared as a falsifiable `HarnessChangeHypothesis` (`src/core/evolution/hypothesis.ts`).
+- **HarnessCompass:** Component-wise constrained evolution minimizing cross-component interference (`DefaultHarnessComposer`).
+- **RRSI (Regularized Recursive Self-Improvement):** Temporally annealed edit budgets, novelty scoring, `BenchmarkSpecificityCritic`, `GeneralizationCritic`, and `HarnessPruner` (`DefaultCandidateRegularizer`).
+- **HarnessOpt-Bench & Rethinking Eval of Harness Evolution:** Inaccessible held-out target partitions (`callerRole === 'admission_gate'`) and matched-budget comparisons against `seed_harness`, `best_of_n_search`, and `extra_reasoning_budget` (`EvolutionBenchmarkProtocol`).
+- **EvoHarnessBench:** Detection of harness-induced forgetting across 11 capability categories (`RetentionSuiteRunner` tracking `retained`, `newly_acquired`, `forgotten`, and `unstable`).
+- **Complex Agents, Shallow Tests (HarnessTester):** Contract and mutation-adequacy testing around LLM-dependent manifest/tool/selector/admission paths (`tests/unit/evolution/mutation-contracts.test.ts`).
+- **Self-Evolving Agent Harness:** Strict separation of mutation targets (`DefaultHarnessSurfaceRegistry`), proposal (`DefaultHarnessProposer`), and fail-closed admission (`FailClosedAdmissionGate`) under an immutable constitutional boundary (`HarnessConstitution`).
+- **What Does a Harness Buy? Tokens, Mostly & Harnessing LLMs Cost:** Explicit resource accounting (cached/uncached tokens, context-memory traffic, verification cost), rerun variance CI95 reporting, and statistical power analysis (`AdaptiveRecursionBudgetPolicy` & `EvolutionBenchmarkProtocol`).

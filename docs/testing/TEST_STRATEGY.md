@@ -2,46 +2,36 @@
 
 ## 1. Test Pyramid & Verification Hierarchy
 
-Vi-Harness employs a multi-tier testing strategy designed to verify functional correctness, state-machine transitions, context efficiency, security boundaries, and benchmark reproducibility.
-
-```mermaid
-pie title Test Distribution by Tier (596 Total Tests)
-    "Unit Tests (Domain, Compiler, Tools, Policy, Security)" : 480
-    "Integration Tests (E2E Loop, Architect/Editor, Git, Pipeline)" : 70
-    "Security & Red-Team Adversarial Tests" : 35
-    "Scientific Benchmark & Reproducibility Tests" : 11
-```
+Vi-Harness employs a five-tier testing strategy designed to verify functional correctness, state-machine transitions, context efficiency, zero-trust security boundaries, deterministic recursive evolution (without requiring live LLM calls), contract/mutation adequacy around LLM-dependent paths, and machine-verifiable architectural synchronization.
 
 ---
 
 ## 2. Test Layer Specifications
 
 ### 2.1. Layer 1: Unit Tests (`tests/unit/`)
-- **Scope**: Fast, isolated verification of individual classes, pure functions, algorithms, and domain models.
-- **Network & I/O Isolation**: Zero real network calls. Uses `TestClock`, `MockModelProvider`, `ScriptedModelProvider`, and in-memory stores.
-- **Key Suites**:
-  - `core/state-machine-hardening.test.ts` (77 tests): Exhaustive matrix of valid/invalid phase transitions.
-  - `compiler/context-budget-balancer.test.ts`: Phase-adaptive token allocation ratios.
-  - `compiler/prefix-caching-compiler.test.ts`: Static/dynamic prefix caching header verification.
-  - `runtime/loop-fingerprinter.test.ts`: Stagnation ($A \to A$) and oscillation ($A \to B \to A$) detection.
-  - `security/audit-integrity-signer.test.ts`: HMAC SHA-256 tamper-proofing and Shannon entropy redaction.
+- **Scope:** Fast, isolated verification of domain models, state-machine transitions, context compaction (`Snip → Micro-compact → Collapse → Auto-compact → Cache-Aware`), tools, security rules, and the **Evolution Plane**.
+- **Network & I/O Isolation:** Zero real LLM network calls. Uses `TestClock`, `MockModelProvider`, `ScriptedModelProvider`, and deterministic probe executors.
+- **Key Evolution Plane Unit Suites:**
+  - `evolution/milestone-a-foundations.test.ts`: `HarnessConstitution`, `EvidenceLevel` monotonic ordering (`E0`..`E4`), `HarnessManifest` deterministic SHA-256 hashing, structural diffing, `PreWriteSyntaxGate` script validation, HMAC signing, rollback, 12-surface `DefaultHarnessSurfaceRegistry`, 30-signal `FailureTaxonomyRegistry`, and `SkillExtractor` failure pattern extraction (`DEFECT-01` fix).
+  - `evolution/milestone-b-c-d-e-f.test.ts`: `DefaultHarnessDiagnoser`, 4-quadrant `DefaultHarnessProposer`, `DefaultCandidateRegularizer` (`BenchmarkSpecificityCritic`, `GeneralizationCritic`, `HarnessPruner`), `IsolatedHarnessProbeRunner` (including held-out split access denial), `DefaultBehavioralContrastAnalyzer`, `DefaultHarnessComposer`, `DefaultMultiObjectiveSelector` (Pareto frontier), `RetentionSuiteRunner` (`retained`, `newly_acquired`, `forgotten`, `unstable`), `FailClosedAdmissionGate`, `FileHarnessExperienceLibrary`, `AdaptiveRecursionBudgetPolicy`, `EightComponentAdapter`, and `EvolutionBenchmarkProtocol`.
+  - `cli/evolve-cli.test.ts`: CLI subcommands (`harness`, `evolve`, `evolution`, `library`, `promote`, `rollback-harness`) with `--dry-run` preview verification.
 
-### 2.2. Layer 2: Integration Tests (`tests/integration/`)
-- **Scope**: End-to-end multi-turn execution flows connecting multiple real subsystems.
-- **Key Suites**:
-  - `meta-harness-production-flow.test.ts`: Multi-step flow with prefix caching, trace logging, and impacted test selection.
-  - `git-real-repository.test.ts`: Real Git worktree manipulation, checkpoint creation, and user edit preservation.
-  - `verification-pipeline.test.ts`: Real process execution, TypeScript compilation, and exit-code evaluation.
-  - `enterprise-readiness-suite.test.ts`: Full enterprise workflow combining cryptographic audit, causal diagnostics, and streaming tool parsing.
+### 2.2. Layer 2: Mutation & Contract-Adequacy Tests (`tests/unit/evolution/mutation-contracts.test.ts`)
+- **Scope:** Inspired by *Complex Agents, Shallow Tests (HarnessTester)*, verifies that LLM-dependent harness paths reject corrupted JSON, key-order permutations, forged HMAC admission signatures, high-Pass@1 candidates that introduce policy violations, hallucinated markdown code fences inside executable scripts, and obfuscated constitutional bypass directives.
 
-### 2.3. Layer 3: Security & Adversarial Red Team (`tests/unit/security/`)
-- **Scope**: Active penetration and exploit simulation.
-- **Key Suites**:
-  - `red-team-suite.test.ts` (16 tests): Path traversal (`../../etc/passwd`), command injection (`cat file; rm -rf /`), secret exposure, permission escalation, and approval spoofing.
-  - `final-security-audit.test.ts`: Production environment boundary enforcement.
+### 2.3. Layer 3: Machine-Verifiable Architecture Synchronization (`tests/unit/docs/architecture-sync.test.ts`)
+- **Scope:** Prevents documentation and architectural drift by asserting at test time that:
+  1. `package.json`, `CITATION.cff`, and `src/cli/index.ts` agree on the canonical version (`0.2.0`).
+  2. `src/core/` has zero imports from `src/infra/` or `src/runtime/`.
+  3. `src/runtime/` has zero concrete imports from `src/infra/evolution/` (preserving the Runtime Plane vs Evolution Plane boundary).
+  4. All 12 evolvable surfaces and 6 immutable constitutional surfaces documented in `CURRENT_ARCHITECTURE.md` match `DefaultHarnessSurfaceRegistry` and `DEFAULT_HARNESS_CONSTITUTION`.
+  5. All 30 canonical failure signals in `FailureTaxonomyRegistry` and 22 evolution threats (`E-01`..`E-22`) in `THREAT_MODEL.md` are present and verified.
 
-### 2.4. Layer 4: Scientific Benchmark & Reproducibility (`src/cli/`)
-- **Scope**: Comparative statistical benchmarks across Pi vs Vi-Harness.
-- **Commands**:
-  - `npm run benchmark:context`: Measures token scaling across 10, 25, 50, and 100 iteration horizons.
-  - `npm run benchmark`: Runs canonical task evaluation suite across isolated trial workspaces.
+### 2.4. Layer 4: Integration Tests (`tests/integration/`)
+- **Key Suites:**
+  - `evolution-lifecycle.test.ts`: Full end-to-end Propose–Probe–Compose–Admission lifecycle across `parallel`, `sequential`, and `adaptive` strategies, canonical `H0` reset across consecutive tasks, `.vi-evolution/` disk persistence/resume, TUI tree rendering, and baseline rollback.
+  - `meta-harness-production-flow.test.ts`, `git-real-repository.test.ts`, `verification-pipeline.test.ts`, `enterprise-readiness-suite.test.ts`.
+
+### 2.5. Layer 5: Security Red Team & Scientific Benchmark Protocol
+- **Security Red Team (`tests/unit/security/red-team-suite.test.ts`):** Active penetration and exploit simulation.
+- **Scientific Benchmark Protocol (`EvolutionBenchmarkProtocol`):** Enforces `evolve` / `held_out` / `ood` split separation, matched-budget comparisons (`seed_harness`, `best_of_n_search`, `extra_reasoning_budget`), 95% confidence intervals, statistical power analysis, and explicit separation of `INFRA_ERROR` unscored runs.

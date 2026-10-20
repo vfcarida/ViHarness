@@ -26,6 +26,7 @@ import { DefaultSession } from '../../core/session/session.js';
 import type { Goal } from '../../core/model/goal.js';
 import { GoalStatus, DEFAULT_GOAL_CONSTRAINTS } from '../../core/model/goal.js';
 import type { ExecutionId } from '../../core/types/identifiers.js';
+import { EvolutionRpcDispatcher } from '../evolution/evolution-rpc-dispatcher.js';
 
 interface AcpSessionRecord {
   readonly sessionId: string;
@@ -44,18 +45,21 @@ export interface AcpHandlerOptions {
   readonly runtime: AgentRuntime;
   readonly idFactory: IdFactory;
   readonly clock: Clock;
+  readonly evolutionDispatcher?: EvolutionRpcDispatcher;
 }
 
 export class AcpHandlers {
   private readonly runtime: AgentRuntime;
   private readonly idFactory: IdFactory;
   private readonly clock: Clock;
+  public readonly evolutionDispatcher: EvolutionRpcDispatcher;
   private readonly sessions = new Map<string, AcpSessionRecord>();
 
   constructor(options: AcpHandlerOptions) {
     this.runtime = options.runtime;
     this.idFactory = options.idFactory;
     this.clock = options.clock;
+    this.evolutionDispatcher = options.evolutionDispatcher ?? new EvolutionRpcDispatcher();
   }
 
   async handleNewSession(params?: AcpNewSessionParams): Promise<AcpNewSessionResult> {

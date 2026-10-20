@@ -1,4 +1,4 @@
-﻿# Maintainers
+# Maintainers
 
 This document lists the current maintainers of Vi-Harness and their areas of responsibility.
 
@@ -6,7 +6,7 @@ This document lists the current maintainers of Vi-Harness and their areas of res
 
 | Maintainer | GitHub | Area of Responsibility |
 |---|---|---|
-| Vi-Harness Contributors | [@vfcarida](https://github.com/vfcarida) | Core runtime, security, context compaction, MCP/ACP protocols |
+| Vinicius Caridá | [@vfcarida](https://github.com/vfcarida) | Principal Architect & Author — Core runtime, recursive evolution plane, security, context compaction, MCP/ACP protocols |
 
 ## Response Time Service-Level Objectives (SLOs)
 

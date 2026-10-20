@@ -15,7 +15,29 @@ import type {
   CreateContextRelationParams,
 } from '../model/context-object.js';
 import type { ContextRelationType } from '../model/context-object.js';
-import type { ContextGraph } from '../../infra/context/context-graph.js';
+
+export interface ContextGraphPort {
+  addNode(node: ContextObject): void;
+  getNode(id: ContextId): ContextObject | undefined;
+  hasNode(id: ContextId): boolean;
+  addRelation(relation: ContextRelation): void;
+  removeRelation(relationId: string): boolean;
+  getRelationsFrom(
+    sourceId: ContextId,
+    relationType?: ContextRelationType,
+  ): ReadonlyArray<ContextRelation>;
+  getRelationsTo(
+    targetId: ContextId,
+    relationType?: ContextRelationType,
+  ): ReadonlyArray<ContextRelation>;
+  getAncestors(startId: ContextId, relationType?: ContextRelationType): Set<ContextId>;
+  getDescendants(startId: ContextId, relationType?: ContextRelationType): Set<ContextId>;
+  detectContradictions(id: ContextId): ReadonlyArray<ContextObject>;
+  subsume(primaryId: ContextId, secondaryId: ContextId): boolean;
+  clusterByTopic(topicTag: string): ReadonlyArray<ContextObject>;
+  getAllNodes(): ReadonlyArray<ContextObject>;
+  clear(): void;
+}
 
 export interface ContextStore {
   /** Create a new ContextObject (starts at version 1). */
@@ -50,8 +72,9 @@ export interface ContextStore {
   ): Promise<ReadonlyArray<ContextRelation>>;
 
   /** Get the underlying ContextGraph. */
-  getGraph(): Promise<ContextGraph>;
+  getGraph(): Promise<ContextGraphPort>;
 
   /** Clear all stored objects and graph state. */
   clear(): Promise<void>;
 }
+

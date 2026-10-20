@@ -48,6 +48,7 @@ export class AcpServer {
                 headlessExecution: true,
                 eventHistory: true,
                 idleSynchronization: true,
+                evolutionPlane: true,
               },
             },
           };
@@ -84,6 +85,13 @@ export class AcpServer {
         }
 
         default: {
+          if (this.handlers.evolutionDispatcher.canHandle(request.method)) {
+            const result = await this.handlers.evolutionDispatcher.dispatch(
+              request.method,
+              request.params,
+            );
+            return { jsonrpc: '2.0', id: request.id, result };
+          }
           return {
             jsonrpc: '2.0',
             id: request.id,

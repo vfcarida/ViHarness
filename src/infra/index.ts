@@ -531,3 +531,18 @@ export type {
 
 // Profile System (DSH Reference)
 export { ProfileLoader, ProfileManager, BUILTIN_PROFILES, KNOWN_BUNDLES } from './profile/index.js';
+
+// Recursive Harness Evolution Plane (Zero-Trust Evidence-Gated Evolution)
+export * from './evolution/index.js';
+export { EvolutionTreeRenderer } from './tui/evolution-tree-renderer.js';
+export { EvolutionBenchmarkProtocol } from './eval/evolution-benchmark-protocol.js';
+export type {
+  ExternalBenchmarkSuiteId,
+  BaselineComparisonCondition,
+  BenchmarkTaskInstance,
+  BenchmarkTaskRunOutcome,
+  ConditionStatisticalSummary,
+  MatchedBudgetBenchmarkReport,
+  BenchmarkTaskExecutor,
+} from './eval/evolution-benchmark-protocol.js';
+

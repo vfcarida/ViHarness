@@ -32,6 +32,12 @@ COMMANDS:
   bench:context                       Run multi-horizon context efficiency benchmark
   bench:tbench                        Run Terminal-Bench (TBench 2.0 / Harbor) suite
   bench:projdevbench                  Run ProjDevBench project construction evaluation
+  harness <inspect|diff|validate|replay> Inspect, diff, validate, or replay HarnessManifests
+  evolve <task> [options]             Run evidence-gated Propose-Probe-Compose evolution
+  evolution <inspect|resume> <run>    Inspect or resume an evolution run
+  library <list|query|inspect|prune|consolidate> Manage evolution experience library
+  promote <candidate> [--dry-run]     Evaluate and promote candidate to canonical baseline
+  rollback-harness [<id>] [--dry-run] Roll back canonical harness baseline
 
 OPTIONS:
   -p, --prompt, --message <task>       Directly solve a coding task in the current workspace
@@ -172,6 +178,30 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
       const { runProjDevBenchCli } = await import('./projdevbench-eval.js');
       await runProjDevBenchCli(subArgs);
       return 0;
+    }
+    case 'harness': {
+      const { runHarnessCli } = await import('./commands/evolve.js');
+      return runHarnessCli(subArgs);
+    }
+    case 'evolve': {
+      const { runEvolveCli } = await import('./commands/evolve.js');
+      return runEvolveCli(subArgs);
+    }
+    case 'evolution': {
+      const { runEvolutionManageCli } = await import('./commands/evolve.js');
+      return runEvolutionManageCli(subArgs);
+    }
+    case 'library': {
+      const { runLibraryCli } = await import('./commands/evolve.js');
+      return runLibraryCli(subArgs);
+    }
+    case 'promote': {
+      const { runPromoteCli } = await import('./commands/evolve.js');
+      return runPromoteCli(subArgs);
+    }
+    case 'rollback-harness': {
+      const { runRollbackHarnessCli } = await import('./commands/evolve.js');
+      return runRollbackHarnessCli(subArgs);
     }
     default: {
       console.error(

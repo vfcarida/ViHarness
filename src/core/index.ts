@@ -37,3 +37,7 @@ export * from './tools/index.js';
 
 // Loop hygiene guards (Repeat tool, Timeout policy)
 export * from './guards/index.js';
+
+// Evolution Plane domain types, constitution, manifest, taxonomy, and ports
+export * from './evolution/index.js';
+

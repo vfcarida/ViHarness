@@ -162,6 +162,8 @@ export interface SolveCliArgs {
   tddKPass: number;
   protectTests: boolean;
   rollouts: number;
+  noTui: boolean;
+  quiet: boolean;
   help: boolean;
 }
 
@@ -205,6 +207,9 @@ OPTIONS:
   --docker-image <image>          Docker image used when --sandbox is docker (default: ubuntu:22.04)
   --git / --no-git                Commit changes via git upon completion (default: false)
   --architect                     Enable dual-model Architect Mode
+  --no-tui                        Disable ANSI visual codes (streamlined line-by-line logging for CI/CD)
+  -q, --quiet                     Quiet mode: suppress banners and non-essential progress output
+  --raw                           Raw plaintext mode: output pure event logs without decorative formatting
   -h, --help                      Show this help message
 
 ENVIRONMENT VARIABLES:
@@ -222,6 +227,8 @@ ENVIRONMENT VARIABLES:
   VI_HARNESS_JUDGE_COMMAND                  Default judge command for autonomous evaluation
   VI_HARNESS_MAX_JUDGE_RETRIES              Default max retries for judge loop (1..10)
   VI_HARNESS_ADVERSARIAL_QA                 Default adversarial QA enforcement (true/false)
+  VI_HARNESS_NO_TUI                         Disable ANSI codes when true (CI environment)
+  VI_HARNESS_QUIET                          Enable quiet mode when true
 `);
 }
 
@@ -257,6 +264,11 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
     judgeCommand: process.env['VI_HARNESS_JUDGE_COMMAND'],
     maxJudgeRetries: parseInt(process.env['VI_HARNESS_MAX_JUDGE_RETRIES'] ?? '3', 10) || 3,
     adversarialQa: process.env['VI_HARNESS_ADVERSARIAL_QA'] === 'true' || false,
+    noTui:
+      process.env['VI_HARNESS_NO_TUI'] === 'true' ||
+      process.env['VI_HARNESS_QUIET'] === 'true' ||
+      false,
+    quiet: process.env['VI_HARNESS_QUIET'] === 'true' || false,
     help: false,
   };
 
@@ -355,6 +367,14 @@ export function parseSolveArgs(args: string[]): SolveCliArgs {
       }
     } else if (arg === '--docker-image' && i + 1 < args.length) {
       result.dockerImage = args[++i]!;
+    } else if (arg === '--no-tui') {
+      result.noTui = true;
+    } else if (arg === '--quiet' || arg === '-q') {
+      result.quiet = true;
+      result.noTui = true;
+    } else if (arg === '--raw') {
+      result.noTui = true;
+      result.mode = 'text';
     } else if (!result.prompt && !arg.startsWith('-')) {
       // Positional argument treated as prompt if not already set
       result.prompt = arg;
@@ -387,6 +407,7 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
   const isJsonl = parsed.mode === 'jsonl';
 
   const logInfo = (msg: string) => {
+    if (parsed.quiet) return;
     if (isJsonl) {
       process.stderr.write(`[vi-harness] ${msg}\n`);
     } else {
@@ -538,6 +559,65 @@ export async function runSolveCli(args: string[] = process.argv.slice(2)): Promi
           data: event.data,
         };
         process.stdout.write(JSON.stringify(streamObj) + '\n');
+      } else if (parsed.quiet) {
+        switch (event.type) {
+          case AgentEventType.AgentStarted:
+            console.log(`[START] ${event.data.description}`);
+            break;
+          case AgentEventType.StateUpdated:
+            console.log(`[PHASE] ${(event.data as any).from} -> ${(event.data as any).to}`);
+            break;
+          case AgentEventType.ToolCompleted: {
+            const act = (event.data as any).result;
+            const status = act?.status === 'SUCCESS' ? 'OK' : 'FAIL';
+            const toolName = act?.toolName ?? act?.metadata?.['toolName'] ?? 'tool';
+            console.log(`[TOOL] ${toolName} (${act?.durationMs ?? 0}ms) - ${status}`);
+            break;
+          }
+          case AgentEventType.AgentCompleted:
+            console.log(`[DONE] Completed in ${(event.data as any).iterationsCount} iterations.`);
+            break;
+          case AgentEventType.AgentFailed:
+            console.error(`[FAIL] ${(event.data as any).error ?? 'Unknown error'}`);
+            break;
+        }
+      } else if (parsed.noTui) {
+        switch (event.type) {
+          case AgentEventType.AgentStarted:
+            console.log(`[TASK_START] ${event.data.description}`);
+            break;
+          case AgentEventType.IterationStarted: {
+            const seq = (event.data as any).sequenceNumber ?? 1;
+            const phase = (event.data as any).stateBefore ?? 'RUNNING';
+            console.log(`[ITERATION ${seq}] Phase: ${phase}`);
+            break;
+          }
+          case AgentEventType.ActionProposed:
+            console.log(`[PROPOSAL] Tool: ${(event.data as any).action?.toolName ?? 'unknown'}`);
+            break;
+          case AgentEventType.ToolCompleted: {
+            const act = (event.data as any).result;
+            const status = act?.status === 'SUCCESS' ? '[OK]' : '[FAIL]';
+            const toolName = act?.toolName ?? act?.metadata?.['toolName'] ?? 'tool';
+            console.log(`${status} Executed: ${toolName} (${act?.durationMs ?? 0}ms)`);
+            if (act?.output) {
+              const lines = String(act.output).trim().split('\n');
+              const preview = lines.slice(0, 3).map((l: string) => `    | ${l}`).join('\n');
+              const more = lines.length > 3 ? `\n    | ... (${lines.length - 3} more lines)` : '';
+              console.log(preview + more);
+            }
+            break;
+          }
+          case AgentEventType.StateUpdated:
+            console.log(`[PHASE_CHANGE] ${(event.data as any).from} -> ${(event.data as any).to}`);
+            break;
+          case AgentEventType.AgentCompleted:
+            console.log(`[SUCCESS] Task Completed in ${(event.data as any).iterationsCount} iterations.`);
+            break;
+          case AgentEventType.AgentFailed:
+            console.error(`[FAILED] Task Failed: ${(event.data as any).error ?? 'Unknown error'}`);
+            break;
+        }
       } else {
         switch (event.type) {
           case AgentEventType.AgentStarted:

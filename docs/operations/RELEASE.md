@@ -73,7 +73,7 @@ git checkout main
 git pull origin main
 
 # Create annotated release tag
-git tag -a v0.2.0 -m "Release v0.2.0: Wave 2 Frentes & Open Source Readiness"
+git tag -a v0.2.0 -m "Release v0.2.0: Wave 2 Tracks & Open Source Readiness"
 git push origin v0.2.0
 ```
 

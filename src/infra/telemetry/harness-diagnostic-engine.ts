@@ -10,28 +10,13 @@
  */
 import { TraceDistiller, type CausalTraceAnalysis } from './trace-distiller.js';
 import type { IterationTraceRecord, ExecutionTraceSummary } from '../../core/model/trace-types.js';
-import type { RunTraceData } from './experience-store.js';
+import type {
+  RecommendationType,
+  HarnessRecommendation,
+  RunTraceData,
+} from '../../core/interfaces/experience-store.js';
 
-export type RecommendationType =
-  | 'THRESHOLD_ADJUSTMENT'
-  | 'COMPACTION_TUNING'
-  | 'ROUTING_CHANGE'
-  | 'TOOL_OPTIMIZATION'
-  | 'POLICY_ADJUSTMENT';
-
-export interface HarnessRecommendation {
-  readonly type: RecommendationType;
-  readonly parameter: string;
-  readonly currentValue: unknown;
-  readonly suggestedValue: unknown;
-  readonly evidence: ReadonlyArray<string>; // trace excerpts supporting the recommendation
-  readonly confidence: number; // 0.0 - 1.0
-  readonly rationale: string;
-  readonly code?: string;
-  readonly priority?: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
-  readonly description?: string;
-  readonly actionablePatchSuggestion?: string;
-}
+export type { RecommendationType, HarnessRecommendation };
 
 export interface HarnessDiagnosticReport {
   readonly executionId: string;

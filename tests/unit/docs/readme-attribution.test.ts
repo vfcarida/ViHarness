@@ -231,9 +231,9 @@ describe('README Attribution & Reference Documentation Suite — P015', () => {
     expect(pkgJson.files).toContain('README.md');
     expect(pkgJson.files).toContain('LICENSE');
 
-    // Check LICENSE content is MIT
+    // Check LICENSE content is MIT and attributed to Vinicius Caridá
     const licenseContent = fs.readFileSync(licensePath, 'utf-8');
     expect(licenseContent).toContain('MIT License');
-    expect(licenseContent).toContain('Vi-Harness Contributors');
+    expect(licenseContent).toContain('Vinicius Caridá');
   });
 });

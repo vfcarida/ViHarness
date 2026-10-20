@@ -14,8 +14,9 @@
 **The open-source coding agent harness — built by studying, synthesizing, and improving upon the best patterns in the field.**
 
 [![CI Status](https://github.com/vfcarida/Vi-Harness/actions/workflows/ci.yml/badge.svg?branch=main&style=for-the-badge)](https://github.com/vfcarida/Vi-Harness/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/Tests-1%2C325%20Passing%20(196%20Files)-brightgreen.svg?style=for-the-badge&logo=vitest)](https://github.com/vfcarida/Vi-Harness/actions)
+[![Tests](https://img.shields.io/badge/Tests-1%2C412%20Passing%20(209%20Files)-brightgreen.svg?style=for-the-badge&logo=vitest)](https://github.com/vfcarida/Vi-Harness/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict%205.8-blue.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0%20(20%2C22%2C24)-green.svg?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-Compliant%20v2024--11-purple.svg?style=for-the-badge)](https://modelcontextprotocol.io/)
 [![ACP Protocol](https://img.shields.io/badge/ACP-JSON--RPC%202.0-orange.svg?style=for-the-badge)](https://github.com/vfcarida/Vi-Harness)
@@ -449,6 +450,12 @@ vi-harness solve \
 
 # Stream machine-readable JSONL events for CI/CD or benchmark runners
 vi-harness solve -p "Refactor API router" --mode jsonl
+
+# Streamlined line-by-line logging for headless CI environments (no ANSI visual codes or emojis)
+vi-harness solve -p "Run migration scripts" --no-tui
+
+# Quiet mode: suppress banners and non-essential progress output (or set VI_HARNESS_QUIET=true)
+vi-harness solve -p "Generate API documentation" --quiet
 ```
 
 ---
@@ -574,6 +581,43 @@ console.log(`Finished with status: ${result.isSuccess ? 'SUCCESS' : 'FAILED'}`);
 
 ---
 
+## 🧬 Evidence-Gated Recursive Harness Evolution (Evolution Plane)
+
+Vi-Harness separates trusted single-task execution (**Runtime Plane**) from governed recursive self-improvement (**Evolution Plane**), synthesizing breakthroughs from **Harness²**, **Agentic Harness Engineering (AHE)**, **HarnessCompass**, **RRSI**, **HarnessOpt-Bench**, **EvoHarnessBench**, and **HarnessTester** under Vi-Harness's zero-trust security boundaries:
+
+- **Canonical `HarnessManifest` & `HarnessSurfaceRegistry`**: Represents an execution harness as an immutable, SHA-256 content-addressed, diffable, and revertible artifact covering 8 Harness² components (`systemPrompt`, `guardrails`, `memoryPolicy`, `toolGuidance`, `subagents`, `skills`, `scripts`, `plugins`) + 4 Vi-Harness native policy surfaces (`contextPolicy`, `routingPolicy`, `verificationPolicy`, `toolSchedulingPolicy`).
+- **Immutable `HarnessConstitution`**: Enforces 4 capability classes (`GUIDANCE`, `DECLARATIVE`, `EXECUTABLE`, `CONSTITUTIONAL`). The optimizer can never weaken `policyEngine`, `auditSigner`, `sandboxConfinement`, `admissionGate`, `rollbackSemantics`, or `testProtectionGate`, nor grant itself elevated privileges.
+- **5-Tier Evidence Hierarchy (`E0_REFLECTION` → `E4_GENERALIZATION`)**: Every candidate declares a falsifiable `HarnessChangeHypothesis` and advances through matched counterfactual probes (`IsolatedHarnessProbeRunner`) and component-wise composition (`DefaultHarnessComposer`).
+- **Parallel, Sequential & VoI-Driven Adaptive Recursion**: Supports fixed-budget (`parallel`, `sequential`) and Expected Value of Information (`adaptive`) recursion strategies, plus RRSI/HarnessCompass regularization (`DefaultCandidateRegularizer` with annealed edit budgets, novelty filtering, benchmark-specificity critic, and pruning).
+- **Canonical `H0` Reset & Fail-Closed Admission**: New tasks start from canonical baseline `H0` while retrieving prior experience from `FileHarnessExperienceLibrary`. Global promotion requires passing `FailClosedAdmissionGate` (inaccessible `held_out` split, `RetentionSuiteRunner` capability forgetting checks, Multi-Objective Pareto selection, and HMAC-SHA-256 provenance verification).
+
+```bash
+# Inspect, validate, diff, or replay a HarnessManifest
+vi-harness harness inspect H0
+vi-harness harness validate H0
+vi-harness harness diff H0 <candidate>
+vi-harness harness replay H0 --dry-run
+
+# Run Propose-Probe-Compose recursive evolution (opt-in)
+vi-harness evolve <task> --mode adaptive --k 4 --profile balanced --dry-run
+vi-harness evolution inspect <runId>
+vi-harness evolution resume <runId> --dry-run
+vi-harness evolution verify-policies H0
+vi-harness evolution qd-archive
+vi-harness evolution chaos-test H0
+vi-harness evolution ltl-verify
+vi-harness evolution conformal-check H0
+vi-harness evolution ledger-verify
+
+# Query/manage the Experience Library and promote/rollback baselines
+vi-harness library list
+vi-harness library prune --dry-run
+vi-harness promote <candidate> --dry-run
+vi-harness rollback-harness H0 --dry-run
+```
+
+---
+
 ## Repository Structure
 
 ```
@@ -582,29 +626,29 @@ Vi-Harness/
 │   ├── architecture/       # Current & target architecture, ADRs, module specifications
 │   │   ├── CURRENT_ARCHITECTURE.md
 │   │   ├── TARGET_ARCHITECTURE.md
-│   │   └── adr/            # 7 Architecture Decision Records
+│   │   └── adr/            # 18 Architecture Decision Records (001–018)
 │   ├── audit/              # Traceability matrix, baseline reports, verification results
 │   │   ├── TRACEABILITY_MATRIX.md
 │   │   └── VERIFICATION_REPORT.md
 │   ├── research/           # Literature reviews, reference matrix, comparative analysis
 │   │   ├── RESEARCH_REPORT.md
 │   │   └── REFERENCE_MATRIX.md
-│   ├── security/           # Threat model, STRIDE analysis, OWASP LLM mitigations
+│   ├── security/           # Threat model, STRIDE analysis, OWASP LLM & Evolution mitigations
 │   │   └── THREAT_MODEL.md
 │   └── testing/            # Test strategy, pyramid breakdown, benchmark protocols
 │       └── TEST_STRATEGY.md
 ├── src/
 │   ├── acp/                # Agent Client Protocol (ACP) JSON-RPC automation server
-│   ├── cli/                # Benchmark and context evaluation CLI tools
-│   ├── core/               # Domain interfaces, state machine, plugin engine, tools & guards
+│   ├── cli/                # Benchmark, execution, and recursive evolution CLI tools
+│   ├── core/               # Domain interfaces, state machine, evolution domain, plugin engine & guards
 │   ├── di/                 # Dependency injection container and service configuration
-│   ├── infra/              # Infrastructure (Compilers, MCP, TUI, Security, Tools, Telemetry)
+│   ├── infra/              # Infrastructure (Compilers, Evolution Plane, MCP, TUI, Security, Tools, Telemetry)
 │   └── runtime/            # 14-phase state machine iteration loop and runtime engine
 └── tests/
     ├── core/               # Core plugin, session, goal, tools, and guards tests
     ├── fixtures/           # Benchmark and reproduction workspaces
-    ├── integration/        # End-to-end multi-turn workflows and real git tests
-    └── unit/               # Domain, compiler, security, MCP, and tool unit tests
+    ├── integration/        # End-to-end multi-turn workflows, evolution lifecycle, and real git tests
+    └── unit/               # Domain, evolution, mutation-contract, compiler, security, MCP, and tool unit tests
 ```
 
 ---
@@ -622,7 +666,7 @@ Vi-Harness/
 
 ## Contributing
 
-We welcome contributions from the community! See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, development setup, and code of conduct. You can also explore the [Community Hub](docs/community/README.md) and [Launch Kit](docs/community/LAUNCH_KIT.md).
+We welcome contributions from the community! See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, development setup, and code of conduct. Explore the canonical [Product & Engineering Roadmap](ROADMAP.md), [Consolidated References](docs/REFERENCES.md), [Community Hub](docs/community/README.md), and [Launch Kit](docs/community/LAUNCH_KIT.md).
 
 ---
 
@@ -673,7 +717,7 @@ If you use Vi-Harness in your research, evaluations, or software engineering pro
 
 ```bibtex
 @software{vi_harness_2026,
-  author = {Vi-Harness Contributors},
+  author = {Caridá, Vinicius},
   title = {Vi-Harness: Enterprise-Grade, Model-Agnostic Coding-Agent Runtime and Harness},
   year = {2026},
   url = {https://github.com/vfcarida/Vi-Harness},
@@ -686,3 +730,5 @@ If you use Vi-Harness in your research, evaluations, or software engineering pro
 ## License
 
 Vi-Harness is licensed under the **[MIT License](./LICENSE)**. Built with respect for the open-source community.
+
+*Designed and architected by [Vinicius Caridá](https://github.com/vfcarida). Implementation and verification accelerated with AI-assisted engineering workflows.*

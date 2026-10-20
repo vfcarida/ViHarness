@@ -206,39 +206,52 @@ export class DefaultAgentRuntime implements AgentRuntime {
 
     const result = await this.runLoop(execution, mergedOptions);
 
-    // Background self-improvement: extract learned pattern skills on completion (Hermes)
-    if (result.success && result.status === 'COMPLETED') {
-      const extractor =
-        this.skillExtractor ??
-        (this.memoryStore
-          ? new SkillExtractor({
-              memoryStore: this.memoryStore,
-              idFactory: this.idFactory,
-              clock: this.clock,
-            })
-          : undefined);
+    // Background self-improvement: extract learned pattern skills on completion AND failure patterns on failure
+    const extractor =
+      this.skillExtractor ??
+      (this.memoryStore
+        ? new SkillExtractor({
+            memoryStore: this.memoryStore,
+            idFactory: this.idFactory,
+            clock: this.clock,
+          })
+        : undefined);
 
-      if (extractor) {
-        try {
+    if (extractor) {
+      try {
+        if (result.success && result.status === 'COMPLETED') {
           await extractor.extractFromExecution(result, task.description, goal.description);
-        } catch (err: any) {
-          this.logger.error(`Skill extraction error: ${err?.message ?? String(err)}`);
+        } else {
+          await extractor.extractFailurePatternFromExecution(
+            result,
+            task.description,
+            goal.description,
+          );
         }
+      } catch (err: any) {
+        this.logger.error(`Skill extraction error: ${err?.message ?? String(err)}`);
       }
+    }
 
-      if (this.skillCurator) {
-        try {
-          await this.skillCurator.advanceIterationCounter(result.iterationCount);
-          await this.skillCurator.curate();
-        } catch {
-          // Curator is best-effort background work
-        }
+    if (this.skillCurator) {
+      try {
+        await this.skillCurator.advanceIterationCounter(result.iterationCount);
+        await this.skillCurator.curate();
+      } catch (err: any) {
+        this.logger.warn(`Skill curator error: ${err?.message ?? String(err)}`);
       }
     }
 
     // Outer-Loop Experience Store: Accumulate traces across runs (Meta-Harness Pattern)
     const expStore = options?.experienceStore ?? this.experienceStore;
     if (expStore) {
+      const currentHarnessConfig: Record<string, unknown> = {
+        architectMode: options?.architectMode,
+        maxAutoCorrectionsPerFile: options?.maxAutoCorrectionsPerFile,
+        autoLintAfterWrite: options?.autoLintAfterWrite,
+        autoTestAfterWrite: options?.autoTestAfterWrite,
+        preserveUserChanges: options?.preserveUserChanges,
+      };
       try {
         await expStore.recordRun({
           runId: execution.executionId,
@@ -246,13 +259,7 @@ export class DefaultAgentRuntime implements AgentRuntime {
           taskId: task.id,
           goalDescription: goal.description,
           executionResult: result,
-          harnessConfig: {
-            architectMode: options?.architectMode,
-            maxAutoCorrectionsPerFile: options?.maxAutoCorrectionsPerFile,
-            autoLintAfterWrite: options?.autoLintAfterWrite,
-            autoTestAfterWrite: options?.autoTestAfterWrite,
-            preserveUserChanges: options?.preserveUserChanges,
-          },
+          harnessConfig: currentHarnessConfig,
         });
 
         // If autoTune enabled, formulate and apply high-confidence recommendations
@@ -260,14 +267,18 @@ export class DefaultAgentRuntime implements AgentRuntime {
           const recentTraces = await expStore.getRecentTraces(5);
           const crossReport = HarnessDiagnosticEngine.analyzeAcrossRuns(recentTraces);
           if (crossReport.recommendations.length > 0) {
-            await HarnessAutoTuner.applyRecommendations({}, crossReport.recommendations, {
-              experienceStore: expStore,
-              idFactory: this.idFactory,
-            });
+            await HarnessAutoTuner.applyRecommendations(
+              currentHarnessConfig,
+              crossReport.recommendations,
+              {
+                experienceStore: expStore,
+                idFactory: this.idFactory,
+              },
+            );
           }
         }
-      } catch {
-        // Experience store accumulation is best-effort outer loop
+      } catch (err: any) {
+        this.logger.warn(`Experience store accumulation warning: ${err?.message ?? String(err)}`);
       }
     }
 

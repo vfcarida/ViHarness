@@ -20,6 +20,16 @@ export type {
   RegressionId,
   ConstraintId,
   MemoryId,
+  SessionId,
+  HarnessId,
+  CandidateId,
+  ProbeId,
+  ContrastId,
+  CompositionId,
+  AdmissionId,
+  ExperienceEntryId,
+  EvolutionRunId,
+  SurfaceId,
   IdFactory,
 } from './identifiers.js';
 export type { Result, Success, ResultFailure } from './result.js';

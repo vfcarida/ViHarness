@@ -38,6 +38,15 @@ export type RegressionId = Id<'Regression'>;
 export type ConstraintId = Id<'Constraint'>;
 export type MemoryId = Id<'Memory'>;
 export type SessionId = Id<'Session'>;
+export type HarnessId = Id<'Harness'>;
+export type CandidateId = Id<'Candidate'>;
+export type ProbeId = Id<'Probe'>;
+export type ContrastId = Id<'Contrast'>;
+export type CompositionId = Id<'Composition'>;
+export type AdmissionId = Id<'Admission'>;
+export type ExperienceEntryId = Id<'ExperienceEntry'>;
+export type EvolutionRunId = Id<'EvolutionRun'>;
+export type SurfaceId = Id<'Surface'>;
 
 // ---------------------------------------------------------------------------
 // IdFactory — abstraction over ID generation
@@ -53,3 +62,11 @@ export interface IdFactory {
   /** Create a new unique identifier. */
   create<T extends string = string>(): Id<T>;
 }
+
+/**
+ * Helper to brand a string literal or deterministic identifier as `Id<T>`.
+ */
+export function createId<T extends string = string>(value: string): Id<T> {
+  return value as Id<T>;
+}
+

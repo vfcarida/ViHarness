@@ -26,7 +26,7 @@
 | **V-008** | Streaming Tool Call Parser | `tests/unit/model/streaming-tool-parser.test.ts` | 1 | ✅ PASS | 10ms | Incremental balanced JSON parsing verified |
 | **V-009** | Subagent Swarm Artifacts | `tests/unit/infra/subagent-manager.test.ts` | 7 | ✅ PASS | 489ms | Artifact returns and depth limits verified |
 | **V-010** | Non-Destructive Git Checkpoints | `tests/integration/git-real-repository.test.ts` | 8 | ✅ PASS | 55.9s | Real Git commit, rollback, and user work preservation verified |
-| **V-GLOBAL** | Full Repository Test Suite | `tests/` (84 test files) | 596 | ✅ PASS | 60.4s | 100% test pass rate across all modules |
+| **V-GLOBAL** | Full Repository Test Suite | `tests/` (209 test files) | 1,412 | ✅ PASS | 64.2s | 100% test pass rate across all runtime and evolution modules |
 | **V-BUILD** | TypeScript Project Build | `src/` -> `dist/` | N/A | ✅ PASS | 5.8s | Strict typecheck and build with 0 errors |
 | **V-LINT** | ESLint Code Quality Check | `src/`, `tests/` | N/A | ✅ PASS | 45.2s | 0 errors |
 

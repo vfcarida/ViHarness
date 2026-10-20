@@ -90,3 +90,40 @@ export interface AggregatedTelemetry {
   readonly verification: VerificationMetrics;
   readonly totalCostUSD: number;
 }
+
+// ---------------------------------------------------------------------------
+// Evolution Plane Telemetry Events
+// ---------------------------------------------------------------------------
+
+export const EvolutionEventType = Object.freeze({
+  EvolutionStarted: 'EvolutionStarted',
+  CandidateProposed: 'CandidateProposed',
+  CandidateRejectedByRegularizer: 'CandidateRejectedByRegularizer',
+  ProbeStarted: 'ProbeStarted',
+  ProbeCompleted: 'ProbeCompleted',
+  ContrastComputed: 'ContrastComputed',
+  CandidateComposed: 'CandidateComposed',
+  CandidateSelected: 'CandidateSelected',
+  AdmissionStarted: 'AdmissionStarted',
+  AdmissionPassed: 'AdmissionPassed',
+  AdmissionFailed: 'AdmissionFailed',
+  HarnessPromoted: 'HarnessPromoted',
+  HarnessRolledBack: 'HarnessRolledBack',
+  LibraryEntryAdded: 'LibraryEntryAdded',
+  LibraryEntryInvalidated: 'LibraryEntryInvalidated',
+  EvolutionBudgetExceeded: 'EvolutionBudgetExceeded',
+} as const);
+
+export type EvolutionEventType =
+  (typeof EvolutionEventType)[keyof typeof EvolutionEventType];
+
+export interface EvolutionTelemetryEvent {
+  readonly eventType: EvolutionEventType;
+  readonly traceId: TraceId;
+  readonly evolutionRunId: string;
+  readonly timestamp: string;
+  readonly manifestId?: string;
+  readonly candidateId?: string;
+  readonly attributes: Readonly<Record<string, unknown>>;
+}
+

@@ -70,3 +70,16 @@ export type { BenchmarkRunner, BenchmarkRunOptions } from './benchmark-runner.js
 
 // Skills
 export type { SkillRegistry, SelfModification } from './skill-registry.js';
+
+// Outer-Loop Experience Store
+export type {
+  RecommendationType,
+  HarnessRecommendation,
+  RunIndexEntry,
+  RunRecord,
+  RecordRunParams,
+  RunTraceData,
+  AutoTuneDecision,
+  ExperienceStore,
+} from './experience-store.js';
+

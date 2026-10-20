@@ -182,7 +182,7 @@ export interface ExecutionOptions {
   readonly maxAutoCorrectionsPerFile?: number; // Default 2
   readonly autoRollback?: boolean;
   readonly rollbackOnAnomaly?: boolean;
-  readonly experienceStore?: import('../../infra/telemetry/experience-store.js').ExperienceStore;
+  readonly experienceStore?: import('../interfaces/experience-store.js').ExperienceStore;
   readonly autoTune?: boolean;
   readonly toolExecutor?: import('../interfaces/tool-executor.js').ToolExecutor;
   readonly requestTimeoutMs?: number;

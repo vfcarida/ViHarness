@@ -2,63 +2,96 @@
 
 ## 1. Architectural Philosophy
 
-Vi-Harness is built on the foundational thesis:
-> **"The agent is not a persistent conversation. The agent is a stateful, evidence-driven state machine."**
+Vi-Harness is built on two foundational theses:
+1. **"The agent is not a persistent conversation. The agent is a stateful, evidence-driven state machine."**
+2. **"Evidence-Gated Recursive Harnessing Under Zero-Trust Constraints."**
 
-Conversations degrade with horizon length due to context window saturation, attention dilution, and the "lost-in-the-middle" effect. Vi-Harness replaces unbounded conversational transcripts with an evidence-driven finite state machine operating over four distinct context tiers.
+Vi-Harness separates execution from self-evolution into two distinct planes:
+- **Runtime Plane (`src/runtime/`, `src/core/state-machine/`):** Executes a single frozen `HarnessManifest` deterministically through a 14-phase state machine, 5-stage progressive context compaction (`Snip → Micro-compact → Collapse → Auto-compact → Cache-Aware`, backed by `ContextCompressor`'s 6 internal execution tiers), parallel tool execution with mutation barriers, and verification-first completion.
+- **Evolution Plane (`src/core/evolution/`, `src/infra/evolution/`):** Recursively improves harnesses via **Propose–Probe–Compose**, regularized candidate filtering (RRSI / HarnessCompass), isolated paired probes, multi-objective Pareto selection, capability retention testing (EvoHarnessBench), and a fail-closed admission gate (`FailClosedAdmissionGate`) governed by an immutable `HarnessConstitution`.
 
 ---
 
-## 2. High-Level System Architecture
+## 2. High-Level Dual-Plane System Architecture
 
 ```mermaid
 flowchart TD
-    subgraph UI_CLI [User & CLI Interface]
-        CLI[Benchmark & Agent CLI]
-        Adapter[Pi Compatibility Adapter]
+    subgraph EvolutionPlane [Vi-Harness Evolution Plane]
+        Library[Harness Experience Library\nFull Manifests + Evidence + Provenance]
+        Diagnoser[DefaultHarnessDiagnoser\n30 Typed Failure Signals]
+        Proposer[DefaultHarnessProposer\n4-Quadrant Candidate Matrix]
+        Regularizer[DefaultCandidateRegularizer\nEdit Budget + Novelty + Specificity Critic + Pruner]
+        ProbeRunner[IsolatedHarnessProbeRunner\nSandboxed Paired Probes]
+        ContrastEngine[DefaultBehavioralContrastAnalyzer\nHypothesis Outcome + Redundancy]
+        Composer[DefaultHarnessComposer\nComponent-Wise Evidence Composition]
+        Selector[DefaultMultiObjectiveSelector\n5 Objectives + Pareto Frontier]
+        AdmissionGate[FailClosedAdmissionGate\nHeld-Out + Retention + Cost + Signature]
+
+        Library --> Proposer
+        Diagnoser --> Proposer --> Regularizer --> ProbeRunner
+        ProbeRunner --> ContrastEngine --> Composer --> Selector --> AdmissionGate
+        AdmissionGate -->|Reflect Positive & Negative Evidence| Library
     end
 
-    subgraph Runtime [Agent Runtime Layer]
+    subgraph Constitution [Immutable Constitutional Boundary]
+        ConstCore[HarnessConstitution\nPolicy Enforcement • Audit Integrity • Admission Gate • Rollback]
+    end
+
+    subgraph RuntimePlane [Vi-Harness Runtime Plane]
         RuntimeEngine[DefaultAgentRuntime]
         LoopExecutor[IterationExecutor]
-        Fingerprinter[LoopFingerprinter]
-        Planner[ActionPlanner]
-        Terminator[TerminationController]
-    end
-
-    subgraph Domain [Core Domain Layer - Zero External Dependencies]
-        StateMachine[Agent State Machine\n14 Canonical Phases]
-        DomainModels[Action, Context, Evidence, Memory, State]
-        ErrorTaxonomy[Domain & Infra Error Hierarchy]
-    end
-
-    subgraph Infra [Infrastructure Services]
-        Compiler[PrefixCaching & 4-Stage Compressor]
-        Router[Utility Model Router\nArchitect vs Editor]
-        Policy[Unbypassable Policy Engine\nLocal Sandbox & Risk Classifier]
+        StateMachine[Agent State Machine - 14 Phases]
+        Compiler[PrefixCaching & 5-Stage Compactor\nSnip -> Micro-compact -> Collapse -> Auto-compact -> Cache-Aware]
+        Router[Utility Model Router]
+        Policy[Zero-Trust Policy Engine & Sandbox]
         Tools[Parallel & Builtin Tool Executor]
         Verifier[Verification Engine & Impacted Selector]
-        Memory[RAG Memory & Lifecycle Store]
-        Telemetry[Meta-Harness Trace Logger & Distiller]
-        Git[Git Checkpoint & Rollback Manager]
+        Git[Two-Phase Git Checkpoint & Rollback]
+        Audit[AuditIntegritySigner - HMAC-SHA256]
+
+        RuntimeEngine --> LoopExecutor
+        LoopExecutor --> StateMachine
+        LoopExecutor --> Compiler
+        LoopExecutor --> Router
+        LoopExecutor --> Policy
+        LoopExecutor --> Tools
+        LoopExecutor --> Verifier
+        LoopExecutor --> Git
+        LoopExecutor --> Audit
     end
 
-    UI_CLI --> RuntimeEngine
-    RuntimeEngine --> LoopExecutor
-    LoopExecutor --> StateMachine
-    LoopExecutor --> Compiler
-    LoopExecutor --> Router
-    LoopExecutor --> Policy
-    LoopExecutor --> Tools
-    LoopExecutor --> Verifier
-    LoopExecutor --> Fingerprinter
-    LoopExecutor --> Telemetry
-    LoopExecutor --> Git
+    AdmissionGate -->|Signed Promoted Manifest| RuntimeEngine
+    ProbeRunner -.->|Isolated Probe Execution| RuntimeEngine
+    ConstCore === AdmissionGate
+    ConstCore === Policy
 ```
 
 ---
 
-## 3. The 14 Canonical Agent Phases
+## 3. Immutable Harness Constitution & Capability Classes
+
+| Capability Class | Surfaces | Task Evidence Required | Global Promotion Required | Mutability |
+| :--- | :--- | :--- | :--- | :--- |
+| **GUIDANCE** | `systemPrompt`, `toolGuidance` | `E1_SINGLE_CONTRAST` | `E4_GENERALIZATION` | Evolvable in sandbox |
+| **DECLARATIVE** | `guardrails`, `memoryPolicy`, `subagents`, `skills`, `contextPolicy`, `routingPolicy`, `verificationPolicy`, `toolSchedulingPolicy` | `E2_REPLICATED_CONTRAST` | `E4_GENERALIZATION` | Evolvable with Zod schema + regression checks |
+| **EXECUTABLE** | `scripts`, `plugins` | `E3_VERIFIED` | `E4_GENERALIZATION` | Evolvable under `PreWriteSyntaxGate` + sandbox + zero privilege escalation |
+| **CONSTITUTIONAL** | `policyEngine`, `auditSigner`, `sandboxConfinement`, `admissionGate`, `rollbackSemantics`, `testProtectionGate` | Immutable | Immutable | **Immutable by any optimizer** |
+
+---
+
+## 4. The 5-Tier Evidence Hierarchy (`E0`–`E4`)
+
+| Level | Identifier | Meaning |
+| :--- | :--- | :--- |
+| **E0** | `E0_REFLECTION` | Observation or hypothesis inferred from traces only. |
+| **E1** | `E1_SINGLE_CONTRAST` | Base and candidate executed on the same task and seed. |
+| **E2** | `E2_REPLICATED_CONTRAST` | Multiple matched executions showing a repeatable behavioral difference. |
+| **E3** | `E3_VERIFIED` | External verifier, tests, and zero policy violations independently sustain the effect. |
+| **E4** | `E4_GENERALIZATION` | Inaccessible held-out/OOD evaluation and capability retention suites sustain the change. |
+
+---
+
+## 5. The 14 Canonical Agent Phases (Runtime Plane)
 
 ```mermaid
 stateDiagram-v2
@@ -91,7 +124,7 @@ stateDiagram-v2
 
 ---
 
-## 4. The Four-Tier Context Model (L0 - L3)
+## 6. The Four-Tier Context Model (L0 - L3) & 5-Stage Compaction
 
 | Tier | Name | Persistence | Typical Token Budget | Contents |
 | :--- | :--- | :--- | :--- | :--- |
@@ -100,53 +133,5 @@ stateDiagram-v2
 | **L2** | **Episodic History** | Session | 10-15% | Condensed prior attempts, failed tool invocations, summarized branch outcomes. |
 | **L3** | **Repository Knowledge** | Permanent | 20-40% | Coding standards, architectural rules, AST Repo-Map symbol graph. |
 
----
-
-## 5. End-to-End Execution Sequence
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User
-    participant Runtime as AgentRuntime
-    participant Compiler as PrefixCachingCompiler
-    participant Router as ModelRouter
-    participant Model as LLM Provider
-    participant Policy as PolicyEngine
-    participant Tool as ToolExecutor
-    participant Verifier as VerificationEngine
-    participant Telemetry as MetaHarnessTraceLogger
-    participant Git as GitCheckpointManager
-
-    User->>Runtime: submitGoal(goal)
-    Runtime->>Git: captureBaseline()
-    
-    loop Each Iteration until Terminal Phase
-        Runtime->>Compiler: compile(state, budget)
-        Compiler-->>Runtime: segregatedContext { static, dynamic }
-        Runtime->>Router: selectModel(phase, budget)
-        Router-->>Runtime: modelSpec (Architect / Editor)
-        Runtime->>Model: generateResponse(messages)
-        Model-->>Runtime: actionProposals
-        
-        loop Each Proposed Action
-            Runtime->>Policy: evaluate(actionProposal)
-            alt Policy ALLOW
-                Runtime->>Tool: execute(action)
-                Tool-->>Runtime: actionResult
-            else Policy REQUIRE_APPROVAL
-                Runtime->>Runtime: transitionTo(HUMAN_REQUIRED)
-            else Policy DENY
-                Runtime->>Runtime: recordPolicyDenial(evidence)
-            end
-        end
-        
-        Runtime->>Verifier: verifyImpacted(modifiedFiles)
-        Verifier-->>Runtime: verificationEvidence (PASS / FAIL / INCONCLUSIVE)
-        Runtime->>Telemetry: recordIteration(traceRecord)
-        Runtime->>Git: createCheckpoint(iterationId)
-        Runtime->>Runtime: evaluateTransitions(state, evidence)
-    end
-    
-    Runtime-->>User: executionResult (DONE / FAILED)
-```
+Progressive Compaction Pipeline (`ContextCompressor` + `CachePrefixTracker`):
+`Snip → Micro-compact → Collapse → Auto-compact → Cache-Aware` (with internal `BUDGET_REDUCTION` and `TOOL_PRUNE` pre-stages).

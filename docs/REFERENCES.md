@@ -8,7 +8,7 @@ This document consolidates the verified academic literature, frontier AI lab res
 
 1. **Meta-Harness (Stanford IRIS Lab, 2026):** *Meta-Harness: Automated Outer-Loop Agent Engineering* (`arXiv:2603.28052`). Informs `MetaHarnessTraceLogger`, `TraceDistiller`, and `HarnessDiagnosticEngine`.
 2. **Claude Code Architecture (Anthropic, 2026):** *Claude Code: An Agentic Operating System Layer* (`arXiv:2604.14228`). Informs the 5-stage progressive compaction pipeline (`ContextCompressor`, `MicroCompactor`), virtual context projection (`ContextCollapse`), and 7-layer security perimeter (`DefaultPolicyEngine`).
-3. **Harness² (Google Research, 2026):** *Harness²: Recursive Agent Harnessing for an Open World* (`arXiv:2610.14224`). Informs the coupled dual-recursion Propose–Probe–Compose loop (`RecursiveEvolutionEngine`), explicit component tuple representation (`HarnessManifest`), and canonical baseline $H_0$ reset invariant.
+3. **Harness² (Google Research, 2026):** *Harness²: Recursive Agent Harnessing for an Open World* ([`arXiv:2610.14224v1`](https://arxiv.org/html/2610.14224v1), [`https://github.com/google-research/harness2`](https://github.com/google-research/harness2)). Informs the coupled dual-recursion Propose–Probe–Compose loop (`RecursiveEvolutionEngine`), explicit 8+4 component tuple representation (`HarnessManifest`, `EightComponentAdapter`), and canonical baseline $H_0$ reset invariant.
 4. **SWE-bench (Jimenez et al., Princeton University, ICLR 2024):** *SWE-bench: Can Language Models Resolve Real-World GitHub Issues?* (`arXiv:2310.06770`). Informs `SweBenchTaskLoader` and multi-turn patch verification.
 5. **Sequential Probability Ratio Test (Wald, 1945):** *Sequential Tests of Statistical Hypotheses*, Annals of Mathematical Statistics. Informs `WaldSprtStoppingRule` in `src/infra/evolution/statistical-admission-control.ts`.
 6. **Holm-Bonferroni Step-Down Procedure (Holm, 1979):** *A Simple Sequentially Rejective Multiple Test Procedure*, Scandinavian Journal of Statistics. Informs `HolmBonferroniMultipleTestingGate` for Family-Wise Error Rate (FWER) control across candidate hypotheses.
@@ -40,5 +40,6 @@ This document consolidates the verified academic literature, frontier AI lab res
 4. **Hermes Agent** (`https://hermes-agent.org`) — Frozen memory snapshots and autonomous skill extraction.
 5. **Pi Agent** (`https://pi.dev`) — Provider abstraction layer and tree-structured session branching.
 6. **DeepSeek Harness** (`https://github.com/deepseek-ai/deepseek-harness`) — Replaceable capability seams, parallel tool barriers, and Agent Client Protocol (ACP) JSON-RPC 2.0 server.
+7. **Google Research — Harness²** (`https://github.com/google-research/harness2` | `https://arxiv.org/html/2610.14224v1`) — Reference implementation and specification of coupled dual-recursion agent harness evolution (`Propose–Probe–Compose`) and 8-component harness tuple representation.
 
 See also [docs/research/REFERENCE_MATRIX.md](research/REFERENCE_MATRIX.md) and [docs/research/RESEARCH_REPORT.md](research/RESEARCH_REPORT.md) for detailed module-to-reference traceability.

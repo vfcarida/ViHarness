@@ -4,7 +4,7 @@
 
 This report documents the theoretical, empirical, and architectural research informing the design of **Vi-Harness**. It synthesizes:
 1. **Wave 1 & 2 Execution Foundations:** Meta-Harness, Claude Code, Pi, Hermes, Prime Agent, Aider, and DeepSeek Harness.
-2. **Wave 3 Recursive Harness Evolution (2026):** **Harness²** (Google Research, arXiv:2610.14224) and the 16 companion papers that redefined self-evolving agent harnesses in 2026.
+2. **Wave 3–10 Recursive Harness Evolution (2026):** **Harness²** (Google Research, [`arXiv:2610.14224v1`](https://arxiv.org/html/2610.14224v1), [`https://github.com/google-research/harness2`](https://github.com/google-research/harness2)) and the companion papers and formal verification methods that redefined self-evolving agent harnesses in 2026.
 
 ---
 
@@ -29,12 +29,12 @@ This report documents the theoretical, empirical, and architectural research inf
 
 ## 3. The 2026 Recursive Harness Evolution Wave
 
-### 3.1. Harness²: Recursive Agent Harnessing for an Open World (Google Research, Oct 2026, arXiv:2610.14224)
+### 3.1. Harness²: Recursive Agent Harnessing for an Open World (Google Research, Oct 2026, [arXiv:2610.14224v1](https://arxiv.org/html/2610.14224v1) | [google-research/harness2](https://github.com/google-research/harness2))
 - **Core Formalization:** A harness is an explicit tuple of editable components $H = (c_1, \dots, c_K)$ around a frozen-weight model.
 - **Coupled Dual Recursion:**
   1. **Task-Level Recursion (Propose–Probe–Compose):** Generates invariant and domain-specific candidates, executes paired probes on the task without ground-truth rubric leakage, analyzes behavioral contrasts, and selectively composes component changes.
   2. **Cross-Task Recursion:** Reflects on contrastive evidence to populate an executable experience library while starting every new task from a canonical baseline $H_0$ to prevent cumulative specialization drift.
-- **Vi-Harness Synthesis & Zero-Trust Advancement:** Vi-Harness implements the full Propose–Probe–Compose dual recursion (`RecursiveEvolutionEngine`), 8+4 component `HarnessManifest`, and `EightComponentAdapter`, while closing Harness²'s documented operational security gap (unrestricted network egress and disabled sandboxing) via `HarnessConstitution` and `IsolatedHarnessProbeRunner`.
+- **Vi-Harness Synthesis & Zero-Trust Advancement:** Vi-Harness implements the full Propose–Probe–Compose dual recursion (`RecursiveEvolutionEngine`), 8+4 component `HarnessManifest`, and `EightComponentAdapter`, while closing Harness²'s documented operational security gap (unrestricted network egress and disabled sandboxing) via `HarnessConstitution`, `IsolatedHarnessProbeRunner`, `WorktreeProbeSandboxManager`, `StructuralPolicyInvariantVerifier`, `RuntimeTemporalContractMonitor`, and `ConformalAbstentionGuard`.
 
 ### 3.2. Falsifiable Observability, Regularization, Held-Out Admission & Retention
 - **Agentic Harness Engineering (AHE):** Component, experience, and decision observability; every edit predeclared as a falsifiable `HarnessChangeHypothesis` (`src/core/evolution/hypothesis.ts`).

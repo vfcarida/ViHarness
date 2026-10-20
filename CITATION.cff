@@ -14,10 +14,40 @@ keywords:
   - "agent harness"
   - "state machine"
   - "meta-harness"
+  - "harness2"
+  - "recursive harness evolution"
   - "context engineering"
   - "prompt caching"
   - "software engineering"
 abstract: >-
-  Vi-Harness is an enterprise-grade, model-agnostic agent harness designed to investigate
-  how much coding-agent performance derives from foundation models versus harness architecture,
-  context compilation, progressive compaction, verification gating, and state-machine control.
+  Vi-Harness is an enterprise-grade, model-agnostic agent harness and evidence-gated recursive
+  evolution runtime designed to investigate and optimize coding-agent performance across
+  8 modular harness components, context compilation, progressive compaction, verification gating,
+  formal LTLf & invariant verification, and state-machine control.
+references:
+  - type: article
+    title: "Harness²: Recursive Agent Harnessing for an Open World"
+    authors:
+      - name: "Google Research"
+    year: 2026
+    url: "https://arxiv.org/html/2610.14224v1"
+    repository-code: "https://github.com/google-research/harness2"
+  - type: article
+    title: "Meta-Harness: End-to-End Optimization of Model Harnesses"
+    authors:
+      - family-names: "Lee"
+        given-names: "Yoonho"
+      - family-names: "Nair"
+        given-names: "Archit"
+      - family-names: "Zhang"
+        given-names: "Qizheng"
+      - family-names: "Lee"
+        given-names: "Kangwook"
+      - family-names: "Khattab"
+        given-names: "Omar"
+      - family-names: "Finn"
+        given-names: "Chelsea"
+    year: 2026
+    url: "https://arxiv.org/abs/2603.28052"
+    repository-code: "https://github.com/stanford-iris-lab/meta-harness"
+

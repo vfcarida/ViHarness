@@ -53,56 +53,69 @@ Vi-Harness solves these by synthesizing proven architectural breakthroughs from 
 
 ## 🔬 The 7 Reference Pillars
 
-Vi-Harness is positioned as an open-source synthesis giving back to the community, built on the foundations of 7 state-of-the-art reference projects:
+Vi-Harness is positioned as an open-source synthesis giving back to the community, built on the foundations of 7 state-of-the-art reference pillars and recently expanded with **Google Research's Harness²** ([`google-research/harness2`](https://github.com/google-research/harness2), [`arXiv:2610.14224v1`](https://arxiv.org/html/2610.14224v1)):
 
 ```mermaid
 mindmap
   root((Vi-Harness Pillars))
-    Meta-Harness [1. Meta-Harness\nStanford IRIS Lab\narXiv:2603.28052]
-      Causal Trace Logging
-      Harness Auto-Tuning
-      Trajectory SFT/DPO Export
-    Claude Code [2. Claude Code\nAnthropic]
-      5-Stage Compaction
-      Read-Time Virtual Projection
-      7-Layer Security Perimeter
-    Pi [3. Pi Agent\npi.dev]
+    Meta-Harness [1. Meta-Harness & Harness²\nStanford IRIS Lab arXiv:2603.28052\nGoogle Research google-research/harness2\narXiv:2610.14224v1]
+      Causal Trace Logging & SFT/DPO/GRPO Export
+      Dual-Recursion Propose-Probe-Compose
+      Canonical H0 Baseline Reset & Experience Library
+      Bayesian Surrogate & Epistatic Surface Graph
+    Claude Code [2. Claude Code & Formal Governance\nAnthropic arXiv:2604.14228]
+      5-Stage Compaction & Virtual Projection
+      7-Layer Security Perimeter & HarnessConstitution
+      Formal Policy Verifier & LTLf Temporal Monitor
+    Pi [3. Pi Agent & Evaluation\npi.dev & HarnessOpt-Bench]
       Provider Abstraction Layer
       Tree-Structured Sessions
-      Reproducible Benchmarks
-    Hermes [4. Hermes\nhermes-agent.org]
+      Matched-Budget & Conformal Abstention Eval
+    Hermes [4. Hermes & MemoHarness\nhermes-agent.org]
       Frozen Memory Snapshots
-      Intelligent Skill Curator
-      Decoupled Knowledge Store
-    Prime Agent [5. Prime Agent\nCline / Prime Intellect]
-      Recursive Subagents
+      Semantic Skill & Subagent Distiller
+      Zero-Search MemoHarness & Federated Sync
+    Prime Agent [5. Prime Agent & Sandboxes\nCline / Prime Intellect]
+      Recursive Subagents & Least-Privilege Roles
       Per-Goal Token Attribution
-      Isolated Execution Contexts
-    Aider [6. Aider\naider.chat]
+      Ephemeral Git Worktree Probe Sandboxes
+    Aider [6. Aider & Structural Analysis\naider.chat]
       PageRank AST Repo Map
-      Two-Phase Git Commits
-      Architect / Editor Split
-    DeepSeek Harness [7. DeepSeek Harness\nDeepSeek AI]
-      Capability Seams Everything is a Plugin
-      Parallel Tool Execution & Barriers
-      Output Spill & Retrieve Tool
-      Loop Hygiene Guards & Timeouts
+      Two-Phase Git Commits & Lineage Bisection
+      Architect / Editor Split & AST Verifier
+    DeepSeek Harness [7. DeepSeek Harness & Autonomy\nDeepSeek AI & google-research/harness2]
+      Capability Seams & 8-Component Harness² Interop
+      Parallel Tool Execution & Spill Store
+      Live Manifest Hot-Swap & Canary CUSUM
+      Deterministic Chaos & Fault-Injection Suite
 ```
+
+### 7 Pillars Grounding & Reference Mapping
+
+| Pillar | Primary Open-Source & Lab References | Core Theoretical & Engineering Grounding | Key Vi-Harness Modules |
+| :--- | :--- | :--- | :--- |
+| **1. Meta-Harness & Harness²** | [google-research/harness2](https://github.com/google-research/harness2) • [arXiv:2610.14224v1](https://arxiv.org/html/2610.14224v1) • [arXiv:2603.28052](https://arxiv.org/abs/2603.28052) • *HarnessCompass* • *RRSI* | Coupled task/cross-task dual recursion (`Propose–Probe–Compose`), 8+4 surface `HarnessManifest`, canonical `H0` reset, Bayesian surrogate (`EI`/`UCB`), and 2nd-order Shapley-Taylor epistatic interaction graphs | `RecursiveEvolutionEngine`, `BayesianHarnessSurrogateModel`, `EpistaticSurfaceGraphAnalyzer`, `ContrastivePreferenceExporter` |
+| **2. Claude Code & Formal Governance** | [anthropics/claude-code](https://github.com/anthropics/claude-code) • [arXiv:2604.14228](https://arxiv.org/abs/2604.14228) • *NIST AI RMF 1.0* • *OWASP LLM Top 10* • *De Giacomo & Vardi (LTLf)* | 5-stage progressive context compaction, read-time virtual projection, unbypassable 7-layer security perimeter, immutable `HarnessConstitution`, formal cross-surface policy satisfiability, and finite-trace $\text{LTL}_f$ runtime contracts | `ContextCompressor`, `DefaultPolicyEngine`, `HarnessConstitution`, `StructuralPolicyInvariantVerifier`, `RuntimeTemporalContractMonitor` |
+| **3. Pi Agent & Evaluation** | [pi.dev](https://pi.dev) • *HarnessOpt-Bench* • *EvoHarnessBench* • *Angelopoulos & Bates (Conformal)* • *Wald SPRT* | Vendor-neutral provider abstraction, tree-structured event-sourced sessions, inaccessible held-out admission gates, capability retention suites, Sequential Probability Ratio Testing, and Split Conformal Abstention | `SqliteSessionStore`, `FailClosedAdmissionGate`, `RetentionSuiteRunner`, `ConformalAbstentionGuard`, `EvolutionBenchmarkProtocol` |
+| **4. Hermes & MemoHarness** | [hermes-agent.org](https://hermes-agent.org) • *MemoHarness* • *SkillExtractor* | Load-once frozen memory snapshots for KV prefix cache reuse, dual-layer experience retrieval, semantic skill/subagent distillation from verified experiences, and privacy-preserving federated synchronization | `FrozenMemorySnapshot`, `SqliteHarnessExperienceLibrary`, `MemoHarnessSynthesizer`, `SkillSubagentDistiller`, `FederatedExperienceSynchronizer` |
+| **5. Prime Agent & Sandboxes** | [cline/cline](https://github.com/cline/cline) • [Prime Intellect](https://github.com/PrimeIntellect-ai/prime-agent) | Context-isolated recursive subagent spawning, hierarchical per-goal token budget attribution, and isolated ephemeral Git worktree (`git worktree add --detach`) counterfactual probe execution | `DefaultSubagentManager`, `GoalBudgetManager`, `WorktreeProbeSandboxManager`, `IsolatedHarnessProbeRunner` |
+| **6. Aider & Structural Analysis** | [Aider-AI/aider](https://github.com/Aider-AI/aider) • *HarnessTester* | PageRank AST symbol repository map across 20+ languages, non-destructive two-phase Git checkpoints, TypeScript Compiler API AST sandbox verification for executable surfaces, and $\mathcal{O}(\log_2 k)$ lineage regression bisection | `SourceCodeIndexer`, `RealGitManager`, `ExecutableSurfaceAstVerifier`, `LineageBisectionDiagnoser`, `PreWriteSyntaxGate` |
+| **7. DeepSeek Harness & Autonomy** | [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) • [google-research/harness2](https://github.com/google-research/harness2) • *MAP-Elites* • *SLSA v1.0* | Replaceable capability seams, parallel tool execution with mutation barriers, 8-component Harness² clean-room adapter, MAP-Elites Quality-Diversity archive, staged canary CUSUM rollback, SLSA hash-chained ledger, and deterministic chaos testing | `ParallelToolExecutor`, `EightComponentAdapter`, `MapElitesHarnessArchive`, `LiveManifestHotSwapOrchestrator`, `CanaryDeploymentController`, `ChaosFaultInjectionTester` |
 
 ---
 
 ## Architecture
 
-Vi-Harness is structured into replaceable capability seams where every subsystem can be swapped or extended without modifying the core runtime:
+Vi-Harness is structured into two strictly separated planes—a deterministic **Runtime Plane** for single-task execution and a zero-trust **Recursive Evolution Plane** grounded in **Google Research's Harness²** ([`google-research/harness2`](https://github.com/google-research/harness2), [`arXiv:2610.14224v1`](https://arxiv.org/html/2610.14224v1))—built over replaceable capability seams:
 
 ```mermaid
 flowchart TB
     subgraph UI_Layer [Interface & Integration Layer]
-        CLI[Benchmark & Execution CLI]
-        TUI[Terminal UI Real-Time Dashboard]
-        MCPServer[MCP Server & Client Subsystem]
-        ACPServer[Agent Client Protocol JSON-RPC Server]
-        PiAdapter[Pi-Compatible Replacement Adapter]
+        CLI[Execution & Evolution CLI\nsolve / evolve / harness / library / promote]
+        TUI[Terminal UI & Evolution Tree Renderer]
+        MCPServer[MCP Server + 6 Evolution MCP Tools]
+        ACPServer[ACP JSON-RPC 2.0 Server + Evolution RPC]
+        Cockpit[Live HTTP/SSE Evolution Cockpit Server]
     end
 
     subgraph Plugin_Layer [Plugin Architecture & Capability Seams]
@@ -115,16 +128,22 @@ flowchart TB
         SandboxSeam[Zero-Trust Policy Sandbox]
     end
 
-    subgraph OuterLoop_Layer [Outer-Loop Adaptation - Meta-Harness]
-        TraceLogger[JSONL Causal Trace Logger .vi-traces/]
-        Distiller[Trace Distiller]
-        AutoTuner[Harness Auto-Tuner]
-        DatasetExporter[SFT & DPO Dataset Exporter]
-        TraceLogger --> Distiller --> AutoTuner
-        TraceLogger --> DatasetExporter
+    subgraph Evolution_Plane [Recursive Evolution Plane - Harness² arXiv:2610.14224v1 & Meta-Harness]
+        EvoEngine[RecursiveEvolutionEngine\nPropose-Probe-Compose Dual Recursion]
+        Surrogate[BayesianHarnessSurrogateModel & EpistaticGraph]
+        Prober[IsolatedHarnessProbeRunner & WorktreeSandbox]
+        Selectors[HypervolumeParetoSelector & MAP-Elites QD Archive]
+        Verifiers[StructuralPolicyVerifier & LTLf Temporal Monitor]
+        Admission[FailClosedAdmissionGate & ConformalAbstentionGuard]
+        ExpLib[HarnessExperienceLibrary & SkillSubagentDistiller]
+        Ledger[CryptographicEvolutionLedger & CanaryController]
+
+        EvoEngine --> Surrogate --> Prober --> Selectors --> Verifiers --> Admission
+        Admission --> ExpLib
+        Admission --> Ledger
     end
 
-    subgraph Core_Runtime [Deterministic State Machine Runtime]
+    subgraph Core_Runtime [Deterministic State Machine Runtime Plane]
         RuntimeEngine[DefaultAgentRuntime]
         IterationLoop[14-Phase IterationExecutor]
         LoopGuards[Repeat-Tool Guard & Timeout Policy]
@@ -148,14 +167,16 @@ flowchart TB
         EntropyScrubber[Shannon Entropy Secret Scrubber]
         AuditSigner[HMAC SHA-256 Cryptographic Audit Signer]
         TwoPhaseGit[Two-Phase Git Checkpoint Manager]
-        TestRunner[Impacted Test & Verification Engine]
+        TestRunner[Impacted Test & Chaos Fault-Injection Engine]
     end
 
     UI_Layer --> PluginTree
+    UI_Layer --> EvoEngine
     PluginTree --> Core_Runtime
+    Admission -->|Signed Promoted HarnessManifest| RuntimeEngine
     IterationLoop --> Context_Subsystem
     IterationLoop --> Security_Verification
-    IterationLoop --> OuterLoop_Layer
+    IterationLoop -->|Causal Traces .vi-traces/| EvoEngine
 ```
 
 > 📖 **Interactive Architecture Tour**: For an interactive deep dive into the 14 FSM states, 6-stage context compilation pipeline, AST syntax gates, and step-by-step developer extension recipes, explore the [Architecture Tour & Extension Guide](docs/architecture/tour.md).
@@ -243,10 +264,10 @@ Comparing token accumulation over long-horizon editing iterations:
 
 ### 3. Repository Test Suite Quality
 ```bash
-Test Files : 196 passed (196)
-Tests      : 1,325 passed (1,325)
-Duration   : ~95s
-Integrity  : Zero mocks in verification pipeline, real Git integration
+Test Files : 209 passed (209)
+Tests      : 1,412 passed (1,412)
+Duration   : ~64s
+Integrity  : Zero mocks in verification pipeline, real Git & Evolution Plane integration
 ```
 
 ---
@@ -373,7 +394,7 @@ npm install
 ### Build & Validate
 ```bash
 npm run build              # Compiles strict TypeScript to dist/
-npm test                   # Runs full test suite (1,304 tests, 193 files)
+npm test                   # Runs full test suite (1,412 tests, 209 files)
 npm run smoke              # Fast production smoke test (< 0.1s)
 npm run prepublish-check   # Pre-publish tarball & packaging validation
 ```
@@ -583,37 +604,78 @@ console.log(`Finished with status: ${result.isSuccess ? 'SUCCESS' : 'FAILED'}`);
 
 ## 🧬 Evidence-Gated Recursive Harness Evolution (Evolution Plane)
 
-Vi-Harness separates trusted single-task execution (**Runtime Plane**) from governed recursive self-improvement (**Evolution Plane**), synthesizing breakthroughs from **Harness²**, **Agentic Harness Engineering (AHE)**, **HarnessCompass**, **RRSI**, **HarnessOpt-Bench**, **EvoHarnessBench**, and **HarnessTester** under Vi-Harness's zero-trust security boundaries:
+Vi-Harness separates trusted single-task execution (**Runtime Plane**) from governed recursive self-improvement (**Evolution Plane**), directly implementing and extending the theoretical and engineering architecture of **Google Research's Harness²** ([`google-research/harness2`](https://github.com/google-research/harness2), [`arXiv:2610.14224v1`](https://arxiv.org/html/2610.14224v1) — *Harness²: Recursive Agent Harnessing for an Open World*), alongside **Agentic Harness Engineering (AHE)**, **HarnessCompass**, **RRSI**, **HarnessOpt-Bench**, **EvoHarnessBench**, **MemoHarness**, **Task-CoEvolve**, **HarnessX**, and **HarnessTester** under Vi-Harness's zero-trust security boundaries:
 
-- **Canonical `HarnessManifest` & `HarnessSurfaceRegistry`**: Represents an execution harness as an immutable, SHA-256 content-addressed, diffable, and revertible artifact covering 8 Harness² components (`systemPrompt`, `guardrails`, `memoryPolicy`, `toolGuidance`, `subagents`, `skills`, `scripts`, `plugins`) + 4 Vi-Harness native policy surfaces (`contextPolicy`, `routingPolicy`, `verificationPolicy`, `toolSchedulingPolicy`).
-- **Immutable `HarnessConstitution`**: Enforces 4 capability classes (`GUIDANCE`, `DECLARATIVE`, `EXECUTABLE`, `CONSTITUTIONAL`). The optimizer can never weaken `policyEngine`, `auditSigner`, `sandboxConfinement`, `admissionGate`, `rollbackSemantics`, or `testProtectionGate`, nor grant itself elevated privileges.
-- **5-Tier Evidence Hierarchy (`E0_REFLECTION` → `E4_GENERALIZATION`)**: Every candidate declares a falsifiable `HarnessChangeHypothesis` and advances through matched counterfactual probes (`IsolatedHarnessProbeRunner`) and component-wise composition (`DefaultHarnessComposer`).
-- **Parallel, Sequential & VoI-Driven Adaptive Recursion**: Supports fixed-budget (`parallel`, `sequential`) and Expected Value of Information (`adaptive`) recursion strategies, plus RRSI/HarnessCompass regularization (`DefaultCandidateRegularizer` with annealed edit budgets, novelty filtering, benchmark-specificity critic, and pruning).
-- **Canonical `H0` Reset & Fail-Closed Admission**: New tasks start from canonical baseline `H0` while retrieving prior experience from `FileHarnessExperienceLibrary`. Global promotion requires passing `FailClosedAdmissionGate` (inaccessible `held_out` split, `RetentionSuiteRunner` capability forgetting checks, Multi-Objective Pareto selection, and HMAC-SHA-256 provenance verification).
+- **Canonical `HarnessManifest` & `EightComponentAdapter` ([`arXiv:2610.14224v1`](https://arxiv.org/html/2610.14224v1))**: Formalizes an execution harness as an immutable, SHA-256 content-addressed, diffable, and revertible artifact covering the 8 conceptual Harness² components (`systemPrompt`, `guardrails`, `memoryPolicy`, `toolGuidance`, `subagents`, `skills`, `scripts`, `plugins`) + 4 Vi-Harness native structural policy surfaces (`contextPolicy`, `routingPolicy`, `verificationPolicy`, `toolSchedulingPolicy`), with bidirectional clean-room JSON interoperability via `EightComponentAdapter`.
+- **Coupled Dual Recursion (`Propose–Probe–Compose` + Canonical `H0` Reset)**:
+  - *Task-Level Recursion*: Diagnoses 30 typed failure signals (`DefaultHarnessDiagnoser`), proposes candidates across a 4-quadrant exploration matrix (`DefaultHarnessProposer`: Invariant vs. Domain-Specific $\times$ Guidance vs. Structural), regularizes edits (`DefaultCandidateRegularizer`), runs isolated paired counterfactual probes (`IsolatedHarnessProbeRunner` & `WorktreeProbeSandboxManager`), analyzes behavioral contrasts (`DefaultBehavioralContrastAnalyzer`), and composes non-conflicting component edits (`DefaultHarnessComposer`).
+  - *Cross-Task Recursion & Canonical `H0` Baseline Reset*: Every new task resets to the canonical baseline `H0` by default to prevent cumulative specialization drift across unrelated tasks, while retrieving structured contrastive experiences from `FileHarnessExperienceLibrary` / `SqliteHarnessExperienceLibrary` and synthesizing zero-search task manifests via `MemoHarnessSynthesizer`.
+- **Immutable `HarnessConstitution` & Formal Verification**: Enforces 4 capability classes (`GUIDANCE`, `DECLARATIVE`, `EXECUTABLE`, `CONSTITUTIONAL`). The optimizer can never weaken `policyEngine`, `auditSigner`, `sandboxConfinement`, `admissionGate`, `rollbackSemantics`, or `testProtectionGate`. `ExecutableSurfaceAstVerifier` statically sandboxes `scripts`/`plugins` ASTs, `StructuralPolicyInvariantVerifier` proves cross-surface policy satisfiability (`INV-POL-01`..`06`), and `RuntimeTemporalContractMonitor` verifies finite-trace $\text{LTL}_f$ contracts (`LTL-01` Verify-After-Write, `LTL-02` Read-Before-Edit, `LTL-03` Bounded-Error-Recovery, `LTL-04` Monotonic-Loop-Hygiene).
+- **Surrogate Acquisition, Epistatic Graphs, Hypervolume Pareto & Quality-Diversity**:
+  - `BayesianHarnessSurrogateModel`: Online Gaussian Process / Kernel Ridge surrogate over 16D structural diff embeddings computing Expected Improvement ($\text{EI}$) and Upper Confidence Bound ($\text{UCB}$) for zero-probe candidate pre-screening.
+  - `EpistaticSurfaceGraphAnalyzer` & `ShapleyComponentAttributor`: Computes coalitional Shapley values ($\phi_j$) and 2nd-order Shapley-Taylor Epistatic Interaction Indices ($\mathcal{I}_{i,j}$) to preserve co-adapted synergistic surface modules and filter antagonistic conflicts.
+  - `HypervolumeParetoSelector` & `MapElitesHarnessArchive`: 5D Halton Dominated Hypervolume contribution ($\Delta\text{HV}$) + Augmented Tchebycheff non-convex Pareto selection paired with a 12-cell `MAP-Elites` behavioral illumination archive.
+- **Statistical Admission Control, Conformal Abstention & Production Resilience**:
+  - `WaldSprtStoppingRule` & `HolmBonferroniMultipleTestingGate`: Sequential Probability Ratio Test early probe termination and Family-Wise Error Rate (FWER) control across candidate hypotheses.
+  - `ConformalAbstentionGuard` & `ConformalUtilityCalibrator`: Split Conformal Prediction non-conformity quantile calibration ($\hat{q}_{1-\alpha}$), $\text{VaR}_\alpha/\text{CVaR}_\alpha$ tail-risk scoring, Honest-by-Construction abstention fallback to `H0`, and deterministic SHA-256 Cryptographic Reproducibility Manifests.
+  - `CanaryDeploymentController`, `LineageBisectionDiagnoser`, `ChaosFaultInjectionTester`, & `CryptographicEvolutionLedger`: Staged production traffic rollout (`10% → 25% → 50% → 100%`) with Page-Hinkley/CUSUM auto-rollback, $\mathcal{O}(\log_2 k)$ lineage regression bisection, deterministic fault-injection resilience testing, and SLSA v1.0 hash-chained provenance.
+
+### Evolution Plane CLI & Programmatic SDK (`vi-harness/evolution`)
 
 ```bash
-# Inspect, validate, diff, or replay a HarnessManifest
+# Inspect, validate, diff, replay, split, transfer, or synthesize a HarnessManifest
 vi-harness harness inspect H0
 vi-harness harness validate H0
 vi-harness harness diff H0 <candidate>
 vi-harness harness replay H0 --dry-run
+vi-harness harness split H0
+vi-harness harness transfer H0 --target-model deepseek-r1
+vi-harness harness synthesize --task "Fix race condition in worker pool" --domain concurrency
 
 # Run Propose-Probe-Compose recursive evolution (opt-in)
 vi-harness evolve <task> --mode adaptive --k 4 --profile balanced --dry-run
 vi-harness evolution inspect <runId>
 vi-harness evolution resume <runId> --dry-run
+vi-harness evolution report <runId> --format md
 vi-harness evolution verify-policies H0
 vi-harness evolution qd-archive
 vi-harness evolution chaos-test H0
 vi-harness evolution ltl-verify
 vi-harness evolution conformal-check H0
 vi-harness evolution ledger-verify
+vi-harness evolution federated-export --workspace vi-harness-prod
+vi-harness evolution export-viforge <runId>
 
 # Query/manage the Experience Library and promote/rollback baselines
 vi-harness library list
 vi-harness library prune --dry-run
+vi-harness library consolidate --dry-run
 vi-harness promote <candidate> --dry-run
 vi-harness rollback-harness H0 --dry-run
+```
+
+```typescript
+import {
+  RecursiveEvolutionEngine,
+  EightComponentAdapter,
+  ConformalAbstentionGuard,
+} from 'vi-harness/evolution';
+
+const engine = new RecursiveEvolutionEngine({ enabledByDefault: true });
+const cycleReport = await engine.runCycle({
+  taskIdentifier: 'optimize-verification-loop',
+  mode: 'adaptive',
+  kCandidates: 4,
+  profile: 'balanced',
+  dryRun: true,
+  evolveTasks: [
+    { taskId: 't1', prompt: 'Add regression test before fixing parser bug', split: 'evolve' },
+  ],
+});
+
+// Export to Google Research Harness² 8-component clean-room bundle
+const adapter = new EightComponentAdapter();
+const harness2Bundle = adapter.exportToEightComponentBundle(cycleReport.finalManifest);
 ```
 
 ---
@@ -622,33 +684,49 @@ vi-harness rollback-harness H0 --dry-run
 
 ```
 Vi-Harness/
+├── ROADMAP.md              # Canonical product & engineering maturity roadmap (Milestones M1–M13)
+├── CITATION.cff            # Academic citation metadata (CFF v1.2.0)
 ├── docs/                   # Complete architectural, audit, and research documentation
-│   ├── architecture/       # Current & target architecture, ADRs, module specifications
+│   ├── REFERENCES.md       # Consolidated academic, governance, and open-source references
+│   ├── architecture/       # Current & target architecture, module map, and 18 ADRs (001–018)
 │   │   ├── CURRENT_ARCHITECTURE.md
 │   │   ├── TARGET_ARCHITECTURE.md
-│   │   └── adr/            # 18 Architecture Decision Records (001–018)
+│   │   ├── MODULE_MAP.md
+│   │   └── adr/            # 18 Architecture Decision Records (including Evolution Plane ADRs 013–018)
 │   ├── audit/              # Traceability matrix, baseline reports, verification results
 │   │   ├── TRACEABILITY_MATRIX.md
 │   │   └── VERIFICATION_REPORT.md
 │   ├── research/           # Literature reviews, reference matrix, comparative analysis
 │   │   ├── RESEARCH_REPORT.md
-│   │   └── REFERENCE_MATRIX.md
-│   ├── security/           # Threat model, STRIDE analysis, OWASP LLM & Evolution mitigations
+│   │   ├── REFERENCE_MATRIX.md
+│   │   └── RELATED_PROJECTS.md
+│   ├── security/           # Threat model, STRIDE analysis, OWASP LLM & Evolution mitigations (E-01..E-22)
 │   │   └── THREAT_MODEL.md
 │   └── testing/            # Test strategy, pyramid breakdown, benchmark protocols
 │       └── TEST_STRATEGY.md
 ├── src/
 │   ├── acp/                # Agent Client Protocol (ACP) JSON-RPC automation server
-│   ├── cli/                # Benchmark, execution, and recursive evolution CLI tools
-│   ├── core/               # Domain interfaces, state machine, evolution domain, plugin engine & guards
-│   ├── di/                 # Dependency injection container and service configuration
-│   ├── infra/              # Infrastructure (Compilers, Evolution Plane, MCP, TUI, Security, Tools, Telemetry)
+│   ├── cli/                # Benchmark, execution (`solve`), and recursive evolution (`evolve`) CLI tools
+│   ├── core/               # Domain interfaces, 14-phase state machine, plugin engine & guards
+│   │   └── evolution/      # Evolution domain (HarnessManifest, HarnessConstitution, Hypothesis, Taxonomy)
+│   ├── di/                 # Dependency injection container (`TOKENS` & `DefaultModule`)
+│   ├── infra/              # Infrastructure subsystems
+│   │   ├── compiler/       # 5-stage progressive context compactor, prefix caching & micro-compactor
+│   │   ├── eval/           # SWE-bench, TBench, Judge-in-the-Loop & EvolutionBenchmarkProtocol
+│   │   ├── evolution/      # 36-module Recursive Evolution Plane (Harness², Surrogate, Epistasis, LTLf, Conformal, QD)
+│   │   ├── git/            # Two-phase Git checkpoint & non-destructive rollback managers
+│   │   ├── mcp/            # Native MCP Server/Client + Evolution MCP tools
+│   │   ├── memory/         # Frozen memory snapshots & failure-aware SkillExtractor
+│   │   ├── security/       # 7-layer PolicyEngine, Shannon entropy scrubber, HMAC signer & AST syntax gate
+│   │   ├── telemetry/      # Meta-Harness JSONL causal trace logger, distiller & SFT/DPO exporter
+│   │   ├── tools/          # Parallel tool executor, spill store & batch semantic AST discovery
+│   │   └── tui/            # Real-time ANSI dashboard & EvolutionTreeRenderer
 │   └── runtime/            # 14-phase state machine iteration loop and runtime engine
 └── tests/
     ├── core/               # Core plugin, session, goal, tools, and guards tests
     ├── fixtures/           # Benchmark and reproduction workspaces
-    ├── integration/        # End-to-end multi-turn workflows, evolution lifecycle, and real git tests
-    └── unit/               # Domain, evolution, mutation-contract, compiler, security, MCP, and tool unit tests
+    ├── integration/        # End-to-end multi-turn workflows, evolution-lifecycle, and real git tests
+    └── unit/               # 209 test files (1,412 passing tests) across runtime, evolution, security & docs
 ```
 
 ---
@@ -672,12 +750,21 @@ We welcome contributions from the community! See [CONTRIBUTING.md](CONTRIBUTING.
 
 ## References & Acknowledgments
 
-Vi-Harness exists because of the groundbreaking work done by these projects. We studied their architectures, learned from their innovations, and synthesized the best patterns into this open-source framework. This is our way of giving back to the community.
+Vi-Harness exists because of the groundbreaking work done by these research labs and open-source projects. We studied their architectures and theoretical formulations, learned from their innovations, and synthesized the best patterns into this open-source framework. This is our way of giving back to the community.
+
+### Harness² (Google Research)
+- **Paper**: *Harness²: Recursive Agent Harnessing for an Open World* (`arXiv:2610.14224v1`)
+- **What we learned**: Coupled dual-recursion architecture combining task-level `Propose–Probe–Compose` cycles with cross-task Experience Library consolidation, explicit 8-component harness tuple formalization (`system_prompt`, `guardrails`, `memory_policy`, `tool_guidance`, `subagents`, `skills`, `scripts`, `plugins`), paired counterfactual probing without ground-truth rubric leakage, and canonical baseline `H0` reset on every new task
+- **Key insight**: Resetting every new task to a canonical baseline `H0` while retrieving verified contrastive experiences from a persistent library prevents cumulative specialization drift (`H0 → H1 → H2`) across unrelated tasks; pairing this recursion with Vi-Harness's `HarnessConstitution` and `FailClosedAdmissionGate` makes self-evolving harnesses safe under zero-trust constraints
+- https://github.com/google-research/harness2
+- https://arxiv.org/html/2610.14224v1
 
 ### Claude Code (Anthropic)
+- **Paper**: *Claude Code: An Agentic Operating System Layer* (`arXiv:2604.14228`)
 - **What we learned**: 5-stage context compaction with cache-aware optimization, 7-layer security perimeter with deny-first policy, MCP server architecture
 - **Key insight**: Context Collapse (read-time virtual projection) avoids mutating message history while still reducing token count
 - https://github.com/anthropics/claude-code
+- https://arxiv.org/abs/2604.14228
 
 ### Aider
 - **What we learned**: PageRank-based repo map using tree-sitter AST, two-phase git commits separating human/AI changes, architect mode with model specialization
@@ -693,21 +780,40 @@ Vi-Harness exists because of the groundbreaking work done by these projects. We 
 - **What we learned**: Frozen memory snapshots for prefix cache optimization, background self-improvement extracting skills from patterns, curator lifecycle (active→stale→archived)
 - **Key insight**: Loading system context once and never mutating it maximizes provider-side KV cache reuse
 - https://github.com/anthropics/hermes
+- https://hermes-agent.org
 
 ### Pi (Cursor)
 - **What we learned**: Tree-structured JSONL sessions with branching at any point, conversation forking for exploration, lightweight persistence format
 - **Key insight**: Conversations are trees, not lists — users naturally want to explore alternatives without losing history
 - https://github.com/anthropics/pi
+- https://pi.dev
 
-### Meta-Harness
+### Meta-Harness (Stanford IRIS Lab)
+- **Paper**: *Meta-Harness: Automated Outer-Loop Agent Engineering* (`arXiv:2603.28052`)
 - **What we learned**: Outer-loop experience storage with full execution traces, non-Markovian cross-run improvement (+15.4pp on benchmarks), filesystem-based trace indexing
 - **Key insight**: Agents that remember past successes AND failures across runs significantly outperform stateless agents
 - https://github.com/meta-harness/meta-harness
+- https://arxiv.org/abs/2603.28052
 
 ### DeepSeek Harness (DeepSeek AI)
 - **What we learned**: "Everything is a Plugin" via capability seams (Service Definition / Provider / Consumer), event-sourced sessions where model history is derived from an append-only log, parallel tool execution with concurrency safety classification, tool-output spill files with retrieval locators, loop-hygiene guards (repeat detection, per-tool timeouts), crash recovery via orphaned-lock detection, and Agent Client Protocol for automation
 - **Key insight**: When every subsystem is a replaceable plugin with reversible effects, users can customize anything without forking — and swapping one provider (e.g., local shell to Docker sandbox) changes the whole product without touching any other code
 - https://github.com/deepseek-ai/deepseek-harness
+
+### Companion Theoretical, Statistical & Governance References (1:1 Pillar Parity)
+
+- **Agentic Harness Engineering (AHE, 2026)** — Component, experience, and decision observability via falsifiable `HarnessChangeHypothesis` contracts (`src/core/evolution/hypothesis.ts`).
+- **HarnessCompass & Regularized Recursive Self-Improvement (RRSI, 2026)** — Component-wise constrained composition (`DefaultHarnessComposer`), temporally annealed edit budgets, novelty scoring, `BenchmarkSpecificityCritic`, `GeneralizationCritic`, and `HarnessPruner` (`DefaultCandidateRegularizer`).
+- **HarnessOpt-Bench, EvoHarnessBench & HarnessTester (2026)** — Held-out target partition admission gating (`FailClosedAdmissionGate`), 11-category capability retention verification (`RetentionSuiteRunner`), matched-budget evaluation (`EvolutionBenchmarkProtocol`), and mutation-contract adequacy testing (`tests/unit/evolution/mutation-contracts.test.ts`).
+- **MemoHarness, Task-CoEvolve, HarnessX & One Recipe, Many Harnesses (2026)** — Dual-layer semantic experience retrieval (`SqliteHarnessExperienceLibrary`, `MemoHarnessSynthesizer`), entropy-driven discriminative task selection (`DiscriminativeTaskSelector`), DPO/GRPO/SPIN post-training co-evolution (`ContrastivePreferenceExporter`, `ViForgeCoEvolutionBridge`), and `TransferableCore` + `EcosystemMargin` decomposition (`EcosystemMarginSplitter`).
+- **Shapley-Taylor Interaction Index (Sundararajan et al., ICML 2020) & Bayesian Optimization (Snoek et al., NeurIPS 2012)** — 2nd-order epistatic surface interaction graphs (`EpistaticSurfaceGraphAnalyzer`), coalitional Shapley attribution (`ShapleyComponentAttributor`), and Gaussian Process Expected Improvement pre-screening (`BayesianHarnessSurrogateModel`).
+- **Finite-Trace Linear Temporal Logic — $\text{LTL}_f$ (De Giacomo & Vardi, IJCAI 2013) & MAP-Elites (Mouret & Clune, 2015, `arXiv:1504.04909`)** — Runtime temporal contract verification (`RuntimeTemporalContractMonitor`) and Quality-Diversity behavioral illumination (`MapElitesHarnessArchive`).
+- **Split Conformal Prediction (Vovk et al., 2005; Angelopoulos & Bates, 2021), Wald SPRT (1945) & Holm-Bonferroni (1979)** — Distribution-free uncertainty intervals and Honest-by-Construction abstention (`ConformalAbstentionGuard`, `ConformalUtilityCalibrator`), sequential early stopping (`WaldSprtStoppingRule`), and FWER multiple-testing control (`HolmBonferroniMultipleTestingGate`).
+- **NIST AI RMF 1.0, OWASP Top 10 for LLM Applications (2025) & SLSA v1.0** — Constitutional safety invariants (`HarnessConstitution`), Shannon entropy credential scrubbing (`SecretScrubber`), and hash-chained provenance attestation (`CryptographicEvolutionLedger`).
+
+### Acknowledgments
+
+We gratefully acknowledge the researchers, engineers, and open-source maintainers behind **Google Research (`harness2` — `https://github.com/google-research/harness2` and `arXiv:2610.14224v1`)**, **Stanford IRIS Lab (`Meta-Harness` — `arXiv:2603.28052`)**, **Anthropic (`Claude Code` — `arXiv:2604.14228`)**, **Paul Gauthier and the Aider community (`Aider`)**, **Cline and Prime Intellect (`Prime Agent`)**, **Nous Research (`Hermes`)**, **Pi (`pi.dev`)**, and **DeepSeek AI (`DeepSeek Harness`)** whose foundational publications and open-source systems inspired Vi-Harness.
 
 ---
 

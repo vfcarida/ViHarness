@@ -93,6 +93,16 @@ describe('README Attribution & Reference Documentation Suite — P015', () => {
         org: 'DeepSeek AI',
         url: 'https://github.com/deepseek-ai/deepseek-harness',
       },
+      {
+        name: 'Harness²',
+        org: 'Google Research',
+        url: 'https://github.com/google-research/harness2',
+      },
+      {
+        name: 'arXiv:2610.14224v1',
+        org: 'Google Research',
+        url: 'https://arxiv.org/html/2610.14224v1',
+      },
     ];
 
     expect(readmeContent).toContain('## References & Acknowledgments');
